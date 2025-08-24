@@ -1,0 +1,43 @@
+[
+  {
+    "id": "jefferson-injury",
+    "title": "Justin Jefferson Ruled Out for Week 8 with Hamstring Injury",
+    "tag": "injury",
+    "summary": "Vikings WR will miss at least one game. Jordan Addison becomes must-start in all formats, with Jalen Nailor also seeing increased targets. Consider prioritizing Addison on waivers if available.",
+    "timestamp": "2 min ago",
+    "impact": "High",
+    "timeframe": "2-3 weeks"
+  },
+  {
+    "id": "waddle-role",
+    "title": "Dolphins Increase Jaylen Waddle's Slot Usage vs Patriots Defense",
+    "tag": "role",
+    "summary": "Miami is expected to deploy Waddle more in the slot to exploit New England's weak slot coverage (allowing 8.2 YPT). Start Waddle with confidence this week over similarly ranked options.",
+    "timestamp": "15 min ago",
+    "impact": "Medium"
+  },
+  {
+    "id": "cardinals-defense",
+    "title": "Cardinals Defense Creates RB1 Opportunity for Opposing Backs",
+    "tag": "matchup",
+    "summary": "Arizona has allowed 150+ rushing yards in three straight games. Any RB facing them this week should be considered for starting lineups, making Zamir White a priority waiver pickup.",
+    "timestamp": "32 min ago",
+    "impact": "Medium"
+  },
+  {
+    "id": "higbee-redzone",
+    "title": "Rams Increase Tyler Higbee's Red Zone Targets After Kupp Injury",
+    "tag": "role",
+    "summary": "With Cooper Kupp sidelined, Higbee has seen 4 red zone targets over the last two games. Consider him a streaming option at the thin TE position, especially in favorable matchups.",
+    "timestamp": "1 hr ago",
+    "impact": "Low"
+  },
+  {
+    "id": "weather-alert",
+    "title": "Weather Alert: High Winds Expected for Bills vs Jets Monday Night",
+    "tag": "other",
+    "summary": "20+ mph winds forecasted for Monday's game could impact the passing game. Consider benching Josh Allen for a safer QB option and prioritize rushing attacks over air yards.",
+    "timestamp": "2 hr ago",
+    "impact": "Medium"
+  }
+]

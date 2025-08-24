@@ -1,0 +1,65 @@
+{
+  "candidates": [
+    {
+      "id": "jordan-addison",
+      "name": "Jordan Addison",
+      "team": "MIN",
+      "pos": "WR",
+      "avail": 87,
+      "proj": 12.4,
+      "roleTrend": "up",
+      "notes": "Rising role with Jefferson out"
+    },
+    {
+      "id": "zamir-white",
+      "name": "Zamir White",
+      "team": "LV",
+      "pos": "RB",
+      "avail": 73,
+      "proj": 10.8,
+      "roleTrend": "flat",
+      "notes": "Splitting carries with Jacobs"
+    },
+    {
+      "id": "tyler-higbee",
+      "name": "Tyler Higbee",
+      "team": "LAR",
+      "pos": "TE",
+      "avail": 91,
+      "proj": 8.2,
+      "roleTrend": "up",
+      "notes": "Consistent target in red zone"
+    }
+  ],
+  "drops": [
+    {
+      "id": "isaiah-pacheco",
+      "name": "Isaiah Pacheco",
+      "team": "KC",
+      "pos": "RB",
+      "status": "IR"
+    },
+    {
+      "id": "elijah-moore",
+      "name": "Elijah Moore",
+      "team": "CLE",
+      "pos": "WR"
+    }
+  ],
+  "faab": [
+    {
+      "id": "jordan-addison",
+      "min": 15,
+      "likely": 20,
+      "max": 25,
+      "rationale": "Strong upside with Jefferson injured"
+    },
+    {
+      "id": "zamir-white",
+      "min": 8,
+      "likely": 12,
+      "max": 15,
+      "rationale": "Handcuff with standalone value"
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "input": { 
+    "playerAId": "nfl.p.1234", 
+    "playerBId": "nfl.p.5678", 
+    "week": 8, 
+    "scoring": "half_ppr" 
+  },
+  "facts": {
+    "playerA": { 
+      "name": "Jaylen Waddle", 
+      "team": "MIA", 
+      "pos": "WR", 
+      "opp": "NE", 
+      "proj": 14.8, 
+      "last4": [12.1, 16.8, 8.4, 14.0], 
+      "snap": 0.82, 
+      "tgtShare": 0.24, 
+      "inj": "Healthy" 
+    },
+    "playerB": { 
+      "name": "Courtland Sutton", 
+      "team": "DEN", 
+      "pos": "WR", 
+      "opp": "CAR",  
+      "proj": 12.6, 
+      "last4": [9.1, 11.0, 18.3, 6.2], 
+      "snap": 0.75, 
+      "tgtShare": 0.19, 
+      "inj": "Questionable" 
+    }
+  },
+  "sos": { 
+    "A": 3.2, 
+    "B": 4.1 
+  },
+  "result": {
+    "recommendation": "A",
+    "confidence": 0.78,
+    "reasons": [
+      "Higher target share (24% vs 19%)",
+      "Favorable matchup vs NE secondary", 
+      "Sutton questionable with ankle injury"
+    ],
+    "pivots": ["Nico Collins", "Zay Flowers"]
+  }
+}
