@@ -3,7 +3,12 @@ import { StartSitInput, StartSitResult, WaiverItem, PlayerSummary, FAABGuidance,
 export async function comparePlayers(input: StartSitInput): Promise<StartSitResult & {facts: any; sos: any; input: StartSitInput}> {
   const mockData = await import("../mocks/playerCompare.mock.json");
   return new Promise((resolve) => {
-    setTimeout(() => resolve(mockData.default), 500);
+    setTimeout(() => resolve({
+      ...mockData.default.result,
+      facts: mockData.default.facts,
+      sos: mockData.default.sos,
+      input: mockData.default.input
+    }), 500);
   });
 }
 

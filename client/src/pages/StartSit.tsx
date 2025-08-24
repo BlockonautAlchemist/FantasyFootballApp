@@ -106,14 +106,14 @@ export default function StartSit() {
                   START {result.recommendation === "A" ? result.facts.playerA.name.toUpperCase() : result.facts.playerB.name.toUpperCase()}
                 </div>
                 <div className="text-2xl font-bold text-slate-800 mb-1" data-testid="text-confidence">
-                  {Math.round(result.result.confidence * 100)}%
+                  {Math.round(result.confidence * 100)}%
                 </div>
                 <div className="text-sm text-slate-600">Confidence</div>
               </div>
               <div className="space-y-3">
                 <h4 className="font-medium text-slate-800">Key Reasons:</h4>
                 <ul className="text-sm text-slate-600 space-y-2">
-                  {result.result.reasons.map((reason, index) => (
+                  {result.reasons?.map((reason: string, index: number) => (
                     <li key={index} className="flex items-start">
                       <i className="fas fa-check text-secondary text-xs mt-1 mr-2"></i>
                       {reason}
@@ -121,11 +121,11 @@ export default function StartSit() {
                   ))}
                 </ul>
               </div>
-              {result.result.pivots && (
+              {result.pivots && (
                 <div className="mt-6 pt-4 border-t border-gray-200">
                   <h4 className="font-medium text-slate-800 mb-2">Pivot Options:</h4>
                   <div className="flex flex-wrap gap-2">
-                    {result.result.pivots.map((pivot, index) => (
+                    {result.pivots?.map((pivot: string, index: number) => (
                       <span key={index} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
                         {pivot}
                       </span>
@@ -141,7 +141,7 @@ export default function StartSit() {
             <ComparisonPanel 
               playerA={result.facts.playerA}
               playerB={result.facts.playerB}
-              recommendation={result.result.recommendation}
+              recommendation={result.recommendation}
             />
           </div>
         </div>

@@ -25,9 +25,9 @@ export default function Navigation() {
           <div className="hidden md:flex items-center space-x-6">
             {navigationItems.map(({ href, label }) => (
               <Link key={href} href={href}>
-                <a
+                <span
                   className={cn(
-                    "transition-colors",
+                    "transition-colors cursor-pointer",
                     location === href
                       ? "text-primary font-medium"
                       : "text-slate-600 hover:text-primary"
@@ -35,7 +35,7 @@ export default function Navigation() {
                   data-testid={`nav-${label.toLowerCase().replace("/", "-")}`}
                 >
                   {label}
-                </a>
+                </span>
               </Link>
             ))}
           </div>
