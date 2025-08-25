@@ -1,5 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
+import UserBadge from "@/components/UserBadge";
 
 const navigationItems = [
   { href: "/", label: "Dashboard" },
@@ -9,6 +10,7 @@ const navigationItems = [
   { href: "/lineup", label: "Lineup" },
   { href: "/sos", label: "SoS" },
   { href: "/news", label: "News" },
+  { href: "/connect", label: "Connect" },
 ];
 
 export default function Navigation() {
@@ -39,9 +41,12 @@ export default function Navigation() {
               </Link>
             ))}
           </div>
-          <button className="md:hidden p-2" data-testid="mobile-menu">
-            <i className="fas fa-bars text-slate-600"></i>
-          </button>
+          <div className="flex items-center space-x-4">
+            <UserBadge />
+            <button className="md:hidden p-2" data-testid="mobile-menu">
+              <i className="fas fa-bars text-slate-600"></i>
+            </button>
+          </div>
         </div>
       </div>
     </nav>

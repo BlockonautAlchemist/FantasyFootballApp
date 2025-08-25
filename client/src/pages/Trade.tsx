@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import PageHeader from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
+import ConnectionCallout from "@/components/ConnectionCallout";
 import { analyzeTrade } from "@/services/api";
 import { PlayerSummary } from "@/services/types";
 
@@ -49,6 +50,11 @@ export default function Trade() {
         title="Trade Analyzer" 
         subtitle="Evaluate trade offers with value analysis and risk assessment" 
       />
+
+      {/* Connection Status */}
+      <div className="mb-6">
+        <ConnectionCallout />
+      </div>
 
       {/* Trade Input */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">

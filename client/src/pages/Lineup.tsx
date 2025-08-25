@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import PageHeader from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
+import ConnectionCallout from "@/components/ConnectionCallout";
 import { optimizeLineup } from "@/services/api";
 
 export default function Lineup() {
@@ -42,6 +43,11 @@ export default function Lineup() {
         title="Lineup Optimizer" 
         subtitle="Get optimal starting lineup with pivot suggestions" 
       />
+
+      {/* Connection Status */}
+      <div className="mb-6">
+        <ConnectionCallout />
+      </div>
 
       {/* My Roster */}
       <div className="bg-surface rounded-lg border border-gray-200 p-6 mb-8">

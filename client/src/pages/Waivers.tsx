@@ -4,6 +4,7 @@ import PageHeader from "@/components/PageHeader";
 import TierBadge from "@/components/TierBadge";
 import RiskChip from "@/components/RiskChip";
 import FAABSlider from "@/components/FAABSlider";
+import ConnectionCallout from "@/components/ConnectionCallout";
 import { Button } from "@/components/ui/button";
 import { getWaivers } from "@/services/api";
 
@@ -37,6 +38,11 @@ export default function Waivers() {
         title="Waiver Wire" 
         subtitle="Top available players with FAAB guidance and drop suggestions" 
       />
+
+      {/* Connection Status */}
+      <div className="mb-6">
+        <ConnectionCallout />
+      </div>
 
       {/* Filters */}
       <div className="bg-surface rounded-lg border border-gray-200 p-4 mb-6">

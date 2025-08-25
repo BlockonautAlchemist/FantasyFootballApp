@@ -1,0 +1,156 @@
+[
+  {
+    "playerId": "nfl.p.32671",
+    "playerKey": "414.p.32671",
+    "name": "Josh Allen",
+    "position": "QB",
+    "team": "BUF",
+    "status": "Healthy",
+    "isStarting": true,
+    "projectedPoints": 22.4,
+    "averagePoints": 19.8
+  },
+  {
+    "playerId": "nfl.p.30123",
+    "playerKey": "414.p.30123", 
+    "name": "Christian McCaffrey",
+    "position": "RB",
+    "team": "SF",
+    "status": "Healthy",
+    "isStarting": true,
+    "projectedPoints": 18.7,
+    "averagePoints": 16.2
+  },
+  {
+    "playerId": "nfl.p.31045",
+    "playerKey": "414.p.31045",
+    "name": "Saquon Barkley", 
+    "position": "RB",
+    "team": "PHI",
+    "status": "Healthy",
+    "isStarting": true,
+    "projectedPoints": 16.3,
+    "averagePoints": 14.8
+  },
+  {
+    "playerId": "nfl.p.33086",
+    "playerKey": "414.p.33086",
+    "name": "Tyreek Hill",
+    "position": "WR", 
+    "team": "MIA",
+    "status": "Healthy",
+    "isStarting": true,
+    "projectedPoints": 15.9,
+    "averagePoints": 14.1
+  },
+  {
+    "playerId": "nfl.p.30972",
+    "playerKey": "414.p.30972",
+    "name": "Stefon Diggs",
+    "position": "WR",
+    "team": "HOU", 
+    "status": "Healthy",
+    "isStarting": true,
+    "projectedPoints": 14.6,
+    "averagePoints": 13.3
+  },
+  {
+    "playerId": "nfl.p.28389",
+    "playerKey": "414.p.28389",
+    "name": "Travis Kelce",
+    "position": "TE",
+    "team": "KC",
+    "status": "Healthy", 
+    "isStarting": true,
+    "projectedPoints": 12.8,
+    "averagePoints": 11.4
+  },
+  {
+    "playerId": "nfl.p.31902",
+    "playerKey": "414.p.31902",
+    "name": "Courtland Sutton",
+    "position": "WR",
+    "team": "DEN",
+    "status": "Questionable",
+    "isStarting": true,
+    "projectedPoints": 11.2,
+    "averagePoints": 10.6
+  },
+  {
+    "playerId": "nfl.p.100025",
+    "playerKey": "414.p.100025",
+    "name": "Philadelphia DST",
+    "position": "DEF",
+    "team": "PHI",
+    "status": "Healthy",
+    "isStarting": true,
+    "projectedPoints": 8.4,
+    "averagePoints": 7.2
+  },
+  {
+    "playerId": "nfl.p.24171",
+    "playerKey": "414.p.24171", 
+    "name": "Justin Tucker",
+    "position": "K",
+    "team": "BAL",
+    "status": "Healthy",
+    "isStarting": true,
+    "projectedPoints": 7.8,
+    "averagePoints": 8.1
+  },
+  {
+    "playerId": "nfl.p.32600",
+    "playerKey": "414.p.32600",
+    "name": "Tua Tagovailoa",
+    "position": "QB", 
+    "team": "MIA",
+    "status": "Healthy",
+    "isStarting": false,
+    "projectedPoints": 16.2,
+    "averagePoints": 15.1
+  },
+  {
+    "playerId": "nfl.p.33593",
+    "playerKey": "414.p.33593",
+    "name": "Rachaad White",
+    "position": "RB",
+    "team": "TB", 
+    "status": "Healthy",
+    "isStarting": false,
+    "projectedPoints": 11.4,
+    "averagePoints": 9.8
+  },
+  {
+    "playerId": "nfl.p.34567",
+    "playerKey": "414.p.34567",
+    "name": "Jordan Addison",
+    "position": "WR",
+    "team": "MIN",
+    "status": "Healthy",
+    "isStarting": false,
+    "projectedPoints": 10.2,
+    "averagePoints": 8.9
+  },
+  {
+    "playerId": "nfl.p.33821",
+    "playerKey": "414.p.33821", 
+    "name": "Tyler Higbee",
+    "position": "TE",
+    "team": "LAR",
+    "status": "Healthy",
+    "isStarting": false,
+    "projectedPoints": 7.6,
+    "averagePoints": 6.8
+  },
+  {
+    "playerId": "nfl.p.34892",
+    "playerKey": "414.p.34892",
+    "name": "Romeo Doubs",
+    "position": "WR", 
+    "team": "GB",
+    "status": "Healthy",
+    "isStarting": false,
+    "projectedPoints": 8.1,
+    "averagePoints": 7.3
+  }
+]

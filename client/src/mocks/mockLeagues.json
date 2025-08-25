@@ -1,0 +1,26 @@
+[
+  {
+    "leagueKey": "414.l.123456",
+    "leagueName": "Championship Dynasty League",
+    "season": "2024",
+    "teamKey": "414.l.123456.t.1",
+    "teamName": "Blockonaut's Ballers",
+    "teamLogo": ""
+  },
+  {
+    "leagueKey": "414.l.789012",
+    "leagueName": "Friends & Family Football",
+    "season": "2024",
+    "teamKey": "414.l.789012.t.4",
+    "teamName": "Fantasy Fanatics",
+    "teamLogo": ""
+  },
+  {
+    "leagueKey": "414.l.345678",
+    "leagueName": "Office League 2024",
+    "season": "2024",
+    "teamKey": "414.l.345678.t.7",
+    "teamName": "The Underdogs",
+    "teamLogo": ""
+  }
+]

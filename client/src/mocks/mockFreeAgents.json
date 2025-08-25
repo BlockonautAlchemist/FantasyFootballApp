@@ -1,0 +1,122 @@
+[
+  {
+    "playerId": "nfl.p.34123",
+    "playerKey": "414.p.34123",
+    "name": "Jordan Addison",
+    "position": "WR", 
+    "team": "MIN",
+    "status": "Healthy",
+    "available": 87,
+    "projectedPoints": 12.4,
+    "ownership": 13,
+    "addDrops": 45
+  },
+  {
+    "playerId": "nfl.p.33892",
+    "playerKey": "414.p.33892",
+    "name": "Zamir White",
+    "position": "RB",
+    "team": "LV",
+    "status": "Healthy", 
+    "available": 73,
+    "projectedPoints": 10.8,
+    "ownership": 27,
+    "addDrops": 32
+  },
+  {
+    "playerId": "nfl.p.29834",
+    "playerKey": "414.p.29834",
+    "name": "Tyler Higbee",
+    "position": "TE",
+    "team": "LAR",
+    "status": "Healthy",
+    "available": 91,
+    "projectedPoints": 8.2,
+    "ownership": 9,
+    "addDrops": 18
+  },
+  {
+    "playerId": "nfl.p.35067",
+    "playerKey": "414.p.35067",
+    "name": "Jalen Nailor",
+    "position": "WR",
+    "team": "MIN", 
+    "status": "Healthy",
+    "available": 95,
+    "projectedPoints": 7.8,
+    "ownership": 5,
+    "addDrops": 23
+  },
+  {
+    "playerId": "nfl.p.34521",
+    "playerKey": "414.p.34521",
+    "name": "Justice Hill",
+    "position": "RB",
+    "team": "BAL",
+    "status": "Healthy",
+    "available": 82,
+    "projectedPoints": 6.4,
+    "ownership": 18,
+    "addDrops": 15
+  },
+  {
+    "playerId": "nfl.p.32987",
+    "playerKey": "414.p.32987", 
+    "name": "Hunter Renfrow",
+    "position": "WR",
+    "team": "LV",
+    "status": "Healthy",
+    "available": 89,
+    "projectedPoints": 6.1,
+    "ownership": 11,
+    "addDrops": 8
+  },
+  {
+    "playerId": "nfl.p.31456",
+    "playerKey": "414.p.31456",
+    "name": "Daniel Carlson",
+    "position": "K",
+    "team": "LV",
+    "status": "Healthy",
+    "available": 76,
+    "projectedPoints": 8.9,
+    "ownership": 24,
+    "addDrops": 12
+  },
+  {
+    "playerId": "nfl.p.100089",
+    "playerKey": "414.p.100089",
+    "name": "Las Vegas DST",
+    "position": "DEF", 
+    "team": "LV",
+    "status": "Healthy",
+    "available": 68,
+    "projectedPoints": 7.2,
+    "ownership": 32,
+    "addDrops": 28
+  },
+  {
+    "playerId": "nfl.p.33178",
+    "playerKey": "414.p.33178",
+    "name": "Gus Edwards",
+    "position": "RB",
+    "team": "LAC",
+    "status": "Healthy",
+    "available": 84,
+    "projectedPoints": 5.8,
+    "ownership": 16,
+    "addDrops": 9
+  },
+  {
+    "playerId": "nfl.p.34789",
+    "playerKey": "414.p.34789",
+    "name": "Quentin Johnston",
+    "position": "WR",
+    "team": "LAC", 
+    "status": "Healthy",
+    "available": 91,
+    "projectedPoints": 5.4,
+    "ownership": 9,
+    "addDrops": 7
+  }
+]

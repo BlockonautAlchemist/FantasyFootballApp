@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import PageHeader from "@/components/PageHeader";
 import SoSHeatmap from "@/components/SoSHeatmap";
 import Callout from "@/components/Callout";
+import ConnectionCallout from "@/components/ConnectionCallout";
 import { Button } from "@/components/ui/button";
 import { getSoS } from "@/services/api";
 
@@ -20,6 +21,11 @@ export default function SoS() {
         title="Strength of Schedule" 
         subtitle="View matchup difficulty by position and week" 
       />
+
+      {/* Connection Status */}
+      <div className="mb-6">
+        <ConnectionCallout />
+      </div>
 
       {/* Controls */}
       <div className="bg-surface rounded-lg border border-gray-200 p-4 mb-6">

@@ -135,4 +135,24 @@
   .sos-very-hard { 
     @apply bg-red-200 text-red-900; 
   }
+
+  .chip {
+    @apply px-3 py-1 rounded-full text-xs font-medium;
+  }
+  
+  .chip-gray {
+    @apply bg-gray-100 text-gray-700;
+  }
+  
+  .chip-success {
+    @apply bg-green-100 text-green-700;
+  }
+  
+  .chip-warning {
+    @apply bg-yellow-100 text-yellow-700;
+  }
+  
+  .btn-outline {
+    @apply border border-gray-300 bg-white text-gray-700 rounded px-4 py-2 hover:bg-gray-50 transition-colors;
+  }
 }

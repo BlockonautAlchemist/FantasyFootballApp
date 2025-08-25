@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import PageHeader from "@/components/PageHeader";
 import PlayerSearch from "@/components/PlayerSearch";
 import ComparisonPanel from "@/components/ComparisonPanel";
+import ConnectionCallout from "@/components/ConnectionCallout";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { comparePlayers } from "@/services/api";
@@ -36,6 +37,11 @@ export default function StartSit() {
         title="Start/Sit Analyzer" 
         subtitle="Compare two players and get a data-driven recommendation" 
       />
+
+      {/* Connection Status */}
+      <div className="mb-6">
+        <ConnectionCallout />
+      </div>
 
       {/* Input Form */}
       <div className="bg-surface rounded-lg border border-gray-200 p-6 mb-8">

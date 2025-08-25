@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import PageHeader from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
+import ConnectionCallout from "@/components/ConnectionCallout";
 import { getNews } from "@/services/api";
 import { NewsItem } from "@/services/types";
 
@@ -44,6 +45,11 @@ export default function News() {
         title="Fantasy News" 
         subtitle="Latest updates and actionable insights" 
       />
+
+      {/* Connection Status */}
+      <div className="mb-6">
+        <ConnectionCallout />
+      </div>
 
       {/* News Filter */}
       <div className="bg-surface rounded-lg border border-gray-200 p-4 mb-6">

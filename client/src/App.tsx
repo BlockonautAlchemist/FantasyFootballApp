@@ -3,6 +3,7 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { LeagueProvider } from "@/context/LeagueContext";
 import Navigation from "@/components/Navigation";
 import Dashboard from "@/pages/Dashboard";
 import StartSit from "@/pages/StartSit";
@@ -11,6 +12,7 @@ import Trade from "@/pages/Trade";
 import Lineup from "@/pages/Lineup";
 import SoS from "@/pages/SoS";
 import News from "@/pages/News";
+import Connect from "@/pages/Connect";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -26,6 +28,7 @@ function Router() {
           <Route path="/lineup" component={Lineup} />
           <Route path="/sos" component={SoS} />
           <Route path="/news" component={News} />
+          <Route path="/connect" component={Connect} />
           <Route component={NotFound} />
         </Switch>
       </div>
@@ -36,10 +39,12 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Router />
-      </TooltipProvider>
+      <LeagueProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Router />
+        </TooltipProvider>
+      </LeagueProvider>
     </QueryClientProvider>
   );
 }

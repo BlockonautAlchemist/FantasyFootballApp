@@ -1,0 +1,168 @@
+Create a frontend-only web app for a Fantasy Assistant (FantasyPros-style, no drafting). Use React + Vite + TypeScript + TailwindCSS. Do not add a backend. All “Yahoo” features are mocked and stateful via localStorage so I can export to Cursor later and make it functional.
+
+Pages (client-side routing)
+
+/ Dashboard – shows “This Week’s Top Recommendation” card and quick links.
+
+/start-sit
+
+/waivers
+
+/trade
+
+/lineup
+
+/sos
+
+/news
+
+/connect (new) – UI for “Connect Yahoo” and league selection (mocked).
+
+Global layout & nav
+
+Top nav with: app name, links to all pages, connection badge on the right:
+
+If not connected: gray chip “Not Linked” + “Connect” button.
+
+If connected: green chip Linked: <leagueName> with a small “Change” button that routes to /connect.
+
+State & mocks (no backend)
+
+Implement a UserContext/LeagueContext that persists to localStorage:
+
+connected: boolean
+
+user: { id: string; displayName: string } | null
+
+linkedLeague: { leagueKey: string; leagueName: string; teamKey?: string; teamName?: string } | null
+
+Add mock data:
+
+mockLeagues.json (array of 2–3 leagues).
+
+mockRoster.json, mockFreeAgents.json for future pages (used only to populate tables).
+
+Add an Auth/Linking service with stubbed functions that only touch localStorage:
+
+startYahooConnect() → simulate redirect by setting a “connecting” flag and pushing to /connect.
+
+completeYahooConnect() → sets connected=true and mock user {id:"demo",displayName:"Blockonaut"}.
+
+listYahooLeagues() → returns mockLeagues.json.
+
+setLinkedLeague(league) → saves to localStorage & context.
+
+disconnect() → clears everything.
+
+Components
+
+ConnectYahooButton.tsx – large button; in this UI-only version it calls completeYahooConnect() and reveals the LeaguePicker.
+
+LeaguePicker.tsx – grid of cards (leagueName, season, teamName) with a “Select” button that calls setLinkedLeague.
+
+UserBadge.tsx – shows connection chip + avatar initials.
+
+Generic UI helpers:
+
+Callout (info/success/warn)
+
+PlayerCard, ComparisonPanel, TierBadge, RiskChip, FAABSlider, SoSHeatmap (simple, data from mocks)
+
+Add minimal utility classes in Tailwind:
+
+.btn primary, .btn-outline, .chip, .input.
+
+Page behavior
+
+/connect
+
+Section 1: “Connect your Yahoo account” with ConnectYahooButton.
+
+After “connected”, Section 2 shows LeaguePicker fed by listYahooLeagues().
+
+After selecting a league, show success callout and a “Go to Dashboard” button.
+
+All other pages
+
+If not connected or no league picked, show an inline callout with a link to /connect and still render demo tables using mocks.
+
+If connected + league set, show a small banner “Demo mode: data is mocked. Real data will load after you connect the backend.”
+
+Services (UI contracts for later)
+
+Create src/services/api.ts that exports front-end contracts you’ll keep when moving to Cursor:
+
+// These currently return mocks; later replace with real HTTP calls.
+export async function getMe() {/* read from localStorage */}
+export async function listYahooLeagues() {/* return mockLeagues */}
+export async function setYahooLeague(payload:{leagueKey:string; leagueName:string; teamKey?:string; teamName?:string}) {/* persist */}
+export async function getRoster(week:number) {/* return mockRoster */}
+export async function getFreeAgents(pos?:string) {/* return mockFreeAgents */}
+
+
+Keep signatures stable so the Cursor backend can drop in with zero UI changes.
+
+File structure
+/src
+  /app
+    main.tsx
+    router.tsx
+    layout/Nav.tsx
+  /context
+    LeagueContext.tsx
+  /pages
+    Dashboard.tsx
+    StartSit.tsx
+    Waivers.tsx
+    Trade.tsx
+    Lineup.tsx
+    SoS.tsx
+    News.tsx
+    Connect.tsx
+  /components
+    ConnectYahooButton.tsx
+    LeaguePicker.tsx
+    UserBadge.tsx
+    Callout.tsx
+    PlayerCard.tsx
+    ComparisonPanel.tsx
+    TierBadge.tsx
+    RiskChip.tsx
+    FAABSlider.tsx
+    SoSHeatmap.tsx
+  /services
+    api.ts
+    auth.ts  // localStorage-only stubs used by Connect page
+  /mocks
+    mockLeagues.json
+    mockRoster.json
+    mockFreeAgents.json
+index.css
+
+Styling & UX polish
+
+Clean, modern Tailwind look.
+
+Dashboard hero card shows a sample “Start/Sit” recommendation (pulled from a tiny local mock in Dashboard.tsx).
+
+Each tool page uses simple tables/cards with data from mocks and a top “Linked: …” chip if connected.
+
+Dark/light ready (but keep default light).
+
+Acceptance criteria
+
+App runs with npm run dev.
+
+/connect: clicking Connect with Yahoo immediately moves to the league picker (mock) and allows selecting a league; selection persists across reloads via localStorage.
+
+Top nav updates to show Linked: <leagueName> once selected; “Change” returns to /connect.
+
+All feature pages render with mocks and show a non-blocking callout if not linked.
+
+No external network calls, no backend code.
+
+Finally, include a README note:
+
+“This is UI-only. In Cursor, replace services/api.ts and services/auth.ts with real calls (Next.js API or Express). Keep function signatures identical. Use the stored league info from LeagueContext for requests.”
+
+Please generate all files and sensible placeholder data so the project is export-ready.

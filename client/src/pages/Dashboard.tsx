@@ -1,5 +1,6 @@
 import { Link } from "wouter";
 import PageHeader from "@/components/PageHeader";
+import ConnectionCallout from "@/components/ConnectionCallout";
 
 const quickActions = [
   {
@@ -77,6 +78,11 @@ export default function Dashboard() {
         title="Dashboard" 
         subtitle="Your fantasy football command center for Week 8" 
       />
+
+      {/* Connection Status */}
+      <div className="mb-6">
+        <ConnectionCallout />
+      </div>
 
       {/* This Week Callout */}
       <div className="bg-gradient-to-r from-primary to-blue-600 text-white rounded-lg p-6 mb-8">

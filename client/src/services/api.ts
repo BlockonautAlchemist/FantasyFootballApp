@@ -1,5 +1,45 @@
 import { StartSitInput, StartSitResult, WaiverItem, PlayerSummary, FAABGuidance, TradeResult, LineupRec, SoSCell, NewsItem } from "./types";
 
+// Frontend contracts for API calls - signatures remain stable when moving to real backend
+
+export async function getMe(): Promise<{id: string; displayName: string} | null> {
+  // Currently reads from localStorage, replace with HTTP call to /api/me
+  const user = localStorage.getItem('fantasy-assistant-user');
+  return user ? JSON.parse(user) : null;
+}
+
+export async function listYahooLeagues(): Promise<any[]> {
+  // Currently returns mocks, replace with HTTP call to /api/yahoo/leagues
+  const mockData = await import("../mocks/mockLeagues.json");
+  return mockData.default;
+}
+
+export async function setYahooLeague(payload: {
+  leagueKey: string; 
+  leagueName: string; 
+  teamKey?: string; 
+  teamName?: string;
+}): Promise<void> {
+  // Currently persists to localStorage, replace with HTTP call to /api/yahoo/league
+  localStorage.setItem('fantasy-assistant-league', JSON.stringify(payload));
+}
+
+export async function getRoster(week: number): Promise<any[]> {
+  // Currently returns mocks, replace with HTTP call to /api/yahoo/roster?week={week}
+  const mockData = await import("../mocks/mockRoster.json");
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(mockData.default), 300);
+  });
+}
+
+export async function getFreeAgents(pos?: string): Promise<any[]> {
+  // Currently returns mocks, replace with HTTP call to /api/yahoo/free-agents?pos={pos}
+  const mockData = await import("../mocks/mockFreeAgents.json");
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(mockData.default.filter(p => !pos || p.position === pos)), 400);
+  });
+}
+
 export async function comparePlayers(input: StartSitInput): Promise<StartSitResult & {facts: any; sos: any; input: StartSitInput}> {
   const mockData = await import("../mocks/playerCompare.mock.json");
   return new Promise((resolve) => {
