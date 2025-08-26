@@ -1,0 +1,1155 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fantasy Football Assistant - MVP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'primary': '#1D4ED8',
+                        'secondary': '#059669', 
+                        'danger': '#DC2626',
+                        'warning': '#D97706',
+                        'surface': '#FFFFFF',
+                        'background': '#F8FAFC'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .input {
+            @apply border border-gray-300 rounded px-3 py-2 w-full focus:ring-2 focus:ring-primary focus:border-primary;
+        }
+        .btn {
+            @apply bg-black text-white rounded px-4 py-2 disabled:opacity-50 hover:bg-gray-800 transition-colors;
+        }
+        .btn-primary {
+            @apply bg-primary text-white rounded px-4 py-2 disabled:opacity-50 hover:bg-blue-700 transition-colors;
+        }
+        .gradient-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .tier-1 { @apply bg-green-100 text-green-800 border border-green-200; }
+        .tier-2 { @apply bg-blue-100 text-blue-800 border border-blue-200; }
+        .tier-3 { @apply bg-yellow-100 text-yellow-800 border border-yellow-200; }
+        .tier-4 { @apply bg-orange-100 text-orange-800 border border-orange-200; }
+        .tier-5 { @apply bg-red-100 text-red-800 border border-red-200; }
+        .risk-low { @apply bg-green-100 text-green-700; }
+        .risk-med { @apply bg-yellow-100 text-yellow-700; }
+        .risk-high { @apply bg-red-100 text-red-700; }
+        .sos-very-easy { @apply bg-green-200 text-green-900; }
+        .sos-easy { @apply bg-green-100 text-green-800; }
+        .sos-neutral { @apply bg-gray-100 text-gray-800; }
+        .sos-hard { @apply bg-red-100 text-red-800; }
+        .sos-very-hard { @apply bg-red-200 text-red-900; }
+    </style>
+</head>
+<body class="bg-background font-sans">
+    <!-- Navigation -->
+    <nav class="bg-surface border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-football-ball text-primary text-xl"></i>
+                    <h1 class="text-xl font-bold text-slate-800">Fantasy Assistant</h1>
+                </div>
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="#dashboard" class="nav-link active text-primary font-medium">Dashboard</a>
+                    <a href="#start-sit" class="nav-link text-slate-600 hover:text-primary transition-colors">Start/Sit</a>
+                    <a href="#waivers" class="nav-link text-slate-600 hover:text-primary transition-colors">Waivers</a>
+                    <a href="#trade" class="nav-link text-slate-600 hover:text-primary transition-colors">Trade</a>
+                    <a href="#lineup" class="nav-link text-slate-600 hover:text-primary transition-colors">Lineup</a>
+                    <a href="#sos" class="nav-link text-slate-600 hover:text-primary transition-colors">SoS</a>
+                    <a href="#news" class="nav-link text-slate-600 hover:text-primary transition-colors">News</a>
+                </div>
+                <button class="md:hidden p-2">
+                    <i class="fas fa-bars text-slate-600"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-6xl mx-auto p-4">
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="page-section">
+            <!-- Page Header -->
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-slate-800 mb-2">Dashboard</h2>
+                <p class="text-slate-600">Your fantasy football command center for Week 8</p>
+            </div>
+
+            <!-- This Week Callout -->
+            <div class="bg-gradient-to-r from-primary to-blue-600 text-white rounded-lg p-6 mb-8">
+                <h3 class="text-xl font-semibold mb-3">
+                    <i class="fas fa-star mr-2"></i>
+                    This Week's Top Recommendation
+                </h3>
+                <div class="bg-white/20 rounded-lg p-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm opacity-90">Start/Sit Confidence: 78%</p>
+                            <p class="text-lg font-medium">Start Jaylen Waddle over Courtland Sutton</p>
+                            <p class="text-sm opacity-90">Higher target share vs weaker secondary</p>
+                        </div>
+                        <button class="bg-white text-primary px-4 py-2 rounded font-medium hover:bg-gray-50 transition-colors">
+                            View Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                <!-- Start/Sit Card -->
+                <div class="bg-surface rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow cursor-pointer">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="bg-primary/10 p-3 rounded-lg">
+                            <i class="fas fa-balance-scale text-primary text-xl"></i>
+                        </div>
+                        <span class="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-1 rounded">WEEKLY</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-slate-800 mb-2">Start/Sit</h3>
+                    <p class="text-slate-600 text-sm mb-4">Compare two players and get data-driven recommendations</p>
+                    <div class="text-xs text-slate-500">
+                        <span class="flex items-center">
+                            <i class="fas fa-chart-line mr-1"></i>
+                            Last used: Waddle vs Sutton
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Waivers Card -->
+                <div class="bg-surface rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow cursor-pointer">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="bg-secondary/10 p-3 rounded-lg">
+                            <i class="fas fa-plus-circle text-secondary text-xl"></i>
+                        </div>
+                        <span class="text-xs font-medium text-emerald-600 bg-emerald-100 px-2 py-1 rounded">5 TARGETS</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-slate-800 mb-2">Waivers</h3>
+                    <p class="text-slate-600 text-sm mb-4">Find the best available pickups with FAAB guidance</p>
+                    <div class="text-xs text-slate-500">
+                        <span class="flex items-center">
+                            <i class="fas fa-trending-up mr-1"></i>
+                            Top target: Jordan Addison
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Trade Card -->
+                <div class="bg-surface rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow cursor-pointer">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="bg-warning/10 p-3 rounded-lg">
+                            <i class="fas fa-exchange-alt text-warning text-xl"></i>
+                        </div>
+                        <span class="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-1 rounded">ANALYZER</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-slate-800 mb-2">Trade Analyzer</h3>
+                    <p class="text-slate-600 text-sm mb-4">Evaluate trade offers with value and risk analysis</p>
+                    <div class="text-xs text-slate-500">
+                        <span class="flex items-center">
+                            <i class="fas fa-calculator mr-1"></i>
+                            Ready to analyze
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Lineup Card -->
+                <div class="bg-surface rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow cursor-pointer">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="bg-purple-500/10 p-3 rounded-lg">
+                            <i class="fas fa-users text-purple-500 text-xl"></i>
+                        </div>
+                        <span class="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-1 rounded">OPTIMIZE</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-slate-800 mb-2">Lineup</h3>
+                    <p class="text-slate-600 text-sm mb-4">Get optimal starting lineup with pivot suggestions</p>
+                    <div class="text-xs text-slate-500">
+                        <span class="flex items-center">
+                            <i class="fas fa-check-circle mr-1"></i>
+                            Lineup set for Week 8
+                        </span>
+                    </div>
+                </div>
+
+                <!-- SoS Card -->
+                <div class="bg-surface rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow cursor-pointer">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="bg-red-500/10 p-3 rounded-lg">
+                            <i class="fas fa-calendar-alt text-red-500 text-xl"></i>
+                        </div>
+                        <span class="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-1 rounded">SCHEDULE</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-slate-800 mb-2">Strength of Schedule</h3>
+                    <p class="text-slate-600 text-sm mb-4">View matchup difficulty heatmaps by position</p>
+                    <div class="text-xs text-slate-500">
+                        <span class="flex items-center">
+                            <i class="fas fa-fire mr-1"></i>
+                            RBs have tough Week 9
+                        </span>
+                    </div>
+                </div>
+
+                <!-- News Card -->
+                <div class="bg-surface rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow cursor-pointer">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="bg-blue-500/10 p-3 rounded-lg">
+                            <i class="fas fa-newspaper text-blue-500 text-xl"></i>
+                        </div>
+                        <span class="text-xs font-medium text-red-600 bg-red-100 px-2 py-1 rounded">3 URGENT</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-slate-800 mb-2">News & Updates</h3>
+                    <p class="text-slate-600 text-sm mb-4">Latest injury reports and role changes</p>
+                    <div class="text-xs text-slate-500">
+                        <span class="flex items-center">
+                            <i class="fas fa-clock mr-1"></i>
+                            Updated 2 minutes ago
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Start/Sit Section -->
+        <section id="start-sit" class="page-section hidden">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-slate-800 mb-2">Start/Sit Analyzer</h2>
+                <p class="text-slate-600">Compare two players and get a data-driven recommendation</p>
+            </div>
+
+            <!-- Input Form -->
+            <div class="bg-surface rounded-lg border border-gray-200 p-6 mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Player A</label>
+                        <input type="text" class="input" placeholder="Search player..." value="Jaylen Waddle">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Player B</label>
+                        <input type="text" class="input" placeholder="Search player..." value="Courtland Sutton">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Week</label>
+                        <select class="input">
+                            <option value="8">Week 8</option>
+                            <option value="9">Week 9</option>
+                            <option value="10">Week 10</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Scoring</label>
+                        <select class="input">
+                            <option value="half_ppr">Half PPR</option>
+                            <option value="ppr">Full PPR</option>
+                            <option value="standard">Standard</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn-primary">
+                    <i class="fas fa-search mr-2"></i>
+                    Compare Players
+                </button>
+            </div>
+
+            <!-- Results Panel -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Recommendation -->
+                <div class="lg:col-span-1">
+                    <div class="bg-surface rounded-lg border border-gray-200 p-6">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-4">Recommendation</h3>
+                        <div class="text-center mb-6">
+                            <div class="bg-secondary/10 text-secondary text-lg font-bold py-3 px-4 rounded-lg mb-3">
+                                START JAYLEN WADDLE
+                            </div>
+                            <div class="text-2xl font-bold text-slate-800 mb-1">78%</div>
+                            <div class="text-sm text-slate-600">Confidence</div>
+                        </div>
+                        <div class="space-y-3">
+                            <h4 class="font-medium text-slate-800">Key Reasons:</h4>
+                            <ul class="text-sm text-slate-600 space-y-2">
+                                <li class="flex items-start">
+                                    <i class="fas fa-check text-secondary text-xs mt-1 mr-2"></i>
+                                    Higher target share (24% vs 19%)
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-check text-secondary text-xs mt-1 mr-2"></i>
+                                    Favorable matchup vs NE secondary
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-check text-secondary text-xs mt-1 mr-2"></i>
+                                    Sutton questionable with ankle injury
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-gray-200">
+                            <h4 class="font-medium text-slate-800 mb-2">Pivot Options:</h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Nico Collins</span>
+                                <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Zay Flowers</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Player Comparison -->
+                <div class="lg:col-span-2">
+                    <div class="bg-surface rounded-lg border border-gray-200 p-6">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-4">Player Comparison</h3>
+                        
+                        <!-- Player Headers -->
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div class="text-center">
+                                <div class="bg-secondary/10 p-4 rounded-lg">
+                                    <h4 class="font-bold text-lg text-slate-800">Jaylen Waddle</h4>
+                                    <p class="text-sm text-slate-600">MIA WR vs NE</p>
+                                    <p class="text-xs text-slate-500">Healthy</p>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <div class="bg-slate-100 p-4 rounded-lg">
+                                    <h4 class="font-bold text-lg text-slate-800">Courtland Sutton</h4>
+                                    <p class="text-sm text-slate-600">DEN WR vs CAR</p>
+                                    <p class="text-xs text-warning">Questionable</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Stats Comparison -->
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead>
+                                    <tr class="border-b border-gray-200">
+                                        <th class="text-left py-2 text-slate-700 font-medium">Stat</th>
+                                        <th class="text-center py-2 text-slate-700 font-medium">Waddle</th>
+                                        <th class="text-center py-2 text-slate-700 font-medium">Sutton</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100">
+                                    <tr>
+                                        <td class="py-2 text-slate-600">Projection</td>
+                                        <td class="text-center py-2 font-medium text-secondary">14.8</td>
+                                        <td class="text-center py-2 font-medium">12.6</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2 text-slate-600">Last 4 Avg</td>
+                                        <td class="text-center py-2 font-medium text-secondary">13.3</td>
+                                        <td class="text-center py-2 font-medium">11.4</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2 text-slate-600">Snap %</td>
+                                        <td class="text-center py-2 font-medium text-secondary">82%</td>
+                                        <td class="text-center py-2 font-medium">75%</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2 text-slate-600">Target Share</td>
+                                        <td class="text-center py-2 font-medium text-secondary">24%</td>
+                                        <td class="text-center py-2 font-medium">19%</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2 text-slate-600">SoS Rating</td>
+                                        <td class="text-center py-2 font-medium text-secondary">3.2/5</td>
+                                        <td class="text-center py-2 font-medium">4.1/5</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Waivers Section -->
+        <section id="waivers" class="page-section hidden">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-slate-800 mb-2">Waiver Wire</h2>
+                <p class="text-slate-600">Top available players with FAAB guidance and drop suggestions</p>
+            </div>
+
+            <!-- Filters -->
+            <div class="bg-surface rounded-lg border border-gray-200 p-4 mb-6">
+                <div class="flex items-center gap-4">
+                    <label class="text-sm font-medium text-slate-700">Filter by Position:</label>
+                    <div class="flex gap-2">
+                        <button class="px-3 py-1 text-xs rounded bg-primary text-white">All</button>
+                        <button class="px-3 py-1 text-xs rounded bg-gray-100 text-slate-600 hover:bg-gray-200">QB</button>
+                        <button class="px-3 py-1 text-xs rounded bg-gray-100 text-slate-600 hover:bg-gray-200">RB</button>
+                        <button class="px-3 py-1 text-xs rounded bg-gray-100 text-slate-600 hover:bg-gray-200">WR</button>
+                        <button class="px-3 py-1 text-xs rounded bg-gray-100 text-slate-600 hover:bg-gray-200">TE</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Available Players -->
+                <div class="lg:col-span-2">
+                    <div class="bg-surface rounded-lg border border-gray-200">
+                        <div class="p-4 border-b border-gray-200">
+                            <h3 class="text-lg font-semibold text-slate-800">Top Available Players</h3>
+                        </div>
+                        <div class="divide-y divide-gray-100">
+                            <!-- Player Row 1 -->
+                            <div class="p-4 hover:bg-gray-50">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-xs font-bold text-primary">JA</div>
+                                        <div>
+                                            <h4 class="font-medium text-slate-800">Jordan Addison</h4>
+                                            <p class="text-sm text-slate-600">MIN WR</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-4">
+                                        <div class="text-center">
+                                            <div class="text-sm font-medium text-slate-800">87%</div>
+                                            <div class="text-xs text-slate-500">Available</div>
+                                        </div>
+                                        <div class="text-center">
+                                            <div class="text-sm font-medium text-slate-800">12.4</div>
+                                            <div class="text-xs text-slate-500">Proj</div>
+                                        </div>
+                                        <span class="tier-2 text-xs px-2 py-1 rounded font-medium">Tier 2</span>
+                                        <span class="risk-low text-xs px-2 py-1 rounded">Low Risk</span>
+                                    </div>
+                                </div>
+                                <div class="mt-2 flex items-center">
+                                    <i class="fas fa-arrow-up text-secondary text-xs mr-1"></i>
+                                    <span class="text-xs text-slate-600">Rising role with Jefferson out</span>
+                                </div>
+                            </div>
+
+                            <!-- Player Row 2 -->
+                            <div class="p-4 hover:bg-gray-50">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 bg-secondary/10 rounded-full flex items-center justify-center text-xs font-bold text-secondary">ZW</div>
+                                        <div>
+                                            <h4 class="font-medium text-slate-800">Zamir White</h4>
+                                            <p class="text-sm text-slate-600">LV RB</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-4">
+                                        <div class="text-center">
+                                            <div class="text-sm font-medium text-slate-800">73%</div>
+                                            <div class="text-xs text-slate-500">Available</div>
+                                        </div>
+                                        <div class="text-center">
+                                            <div class="text-sm font-medium text-slate-800">10.8</div>
+                                            <div class="text-xs text-slate-500">Proj</div>
+                                        </div>
+                                        <span class="tier-3 text-xs px-2 py-1 rounded font-medium">Tier 3</span>
+                                        <span class="risk-med text-xs px-2 py-1 rounded">Med Risk</span>
+                                    </div>
+                                </div>
+                                <div class="mt-2 flex items-center">
+                                    <i class="fas fa-minus text-slate-400 text-xs mr-1"></i>
+                                    <span class="text-xs text-slate-600">Splitting carries with Jacobs</span>
+                                </div>
+                            </div>
+
+                            <!-- Player Row 3 -->
+                            <div class="p-4 hover:bg-gray-50">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 bg-warning/10 rounded-full flex items-center justify-center text-xs font-bold text-warning">TH</div>
+                                        <div>
+                                            <h4 class="font-medium text-slate-800">Tyler Higbee</h4>
+                                            <p class="text-sm text-slate-600">LAR TE</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-4">
+                                        <div class="text-center">
+                                            <div class="text-sm font-medium text-slate-800">91%</div>
+                                            <div class="text-xs text-slate-500">Available</div>
+                                        </div>
+                                        <div class="text-center">
+                                            <div class="text-sm font-medium text-slate-800">8.2</div>
+                                            <div class="text-xs text-slate-500">Proj</div>
+                                        </div>
+                                        <span class="tier-4 text-xs px-2 py-1 rounded font-medium">Tier 4</span>
+                                        <span class="risk-low text-xs px-2 py-1 rounded">Low Risk</span>
+                                    </div>
+                                </div>
+                                <div class="mt-2 flex items-center">
+                                    <i class="fas fa-arrow-up text-secondary text-xs mr-1"></i>
+                                    <span class="text-xs text-slate-600">Consistent target in red zone</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAAB & Drops -->
+                <div class="lg:col-span-1 space-y-6">
+                    <!-- FAAB Guidance -->
+                    <div class="bg-surface rounded-lg border border-gray-200 p-4">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-4">FAAB Guidance</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm font-medium text-slate-700">Jordan Addison</span>
+                                    <span class="text-xs text-slate-500">15-25%</span>
+                                </div>
+                                <div class="bg-gray-200 rounded-full h-2">
+                                    <div class="bg-secondary h-2 rounded-full" style="width: 20%"></div>
+                                </div>
+                                <p class="text-xs text-slate-600 mt-1">Strong upside with Jefferson injured</p>
+                            </div>
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm font-medium text-slate-700">Zamir White</span>
+                                    <span class="text-xs text-slate-500">8-15%</span>
+                                </div>
+                                <div class="bg-gray-200 rounded-full h-2">
+                                    <div class="bg-warning h-2 rounded-full" style="width: 12%"></div>
+                                </div>
+                                <p class="text-xs text-slate-600 mt-1">Handcuff with standalone value</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Suggested Drops -->
+                    <div class="bg-surface rounded-lg border border-gray-200 p-4">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-4">Suggested Drops</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between p-2 bg-red-50 rounded">
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-6 h-6 bg-danger/10 rounded-full flex items-center justify-center text-xs font-bold text-danger">IR</div>
+                                    <div>
+                                        <p class="text-sm font-medium text-slate-800">Isaiah Pacheco</p>
+                                        <p class="text-xs text-slate-600">KC RB - IR</p>
+                                    </div>
+                                </div>
+                                <span class="text-xs text-danger font-medium">Drop</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2 bg-yellow-50 rounded">
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-6 h-6 bg-warning/10 rounded-full flex items-center justify-center text-xs font-bold text-warning">BN</div>
+                                    <div>
+                                        <p class="text-sm font-medium text-slate-800">Elijah Moore</p>
+                                        <p class="text-xs text-slate-600">CLE WR</p>
+                                    </div>
+                                </div>
+                                <span class="text-xs text-warning font-medium">Consider</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Trade Section -->
+        <section id="trade" class="page-section hidden">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-slate-800 mb-2">Trade Analyzer</h2>
+                <p class="text-slate-600">Evaluate trade offers with value analysis and risk assessment</p>
+            </div>
+
+            <!-- Trade Input -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <div class="bg-surface rounded-lg border border-gray-200 p-6">
+                    <h3 class="text-lg font-semibold text-slate-800 mb-4 text-center">You Give</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-red-50 border border-red-200 rounded">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-xs font-bold text-primary">CD</div>
+                                <div>
+                                    <p class="font-medium text-slate-800">CeeDee Lamb</p>
+                                    <p class="text-sm text-slate-600">DAL WR</p>
+                                </div>
+                            </div>
+                            <button class="text-red-500 hover:text-red-700">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-red-50 border border-red-200 rounded">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-secondary/10 rounded-full flex items-center justify-center text-xs font-bold text-secondary">JT</div>
+                                <div>
+                                    <p class="font-medium text-slate-800">Jonathan Taylor</p>
+                                    <p class="text-sm text-slate-600">IND RB</p>
+                                </div>
+                            </div>
+                            <button class="text-red-500 hover:text-red-700">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <button class="w-full p-3 border-2 border-dashed border-gray-300 rounded text-slate-500 hover:border-gray-400 hover:text-slate-600">
+                            <i class="fas fa-plus mr-2"></i>
+                            Add Player
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-surface rounded-lg border border-gray-200 p-6">
+                    <h3 class="text-lg font-semibold text-slate-800 mb-4 text-center">You Receive</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-xs font-bold text-primary">TH</div>
+                                <div>
+                                    <p class="font-medium text-slate-800">Tyreek Hill</p>
+                                    <p class="text-sm text-slate-600">MIA WR</p>
+                                </div>
+                            </div>
+                            <button class="text-red-500 hover:text-red-700">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-warning/10 rounded-full flex items-center justify-center text-xs font-bold text-warning">AJ</div>
+                                <div>
+                                    <p class="font-medium text-slate-800">Aaron Jones</p>
+                                    <p class="text-sm text-slate-600">MIN RB</p>
+                                </div>
+                            </div>
+                            <button class="text-red-500 hover:text-red-700">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-blue-500/10 rounded-full flex items-center justify-center text-xs font-bold text-blue-500">DK</div>
+                                <div>
+                                    <p class="font-medium text-slate-800">DK Metcalf</p>
+                                    <p class="text-sm text-slate-600">SEA WR</p>
+                                </div>
+                            </div>
+                            <button class="text-red-500 hover:text-red-700">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <button class="w-full p-3 border-2 border-dashed border-gray-300 rounded text-slate-500 hover:border-gray-400 hover:text-slate-600">
+                            <i class="fas fa-plus mr-2"></i>
+                            Add Player
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mb-8">
+                <button class="btn-primary text-lg px-8 py-3">
+                    <i class="fas fa-calculator mr-2"></i>
+                    Analyze Trade
+                </button>
+            </div>
+
+            <!-- Trade Analysis Results -->
+            <div class="bg-surface rounded-lg border border-gray-200 p-6">
+                <h3 class="text-xl font-semibold text-slate-800 mb-6">Trade Analysis</h3>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Verdict -->
+                    <div class="text-center">
+                        <div class="bg-secondary/10 text-secondary text-lg font-bold py-4 px-6 rounded-lg mb-4">
+                            ACCEPT TRADE
+                        </div>
+                        <div class="text-3xl font-bold text-secondary mb-2">+12.4</div>
+                        <div class="text-sm text-slate-600">Value Delta (Points/Week)</div>
+                    </div>
+
+                    <!-- Risk Assessment -->
+                    <div class="text-center">
+                        <div class="bg-warning/10 p-4 rounded-lg mb-4">
+                            <i class="fas fa-exclamation-triangle text-warning text-2xl mb-2"></i>
+                            <div class="font-semibold text-slate-800">Medium Risk</div>
+                        </div>
+                        <div class="text-2xl font-bold text-slate-800 mb-2">3.2/5</div>
+                        <div class="text-sm text-slate-600">Risk Score</div>
+                    </div>
+
+                    <!-- ROS Impact -->
+                    <div class="text-center">
+                        <div class="bg-primary/10 p-4 rounded-lg mb-4">
+                            <i class="fas fa-chart-line text-primary text-2xl mb-2"></i>
+                            <div class="font-semibold text-slate-800">Improves Depth</div>
+                        </div>
+                        <div class="text-2xl font-bold text-slate-800 mb-2">+8%</div>
+                        <div class="text-sm text-slate-600">Championship Odds</div>
+                    </div>
+                </div>
+
+                <div class="mt-8 pt-6 border-t border-gray-200">
+                    <h4 class="font-semibold text-slate-800 mb-4">Analysis Summary</h4>
+                    <ul class="space-y-2">
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-secondary text-sm mt-1 mr-3"></i>
+                            <span class="text-slate-600">You gain significant depth at WR and RB positions</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-secondary text-sm mt-1 mr-3"></i>
+                            <span class="text-slate-600">Hill and Metcalf have easier playoff schedules</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-exclamation text-warning text-sm mt-1 mr-3"></i>
+                            <span class="text-slate-600">Jones age/injury concerns, monitor workload</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-secondary text-sm mt-1 mr-3"></i>
+                            <span class="text-slate-600">Overall talent upgrade while maintaining positional balance</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- SoS Section -->
+        <section id="sos" class="page-section hidden">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-slate-800 mb-2">Strength of Schedule</h2>
+                <p class="text-slate-600">View matchup difficulty by position and week</p>
+            </div>
+
+            <!-- Controls -->
+            <div class="bg-surface rounded-lg border border-gray-200 p-4 mb-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <label class="text-sm font-medium text-slate-700">View:</label>
+                        <div class="flex gap-2">
+                            <button class="px-4 py-2 text-sm rounded bg-primary text-white">Weekly</button>
+                            <button class="px-4 py-2 text-sm rounded bg-gray-100 text-slate-600 hover:bg-gray-200">Rest of Season</button>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span class="text-sm text-slate-600">Legend:</span>
+                        <div class="flex items-center gap-2 text-xs">
+                            <div class="w-4 h-4 sos-very-easy rounded"></div>
+                            <span>Very Easy</span>
+                            <div class="w-4 h-4 sos-easy rounded"></div>
+                            <span>Easy</span>
+                            <div class="w-4 h-4 sos-neutral rounded"></div>
+                            <span>Neutral</span>
+                            <div class="w-4 h-4 sos-hard rounded"></div>
+                            <span>Hard</span>
+                            <div class="w-4 h-4 sos-very-hard rounded"></div>
+                            <span>Very Hard</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SoS Heatmap -->
+            <div class="bg-surface rounded-lg border border-gray-200 overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="text-left p-4 font-medium text-slate-700">Position</th>
+                            <th class="text-center p-4 font-medium text-slate-700">Week 8</th>
+                            <th class="text-center p-4 font-medium text-slate-700">Week 9</th>
+                            <th class="text-center p-4 font-medium text-slate-700">Week 10</th>
+                            <th class="text-center p-4 font-medium text-slate-700">Week 11</th>
+                            <th class="text-center p-4 font-medium text-slate-700">Week 12</th>
+                            <th class="text-center p-4 font-medium text-slate-700">Week 13</th>
+                            <th class="text-center p-4 font-medium text-slate-700">Week 14</th>
+                            <th class="text-center p-4 font-medium text-slate-700">Week 15</th>
+                            <th class="text-center p-4 font-medium text-slate-700">Week 16</th>
+                            <th class="text-center p-4 font-medium text-slate-700">Week 17</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        <tr>
+                            <td class="p-4 font-medium text-slate-800">QB</td>
+                            <td class="text-center p-4">
+                                <div class="sos-easy rounded px-2 py-1 text-sm font-medium">2.1</div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="sos-hard rounded px-2 py-1 text-sm font-medium">3.8</div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="sos-neutral rounded px-2 py-1 text-sm font-medium">3.0</div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="sos-very-easy rounded px-2 py-1 text-sm font-medium">1.8</div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="sos-easy rounded px-2 py-1 text-sm font-medium">2.3</div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="sos-hard rounded px-2 py-1 text-sm font-medium">3.7</div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="sos-very-hard rounded px-2 py-1 text-sm font-medium">4.2</div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="sos-neutral rounded px-2 py-1 text-sm font-medium">2.9</div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="sos-easy rounded px-2 py-1 text-sm font-medium">2.4</div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="sos-neutral rounded px-2 py-1 text-sm font-medium">3.1</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="p-4 font-medium text-slate-800">RB</td>
+                            <td class="text-center p-4">
+                                <div class="sos-neutral rounded px-2 py-1 text-sm font-medium">2.8</div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="sos-very-hard rounded px-2 py-1 text-sm font-medium">4.5</div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="sos-hard rounded px-2 py-1 text-sm font-medium">3.6</div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="sos-easy rounded px-2 py-1 text-sm font-medium">2.2</div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="sos-neutral rounded px-2 py-1 text-sm font-medium">3.0</div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="sos-very-easy rounded px-2 py-1 text-sm font-medium">1.9</div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="sos-easy rounded px-2 py-1 text-sm font-medium">2.5</div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="sos-hard rounded px-2 py-1 text-sm font-medium">3.8</div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="sos-neutral rounded px-2 py-1 text-sm font-medium">2.7</div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="sos-easy rounded px-2 py-1 text-sm font-medium">2.3</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="p-4 font-medium text-slate-800">WR</td>
+                            <td class="text-center p-4">
+                                <div class="sos-hard rounded px-2 py-1 text-sm font-medium">3.9</div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="sos-easy rounded px-2 py-1 text-sm font-medium">2.1</div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="sos-very-easy rounded px-2 py-1 text-sm font-medium">1.7</div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="sos-neutral rounded px-2 py-1 text-sm font-medium">3.2</div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="sos-hard rounded px-2 py-1 text-sm font-medium">3.6</div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="sos-easy rounded px-2 py-1 text-sm font-medium">2.4</div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="sos-neutral rounded px-2 py-1 text-sm font-medium">2.8</div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="sos-very-hard rounded px-2 py-1 text-sm font-medium">4.3</div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="sos-easy rounded px-2 py-1 text-sm font-medium">2.6</div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="sos-neutral rounded px-2 py-1 text-sm font-medium">3.0</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="p-4 font-medium text-slate-800">TE</td>
+                            <td class="text-center p-4">
+                                <div class="sos-very-easy rounded px-2 py-1 text-sm font-medium">1.6</div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="sos-neutral rounded px-2 py-1 text-sm font-medium">2.9</div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="sos-easy rounded px-2 py-1 text-sm font-medium">2.5</div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="sos-hard rounded px-2 py-1 text-sm font-medium">3.7</div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="sos-very-hard rounded px-2 py-1 text-sm font-medium">4.4</div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="sos-neutral rounded px-2 py-1 text-sm font-medium">3.1</div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="sos-easy rounded px-2 py-1 text-sm font-medium">2.2</div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="sos-hard rounded px-2 py-1 text-sm font-medium">3.5</div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="sos-very-easy rounded px-2 py-1 text-sm font-medium">1.8</div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="sos-neutral rounded px-2 py-1 text-sm font-medium">2.7</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- SoS Insights -->
+            <div class="mt-6 bg-surface rounded-lg border border-gray-200 p-6">
+                <h3 class="text-lg font-semibold text-slate-800 mb-4">Key Insights</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <h4 class="font-medium text-green-800 mb-2">
+                            <i class="fas fa-thumbs-up mr-2"></i>
+                            Favorable Matchups
+                        </h4>
+                        <ul class="text-sm text-green-700 space-y-1">
+                            <li>• WRs have soft Week 10-11 stretch</li>
+                            <li>• TEs face weak coverage Week 8</li>
+                            <li>• RBs get relief Week 11-13</li>
+                        </ul>
+                    </div>
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                        <h4 class="font-medium text-red-800 mb-2">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                            Tough Weeks Ahead
+                        </h4>
+                        <ul class="text-sm text-red-700 space-y-1">
+                            <li>• RB nightmare in Week 9</li>
+                            <li>• QB struggles Week 14</li>
+                            <li>• WR challenges Week 15</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- News Section -->
+        <section id="news" class="page-section hidden">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-slate-800 mb-2">Fantasy News</h2>
+                <p class="text-slate-600">Latest updates and actionable insights</p>
+            </div>
+
+            <!-- News Filter -->
+            <div class="bg-surface rounded-lg border border-gray-200 p-4 mb-6">
+                <div class="flex items-center gap-4">
+                    <label class="text-sm font-medium text-slate-700">Filter by:</label>
+                    <div class="flex gap-2">
+                        <button class="px-3 py-1 text-xs rounded bg-primary text-white">All</button>
+                        <button class="px-3 py-1 text-xs rounded bg-gray-100 text-slate-600 hover:bg-gray-200">Injury</button>
+                        <button class="px-3 py-1 text-xs rounded bg-gray-100 text-slate-600 hover:bg-gray-200">Role</button>
+                        <button class="px-3 py-1 text-xs rounded bg-gray-100 text-slate-600 hover:bg-gray-200">Matchup</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- News Items -->
+            <div class="space-y-4">
+                <!-- News Item 1 -->
+                <div class="bg-surface rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="flex items-center gap-3">
+                            <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded font-medium">INJURY</span>
+                            <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded font-medium">URGENT</span>
+                        </div>
+                        <span class="text-xs text-slate-500">2 min ago</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-slate-800 mb-2">
+                        Justin Jefferson Ruled Out for Week 8 with Hamstring Injury
+                    </h3>
+                    <p class="text-slate-600 mb-4">
+                        Vikings WR will miss at least one game. Jordan Addison becomes must-start in all formats, with Jalen Nailor also seeing increased targets. Consider prioritizing Addison on waivers if available.
+                    </p>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-chart-line text-secondary text-sm"></i>
+                            <span class="text-sm text-slate-600">Impact: High</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-clock text-slate-400 text-sm"></i>
+                            <span class="text-sm text-slate-500">2-3 weeks</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- News Item 2 -->
+                <div class="bg-surface rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="flex items-center gap-3">
+                            <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded font-medium">ROLE</span>
+                        </div>
+                        <span class="text-xs text-slate-500">15 min ago</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-slate-800 mb-2">
+                        Dolphins Increase Jaylen Waddle's Slot Usage vs Patriots Defense
+                    </h3>
+                    <p class="text-slate-600 mb-4">
+                        Miami is expected to deploy Waddle more in the slot to exploit New England's weak slot coverage (allowing 8.2 YPT). Start Waddle with confidence this week over similarly ranked options.
+                    </p>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-chart-line text-secondary text-sm"></i>
+                            <span class="text-sm text-slate-600">Impact: Medium</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-calendar text-slate-400 text-sm"></i>
+                            <span class="text-sm text-slate-500">Week 8</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- News Item 3 -->
+                <div class="bg-surface rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="flex items-center gap-3">
+                            <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded font-medium">MATCHUP</span>
+                        </div>
+                        <span class="text-xs text-slate-500">32 min ago</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-slate-800 mb-2">
+                        Cardinals Defense Creates RB1 Opportunity for Opposing Backs
+                    </h3>
+                    <p class="text-slate-600 mb-4">
+                        Arizona has allowed 150+ rushing yards in three straight games. Any RB facing them this week should be considered for starting lineups, making Zamir White a priority waiver pickup.
+                    </p>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-chart-line text-secondary text-sm"></i>
+                            <span class="text-sm text-slate-600">Impact: Medium</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-shield-alt text-slate-400 text-sm"></i>
+                            <span class="text-sm text-slate-500">Defense</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- News Item 4 -->
+                <div class="bg-surface rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="flex items-center gap-3">
+                            <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded font-medium">ROLE</span>
+                        </div>
+                        <span class="text-xs text-slate-500">1 hr ago</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-slate-800 mb-2">
+                        Rams Increase Tyler Higbee's Red Zone Targets After Kupp Injury
+                    </h3>
+                    <p class="text-slate-600 mb-4">
+                        With Cooper Kupp sidelined, Higbee has seen 4 red zone targets over the last two games. Consider him a streaming option at the thin TE position, especially in favorable matchups.
+                    </p>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-chart-line text-warning text-sm"></i>
+                            <span class="text-sm text-slate-600">Impact: Low</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-bullseye text-slate-400 text-sm"></i>
+                            <span class="text-sm text-slate-500">Red Zone</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- News Item 5 -->
+                <div class="bg-surface rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="flex items-center gap-3">
+                            <span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded font-medium">OTHER</span>
+                        </div>
+                        <span class="text-xs text-slate-500">2 hr ago</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-slate-800 mb-2">
+                        Weather Alert: High Winds Expected for Bills vs Jets Monday Night
+                    </h3>
+                    <p class="text-slate-600 mb-4">
+                        20+ mph winds forecasted for Monday's game could impact the passing game. Consider benching Josh Allen for a safer QB option and prioritize rushing attacks over air yards.
+                    </p>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-wind text-blue-500 text-sm"></i>
+                            <span class="text-sm text-slate-600">Impact: Medium</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-cloud text-slate-400 text-sm"></i>
+                            <span class="text-sm text-slate-500">Weather</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Load More -->
+            <div class="text-center mt-8">
+                <button class="btn bg-gray-100 text-slate-600 hover:bg-gray-200">
+                    <i class="fas fa-plus mr-2"></i>
+                    Load More News
+                </button>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        (function() {
+            // Navigation functionality
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('.page-section');
+            
+            function showSection(targetId) {
+                // Hide all sections
+                sections.forEach(section => {
+                    section.classList.add('hidden');
+                });
+                
+                // Show target section
+                const targetSection = document.querySelector(targetId);
+                if (targetSection) {
+                    targetSection.classList.remove('hidden');
+                }
+                
+                // Update active nav link
+                navLinks.forEach(link => {
+                    link.classList.remove('active', 'text-primary', 'font-medium');
+                    link.classList.add('text-slate-600');
+                });
+                
+                const activeLink = document.querySelector(`a[href="${targetId}"]`);
+                if (activeLink) {
+                    activeLink.classList.add('active', 'text-primary', 'font-medium');
+                    activeLink.classList.remove('text-slate-600');
+                }
+            }
+            
+            // Add click handlers to nav links
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('href');
+                    showSection(targetId);
+                });
+            });
+            
+            // Show dashboard by default
+            showSection('#dashboard');
+            
+            // Add click handlers for dashboard cards
+            document.querySelectorAll('[id="dashboard"] .cursor-pointer').forEach((card, index) => {
+                const sections = ['#start-sit', '#waivers', '#trade', '#lineup', '#sos', '#news'];
+                card.addEventListener('click', () => {
+                    if (sections[index]) {
+                        showSection(sections[index]);
+                    }
+                });
+            });
+            
+            // TODO: Implement business logic, API calls, or state management for:
+            // - Player search functionality
+            // - Start/Sit analysis calculations
+            // - Waiver wire recommendations
+            // - Trade value calculations
+            // - Lineup optimization
+            // - SoS data fetching
+            // - News feed updates
+            // - Form submissions and data persistence
+            
+        })();
+    </script>
+</body>
+</html>
