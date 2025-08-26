@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import PageHeader from "@/components/PageHeader";
-import ConnectionCallout from "@/components/ConnectionCallout";
+import { motion, AnimatePresence } from "framer-motion";
+import Reveal from "@/components/Reveal";
+import MagneticButton from "@/components/MagneticButton";
 
 interface Message {
   id: string;
@@ -16,13 +16,13 @@ export default function Chatbot() {
       id: '1',
       text: "Who should I start this week, Jaylen Waddle or Courtland Sutton?",
       sender: 'user',
-      timestamp: new Date(Date.now() - 300000) // 5 minutes ago
+      timestamp: new Date(Date.now() - 300000)
     },
     {
       id: '2',
       text: "I'd recommend Jaylen Waddle. He has a higher target share and faces a weaker secondary this week.",
       sender: 'assistant',
-      timestamp: new Date(Date.now() - 240000) // 4 minutes ago
+      timestamp: new Date(Date.now() - 240000)
     }
   ]);
   
@@ -45,86 +45,125 @@ export default function Chatbot() {
   };
 
   return (
-    <div>
-      <PageHeader 
-        title="Fantasy Assistant Chat" 
-        subtitle="Get personalized advice for your fantasy football questions" 
-      />
+    <div className="min-h-screen pt-32 pb-16">
+      <div className="container">
+        {/* Header */}
+        <div className="text-center mb-16">
+          <Reveal>
+            <h1 className="mb-6">
+              Ask the Assistant
+            </h1>
+          </Reveal>
+          
+          <Reveal delay={0.2}>
+            <p className="text-gray-400 text-xl max-w-2xl mx-auto">
+              Get instant, AI-powered answers to all your fantasy football questions. 
+              From start/sit decisions to trade analysis.
+            </p>
+          </Reveal>
+        </div>
 
-      {/* Connection Status */}
-      <div className="mb-6">
-        <ConnectionCallout />
-      </div>
-
-      {/* Chat Window */}
-      <div className="max-w-2xl mx-auto p-4">
-        <div className="bg-surface border border-gray-200 rounded-lg shadow-sm overflow-hidden" data-testid="chat-window">
-          {/* Chat Header */}
-          <div className="bg-primary/5 border-b border-gray-200 p-4">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                <i className="fas fa-robot text-primary"></i>
-              </div>
-              <div>
-                <h3 className="font-semibold text-slate-800">Fantasy Assistant</h3>
-                <p className="text-sm text-slate-600">Your AI-powered fantasy football advisor</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Messages Area */}
-          <div className="h-96 overflow-y-auto p-4 space-y-4" data-testid="messages-area">
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                data-testid={`message-${message.sender}-${message.id}`}
-              >
-                <div
-                  className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                    message.sender === 'user'
-                      ? 'bg-blue-500 text-white rounded-br-none'
-                      : 'bg-gray-100 text-slate-800 rounded-bl-none'
-                  }`}
-                >
-                  <p className="text-sm">{message.text}</p>
-                  <p className={`text-xs mt-1 ${
-                    message.sender === 'user' ? 'text-blue-100' : 'text-slate-500'
-                  }`}>
-                    {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </p>
+        {/* Chat Window */}
+        <Reveal delay={0.4}>
+          <div className="max-w-4xl mx-auto">
+            <motion.div 
+              className="bg-white/5 border border-white/10 rounded-2xl backdrop-blur-sm overflow-hidden"
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              data-testid="chat-window"
+            >
+              {/* Chat Header */}
+              <div className="border-b border-white/10 p-6">
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="text-white">
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" strokeWidth={2}/>
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="font-display font-semibold text-xl text-white">Fantasy Assistant</h3>
+                    <p className="text-gray-400 text-sm">Always ready to help you win</p>
+                  </div>
+                  <div className="ml-auto">
+                    <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                  </div>
                 </div>
               </div>
-            ))}
-          </div>
 
-          {/* Input Area */}
-          <div className="border-t border-gray-200 p-4">
-            <form onSubmit={handleSubmit} className="flex space-x-2">
-              <input
-                type="text"
-                value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
-                placeholder="Ask your fantasy assistant…"
-                className="flex-1 input"
-                data-testid="chat-input"
-              />
-              <Button 
-                type="submit" 
-                className="btn-primary"
-                disabled={!inputMessage.trim()}
-                data-testid="send-button"
-              >
-                <i className="fas fa-paper-plane"></i>
-              </Button>
-            </form>
-          </div>
-        </div>
+              {/* Messages Area */}
+              <div className="h-96 overflow-y-auto p-6 space-y-4" data-testid="messages-area">
+                <AnimatePresence>
+                  {messages.map((message, index) => (
+                    <motion.div
+                      key={message.id}
+                      initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      transition={{ 
+                        duration: 0.5,
+                        delay: index * 0.1,
+                        ease: "easeOut"
+                      }}
+                      className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                      data-testid={`message-${message.sender}-${message.id}`}
+                    >
+                      <div
+                        className={`max-w-sm lg:max-w-md px-4 py-3 rounded-2xl ${
+                          message.sender === 'user'
+                            ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white ml-8'
+                            : 'bg-white/10 text-gray-200 mr-8'
+                        } backdrop-blur-sm`}
+                      >
+                        <p className="text-sm leading-relaxed">{message.text}</p>
+                        <p className={`text-xs mt-2 ${
+                          message.sender === 'user' ? 'text-blue-100' : 'text-gray-400'
+                        }`}>
+                          {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      </div>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
 
-        {/* Chat Info */}
-        <div className="mt-4 text-center text-sm text-slate-600">
-          <p>Get instant answers to your fantasy football questions</p>
-        </div>
+              {/* Input Area */}
+              <div className="border-t border-white/10 p-6">
+                <form onSubmit={handleSubmit} className="flex space-x-4">
+                  <div className="flex-1 relative">
+                    <input
+                      type="text"
+                      value={inputMessage}
+                      onChange={(e) => setInputMessage(e.target.value)}
+                      placeholder="Ask your fantasy assistant…"
+                      className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-white/40 transition-colors"
+                      data-testid="chat-input"
+                    />
+                  </div>
+                  
+                  <MagneticButton>
+                    <button
+                      type="submit" 
+                      className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
+                      disabled={!inputMessage.trim()}
+                      data-testid="send-button"
+                    >
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </button>
+                  </MagneticButton>
+                </form>
+              </div>
+            </motion.div>
+
+            {/* Help Text */}
+            <div className="text-center mt-8">
+              <p className="text-gray-500 text-sm">
+                Try asking: "Should I trade CMC for Josh Allen?" or "Who are the best waiver pickups?"
+              </p>
+            </div>
+          </div>
+        </Reveal>
       </div>
     </div>
   );

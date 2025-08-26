@@ -1,0 +1,87 @@
+Refactor my React + Vite + TypeScript + Tailwind app to adopt a minimalist, high-impact portfolio style inspired by modern personal sites with smooth animations.
+
+Design language
+
+Typography-first, lots of white space, big headings.
+
+Fonts: load Inter (body) and Space Grotesk (display) via CSS import.
+
+Colors: near-white background #0b0b0b text on #f6f6f6 (or dark mode inverse), subtle accents only.
+
+Grid: wide container (max-w-6xl) with generous paddings.
+
+Libraries
+
+Add framer-motion for component/scroll reveals.
+
+Add lenis (or equivalent) for smooth scrolling inertia.
+
+No backend.
+
+Global
+
+Create src/styles/theme.css with base styles: selection color, link underline animation, oversized H1/H2 scales, .container utility.
+
+In main.tsx, initialize Lenis smooth scroll.
+
+Layout
+
+Sticky top bar with minimal logo on left and nav on right (underline-on-hover).
+
+Footer with tiny mono text and social links.
+
+Hero section (home)
+
+Full-viewport hero with oversized headline (2–3 lines), subcopy, and a subtle parallax background block.
+
+“Explore” chevron that smooth-scrolls to the next section.
+
+Section patterns
+
+Marquee/intro line: slow, continuous marquee text (CSS transform loop).
+
+Cards row for your tools (Start/Sit, Waivers, Trade, etc.) with magnetic hover (scale 1.02) and motion fade-up on enter.
+
+Feature split: image/illustration placeholder on one side, copy on the other; parallax translateY on scroll.
+
+Quote/CTA band with subtle grain/noise background.
+
+Animations (Framer Motion)
+
+Reusable variants: fadeUp, stagger, scaleIn, parallax.
+
+Animate on view with once: true, small delays, spring transitions.
+
+Page transitions: fade/slide between routes.
+
+Chatbot page
+
+Minimal chat panel with floating input; messages fade/slide in.
+
+Header has big “Ask the Assistant” title with reveal.
+
+Utilities/components
+
+Reveal.tsx (wraps children with motion + viewport)
+
+Marquee.tsx (CSS keyframes)
+
+Parallax.tsx (ties scroll to transform)
+
+MagneticButton.tsx (scale + slight translate on hover)
+
+Update existing cards to use these effects.
+
+Acceptance
+
+Smooth scroll feels inertial.
+
+Sections reveal as they enter viewport; hero has parallax.
+
+Cards subtly scale on hover; links underline animate.
+
+No blocking network calls; all current pages still route and render.
+
+Provide a README note on where to plug real data later.
+
+Implement this styling and motion system across the Home/Dashboard and reuse on other pages for a cohesive, animated experience.

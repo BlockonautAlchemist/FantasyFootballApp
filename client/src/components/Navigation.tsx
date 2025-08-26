@@ -1,16 +1,16 @@
 import { Link, useLocation } from "wouter";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import UserBadge from "@/components/UserBadge";
 
 const navigationItems = [
-  { href: "/", label: "Dashboard" },
+  { href: "/", label: "Home" },
   { href: "/start-sit", label: "Start/Sit" },
   { href: "/waivers", label: "Waivers" },
   { href: "/trade", label: "Trade" },
   { href: "/lineup", label: "Lineup" },
-  { href: "/sos", label: "SoS" },
+  { href: "/sos", label: "Schedule" },
   { href: "/news", label: "News" },
-  { href: "/chatbot", label: "Chatbot" },
+  { href: "/chatbot", label: "Assistant" },
   { href: "/connect", label: "Connect" },
 ];
 
@@ -18,38 +18,73 @@ export default function Navigation() {
   const [location] = useLocation();
 
   return (
-    <nav className="bg-surface border-b border-gray-200 sticky top-0 z-50">
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex items-center space-x-2">
-            <i className="fas fa-football-ball text-primary text-xl"></i>
-            <h1 className="text-xl font-bold text-slate-800">Fantasy Assistant</h1>
-          </div>
-          <div className="hidden md:flex items-center space-x-6">
-            {navigationItems.map(({ href, label }) => (
-              <Link key={href} href={href}>
-                <span
-                  className={cn(
-                    "transition-colors cursor-pointer",
-                    location === href
-                      ? "text-primary font-medium"
-                      : "text-slate-600 hover:text-primary"
-                  )}
-                  data-testid={`nav-${label.toLowerCase().replace("/", "-")}`}
-                >
-                  {label}
-                </span>
-              </Link>
+    <motion.nav 
+      className="fixed top-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-sm border-b border-white/10"
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
+    >
+      <div className="container">
+        <div className="flex justify-between items-center h-20">
+          {/* Logo */}
+          <Link href="/">
+            <motion.div 
+              className="flex items-center space-x-3 cursor-pointer"
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.2 }}
+            >
+              <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
+                <span className="text-black font-bold text-sm">F</span>
+              </div>
+              <span className="font-display font-semibold text-xl text-white">
+                Fantasy
+              </span>
+            </motion.div>
+          </Link>
+
+          {/* Navigation */}
+          <div className="hidden md:flex items-center space-x-8">
+            {navigationItems.map(({ href, label }, index) => (
+              <motion.div
+                key={href}
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ 
+                  duration: 0.6, 
+                  delay: 0.1 + index * 0.05,
+                  ease: "easeOut" 
+                }}
+              >
+                <Link href={href}>
+                  <span
+                    className={cn(
+                      "link-underline text-sm font-medium transition-colors cursor-pointer",
+                      location === href
+                        ? "text-white"
+                        : "text-gray-400 hover:text-white"
+                    )}
+                    data-testid={`nav-${label.toLowerCase()}`}
+                  >
+                    {label}
+                  </span>
+                </Link>
+              </motion.div>
             ))}
           </div>
-          <div className="flex items-center space-x-4">
-            <UserBadge />
-            <button className="md:hidden p-2" data-testid="mobile-menu">
-              <i className="fas fa-bars text-slate-600"></i>
-            </button>
-          </div>
+
+          {/* Mobile Menu Button */}
+          <motion.button 
+            className="md:hidden p-2 text-white"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            data-testid="mobile-menu"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M3 6h18M3 12h18M3 18h18" strokeWidth={2} strokeLinecap="round"/>
+            </svg>
+          </motion.button>
         </div>
       </div>
-    </nav>
+    </motion.nav>
   );
 }

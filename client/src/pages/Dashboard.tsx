@@ -1,142 +1,309 @@
+import { motion } from "framer-motion";
 import { Link } from "wouter";
-import PageHeader from "@/components/PageHeader";
+import Reveal from "@/components/Reveal";
+import Marquee from "@/components/Marquee";
+import Parallax from "@/components/Parallax";
+import MagneticButton from "@/components/MagneticButton";
 import ConnectionCallout from "@/components/ConnectionCallout";
 
-const quickActions = [
+const tools = [
   {
     title: "Start/Sit",
-    description: "Compare two players and get data-driven recommendations",
-    icon: "fas fa-balance-scale",
+    description: "Compare players with AI-powered insights",
     href: "/start-sit",
-    bgColor: "bg-primary/10",
-    iconColor: "text-primary",
-    badge: "WEEKLY",
-    badgeColor: "text-slate-500 bg-slate-100",
-    lastUsed: "Last used: Waddle vs Sutton"
+    icon: "⚖️",
+    gradient: "from-blue-600 to-purple-600"
   },
   {
     title: "Waivers",
-    description: "Find the best available pickups with FAAB guidance",
-    icon: "fas fa-plus-circle",
+    description: "Discover hidden gems on the wire",
     href: "/waivers",
-    bgColor: "bg-secondary/10",
-    iconColor: "text-secondary",
-    badge: "5 TARGETS",
-    badgeColor: "text-emerald-600 bg-emerald-100",
-    lastUsed: "Top target: Jordan Addison"
+    icon: "💎",
+    gradient: "from-emerald-600 to-teal-600"
   },
   {
-    title: "Trade Analyzer",
-    description: "Evaluate trade offers with value and risk analysis",
-    icon: "fas fa-exchange-alt",
+    title: "Trade",
+    description: "Analyze trades with precision",
     href: "/trade",
-    bgColor: "bg-warning/10",
-    iconColor: "text-warning",
-    badge: "ANALYZER",
-    badgeColor: "text-slate-500 bg-slate-100",
-    lastUsed: "Ready to analyze"
+    icon: "🤝",
+    gradient: "from-orange-600 to-red-600"
   },
   {
     title: "Lineup",
-    description: "Get optimal starting lineup with pivot suggestions",
-    icon: "fas fa-users",
+    description: "Optimize your starting lineup",
     href: "/lineup",
-    bgColor: "bg-purple-500/10",
-    iconColor: "text-purple-500",
-    badge: "OPTIMIZE",
-    badgeColor: "text-slate-500 bg-slate-100",
-    lastUsed: "Lineup set for Week 8"
+    icon: "📊",
+    gradient: "from-pink-600 to-rose-600"
   },
   {
-    title: "Strength of Schedule",
-    description: "View matchup difficulty heatmaps by position",
-    icon: "fas fa-calendar-alt",
+    title: "Schedule",
+    description: "Plan ahead with matchup data",
     href: "/sos",
-    bgColor: "bg-red-500/10",
-    iconColor: "text-red-500",
-    badge: "SCHEDULE",
-    badgeColor: "text-slate-500 bg-slate-100",
-    lastUsed: "RBs have tough Week 9"
+    icon: "📅",
+    gradient: "from-indigo-600 to-blue-600"
   },
   {
-    title: "News & Updates",
-    description: "Latest injury reports and role changes",
-    icon: "fas fa-newspaper",
+    title: "News",
+    description: "Stay updated with the latest",
     href: "/news",
-    bgColor: "bg-blue-500/10",
-    iconColor: "text-blue-500",
-    badge: "3 URGENT",
-    badgeColor: "text-red-600 bg-red-100",
-    lastUsed: "Updated 2 minutes ago"
+    icon: "📰",
+    gradient: "from-yellow-600 to-orange-600"
+  },
+  {
+    title: "Assistant",
+    description: "Chat with your fantasy AI",
+    href: "/chatbot",
+    icon: "🤖",
+    gradient: "from-purple-600 to-pink-600"
+  },
+  {
+    title: "Connect",
+    description: "Link your Yahoo account",
+    href: "/connect",
+    icon: "🔗",
+    gradient: "from-cyan-600 to-blue-600"
   }
 ];
 
 export default function Dashboard() {
   return (
-    <div>
-      <PageHeader 
-        title="Dashboard" 
-        subtitle="Your fantasy football command center for Week 8" 
-      />
+    <>
+      {/* Hero Section */}
+      <section className="min-h-screen flex items-center justify-center relative overflow-hidden">
+        {/* Background Parallax Element */}
+        <Parallax offset={100} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-5">
+          <div className="w-[800px] h-[800px] rounded-full bg-gradient-to-r from-white to-gray-300" />
+        </Parallax>
+
+        <div className="container relative z-10 text-center">
+          <Reveal>
+            <h1 className="mb-8 gradient-text leading-tight">
+              Fantasy Football
+              <br />
+              Reimagined
+            </h1>
+          </Reveal>
+
+          <Reveal delay={0.2}>
+            <p className="text-xl md:text-2xl text-gray-400 mb-12 max-w-2xl mx-auto leading-relaxed">
+              AI-powered insights, real-time analysis, and championship-winning strategies 
+              all in one beautiful interface.
+            </p>
+          </Reveal>
+
+          <Reveal delay={0.4}>
+            <MagneticButton className="bg-white text-black px-8 py-4 rounded-full font-display font-semibold text-lg">
+              <Link href="#tools" className="flex items-center space-x-2">
+                <span>Explore Tools</span>
+                <motion.div
+                  animate={{ y: [0, 4, 0] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M7 13l3 3 7-7" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </motion.div>
+              </Link>
+            </MagneticButton>
+          </Reveal>
+        </div>
+
+        {/* Scroll Indicator */}
+        <motion.div
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 text-gray-500"
+          animate={{ y: [0, 10, 0] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M7 13l3 3 7-7" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </motion.div>
+      </section>
+
+      {/* Marquee Section */}
+      <section className="py-8 border-y border-white/10 bg-white/5">
+        <Marquee className="text-6xl md:text-8xl font-display font-bold text-white/10">
+          DOMINATE YOUR LEAGUE • WIN CHAMPIONSHIPS • ANALYZE EVERYTHING • 
+        </Marquee>
+      </section>
 
       {/* Connection Status */}
-      <div className="mb-6">
-        <ConnectionCallout />
-      </div>
+      <section className="py-16">
+        <div className="container">
+          <ConnectionCallout />
+        </div>
+      </section>
 
-      {/* This Week Callout */}
-      <div className="bg-gradient-to-r from-primary to-blue-600 text-white rounded-lg p-6 mb-8">
-        <h3 className="text-xl font-semibold mb-3">
-          <i className="fas fa-star mr-2"></i>
-          This Week's Top Recommendation
-        </h3>
-        <div className="bg-white/20 rounded-lg p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm opacity-90">Start/Sit Confidence: 78%</p>
-              <p className="text-lg font-medium">Start Jaylen Waddle over Courtland Sutton</p>
-              <p className="text-sm opacity-90">Higher target share vs weaker secondary</p>
-            </div>
-            <Link href="/start-sit">
-              <button 
-                className="bg-white text-primary px-4 py-2 rounded font-medium hover:bg-gray-50 transition-colors"
-                data-testid="button-view-details"
-              >
-                View Details
-              </button>
-            </Link>
+      {/* Tools Grid */}
+      <section id="tools" className="py-32">
+        <div className="container">
+          <Reveal>
+            <h2 className="mb-4 text-center">
+              Your Fantasy Arsenal
+            </h2>
+          </Reveal>
+
+          <Reveal delay={0.2}>
+            <p className="text-center text-gray-400 text-xl mb-20 max-w-2xl mx-auto">
+              Eight powerful tools designed to give you the competitive edge you need 
+              to dominate your league.
+            </p>
+          </Reveal>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {tools.map((tool, index) => (
+              <Reveal key={tool.href} delay={0.1 * index}>
+                <Link href={tool.href}>
+                  <motion.div
+                    className="group bg-white/5 border border-white/10 rounded-2xl p-6 cursor-pointer card-magnetic"
+                    whileHover={{ y: -8 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                    data-testid={`tool-card-${tool.title.toLowerCase()}`}
+                  >
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${tool.gradient} flex items-center justify-center mb-4 text-xl`}>
+                      {tool.icon}
+                    </div>
+                    
+                    <h3 className="font-display font-semibold text-xl mb-2 text-white group-hover:text-gray-200 transition-colors">
+                      {tool.title}
+                    </h3>
+                    
+                    <p className="text-gray-400 text-sm leading-relaxed">
+                      {tool.description}
+                    </p>
+
+                    <motion.div
+                      className="mt-4 text-gray-500 group-hover:text-white transition-colors"
+                      whileHover={{ x: 4 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M5 12h14M12 5l7 7-7 7" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </motion.div>
+                  </motion.div>
+                </Link>
+              </Reveal>
+            ))}
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Quick Actions Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        {quickActions.map((action, index) => (
-          <Link key={action.href} href={action.href}>
-            <div 
-              className="bg-surface rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow cursor-pointer"
-              data-testid={`card-${action.title.toLowerCase().replace(/\s+/g, "-")}`}
-            >
-              <div className="flex items-center justify-between mb-4">
-                <div className={`${action.bgColor} p-3 rounded-lg`}>
-                  <i className={`${action.icon} ${action.iconColor} text-xl`}></i>
+      {/* Feature Split */}
+      <section className="py-32">
+        <div className="container">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <Reveal>
+              <div>
+                <h2 className="mb-6">
+                  Built for Champions
+                </h2>
+                <p className="text-gray-400 text-lg mb-8 leading-relaxed">
+                  Every feature is crafted with one goal in mind: helping you make the decisions 
+                  that win championships. From advanced player comparisons to real-time market 
+                  analysis, we've got you covered.
+                </p>
+                <MagneticButton className="bg-white/10 border border-white/20 text-white px-6 py-3 rounded-xl font-medium">
+                  Learn More
+                </MagneticButton>
+              </div>
+            </Reveal>
+
+            <Parallax offset={30}>
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-2xl blur-3xl" />
+                <div className="relative bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-sm">
+                  <div className="grid grid-cols-2 gap-4 text-center">
+                    <div className="p-4">
+                      <div className="text-3xl font-bold text-white mb-1">95%</div>
+                      <div className="text-sm text-gray-400">Accuracy Rate</div>
+                    </div>
+                    <div className="p-4">
+                      <div className="text-3xl font-bold text-white mb-1">2.3x</div>
+                      <div className="text-sm text-gray-400">Win Rate Boost</div>
+                    </div>
+                    <div className="p-4">
+                      <div className="text-3xl font-bold text-white mb-1">500K+</div>
+                      <div className="text-sm text-gray-400">Decisions Made</div>
+                    </div>
+                    <div className="p-4">
+                      <div className="text-3xl font-bold text-white mb-1">#1</div>
+                      <div className="text-sm text-gray-400">Fantasy Tool</div>
+                    </div>
+                  </div>
                 </div>
-                <span className={`text-xs font-medium ${action.badgeColor} px-2 py-1 rounded`}>
-                  {action.badge}
-                </span>
               </div>
-              <h3 className="text-lg font-semibold text-slate-800 mb-2">{action.title}</h3>
-              <p className="text-slate-600 text-sm mb-4">{action.description}</p>
-              <div className="text-xs text-slate-500">
-                <span className="flex items-center">
-                  <i className="fas fa-chart-line mr-1"></i>
-                  {action.lastUsed}
-                </span>
-              </div>
+            </Parallax>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-32 grain bg-gradient-to-r from-white/5 to-gray-800/5">
+        <div className="container text-center">
+          <Reveal>
+            <h2 className="mb-6">
+              Ready to Dominate?
+            </h2>
+          </Reveal>
+
+          <Reveal delay={0.2}>
+            <p className="text-gray-400 text-xl mb-12 max-w-2xl mx-auto leading-relaxed">
+              Join thousands of fantasy players who have already transformed their game 
+              with our intelligent insights.
+            </p>
+          </Reveal>
+
+          <Reveal delay={0.4}>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/connect">
+                <MagneticButton className="bg-white text-black px-8 py-4 rounded-full font-display font-semibold text-lg">
+                  Connect Yahoo Account
+                </MagneticButton>
+              </Link>
+              <Link href="/start-sit">
+                <MagneticButton className="bg-white/10 border border-white/20 text-white px-8 py-4 rounded-full font-display font-semibold text-lg">
+                  Try Start/Sit Tool
+                </MagneticButton>
+              </Link>
             </div>
-          </Link>
-        ))}
-      </div>
-    </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-16 border-t border-white/10">
+        <div className="container">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="text-mono text-gray-500 mb-4 md:mb-0">
+              © 2024 Fantasy Assistant. All rights reserved.
+            </div>
+            <div className="flex space-x-6 text-gray-500">
+              <motion.a 
+                href="#" 
+                className="hover:text-white transition-colors"
+                whileHover={{ scale: 1.1 }}
+              >
+                Twitter
+              </motion.a>
+              <motion.a 
+                href="#" 
+                className="hover:text-white transition-colors"
+                whileHover={{ scale: 1.1 }}
+              >
+                Discord
+              </motion.a>
+              <motion.a 
+                href="#" 
+                className="hover:text-white transition-colors"
+                whileHover={{ scale: 1.1 }}
+              >
+                GitHub
+              </motion.a>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </>
   );
 }
