@@ -139,6 +139,11 @@ a {
   font-size: 0.875rem;
 }
 
+/* Radial gradient utility */
+.bg-gradient-radial {
+  background-image: radial-gradient(var(--tw-gradient-stops));
+}
+
 .gradient-text {
   background: linear-gradient(135deg, var(--color-text) 0%, var(--color-text-muted) 100%);
   -webkit-background-clip: text;

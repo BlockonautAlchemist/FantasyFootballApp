@@ -70,6 +70,9 @@ export default function Dashboard() {
     <>
       {/* Hero Section */}
       <section className="min-h-screen flex items-center justify-center relative overflow-hidden">
+        {/* Radial Gradient Background Overlay */}
+        <div className="absolute inset-0 bg-gradient-radial from-indigo-500/20 via-purple-500/10 to-transparent" />
+        
         {/* Background Parallax Element */}
         <Parallax offset={100} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-5">
           <div className="w-[800px] h-[800px] rounded-full bg-gradient-to-r from-white to-gray-300" />
@@ -77,11 +80,24 @@ export default function Dashboard() {
 
         <div className="container relative z-10 text-center">
           <Reveal>
-            <h1 className="mb-8 gradient-text leading-tight">
+            <motion.h1 
+              className="mb-8 leading-tight bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent"
+              animate={{ 
+                textShadow: "0px 0px 20px rgba(128,0,255,0.6)" 
+              }}
+              transition={{
+                textShadow: {
+                  duration: 2,
+                  repeat: Infinity,
+                  repeatType: "reverse",
+                  ease: "easeInOut"
+                }
+              }}
+            >
               Fantasy Football
               <br />
               Reimagined
-            </h1>
+            </motion.h1>
           </Reveal>
 
           <Reveal delay={0.2}>
@@ -92,19 +108,28 @@ export default function Dashboard() {
           </Reveal>
 
           <Reveal delay={0.4}>
-            <MagneticButton className="bg-white text-black px-8 py-4 rounded-full font-display font-semibold text-lg">
-              <Link href="#tools" className="flex items-center space-x-2">
-                <span>Explore Tools</span>
-                <motion.div
-                  animate={{ y: [0, 4, 0] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path d="M7 13l3 3 7-7" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </motion.div>
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Link href="#tools">
+                <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold rounded-full px-6 py-3 shadow-lg transition-all duration-300 relative overflow-hidden group">
+                  {/* Shimmer effect */}
+                  <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                  
+                  <span className="relative z-10">Explore Tools</span>
+                  <motion.div
+                    className="relative z-10"
+                    animate={{ y: [0, 4, 0] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path d="M7 13l3 3 7-7" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </motion.div>
+                </div>
               </Link>
-            </MagneticButton>
+            </motion.div>
           </Reveal>
         </div>
 
