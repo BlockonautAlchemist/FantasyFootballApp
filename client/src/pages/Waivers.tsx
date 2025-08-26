@@ -126,7 +126,7 @@ export default function Waivers() {
           <div className="lg:col-span-1 space-y-6">
             {/* FAAB Guidance */}
             <div className="bg-surface rounded-lg border border-border p-4">
-              <h3 className="text-lg font-semibold text-slate-800 mb-4">FAAB Guidance</h3>
+              <h3 className="text-lg font-semibold text-text mb-4">FAAB Guidance</h3>
               <div className="space-y-4">
                 {waiverData?.faab.map((guidance) => (
                   <FAABSlider key={guidance.id} guidance={guidance} />
@@ -136,7 +136,7 @@ export default function Waivers() {
 
             {/* Suggested Drops */}
             <div className="bg-surface rounded-lg border border-border p-4">
-              <h3 className="text-lg font-semibold text-slate-800 mb-4">Suggested Drops</h3>
+              <h3 className="text-lg font-semibold text-text mb-4">Suggested Drops</h3>
               <div className="space-y-3">
                 {waiverData?.drops.map((player) => {
                   const initials = player.name.split(" ").map(n => n[0]).join("").toUpperCase();
@@ -145,19 +145,19 @@ export default function Waivers() {
                   return (
                     <div 
                       key={player.id} 
-                      className={`flex items-center justify-between p-2 rounded ${isDrop ? "bg-red-50" : "bg-yellow-50"}`}
+                      className={`flex items-center justify-between p-2 rounded bg-surface2`}
                       data-testid={`drop-${player.id}`}
                     >
                       <div className="flex items-center space-x-2">
-                        <div className={`w-6 h-6 ${isDrop ? "bg-red-100" : "bg-yellow-100"} rounded-full flex items-center justify-center text-xs font-bold ${isDrop ? "text-red-600" : "text-yellow-600"}`}>
+                        <div className={`w-6 h-6 ${isDrop ? "bg-danger/20" : "bg-warning/20"} rounded-full flex items-center justify-center text-xs font-bold ${isDrop ? "text-danger" : "text-warning"}`}>
                           {isDrop ? "IR" : "BN"}
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-slate-800">{player.name}</p>
-                          <p className="text-xs text-slate-600">{player.team} {player.pos}{player.status ? ` - ${player.status}` : ""}</p>
+                          <p className="text-sm font-medium text-text">{player.name}</p>
+                          <p className="text-xs text-textDim">{player.team} {player.pos}{player.status ? ` - ${player.status}` : ""}</p>
                         </div>
                       </div>
-                      <span className={`text-xs font-medium ${isDrop ? "text-red-600" : "text-yellow-600"}`}>
+                      <span className={`text-xs font-medium ${isDrop ? "text-danger" : "text-warning"}`}>
                         {isDrop ? "Drop" : "Consider"}
                       </span>
                     </div>
