@@ -42,7 +42,7 @@ export default function UserBadge() {
         <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-xs font-bold text-primary">
           {userInitials}
         </div>
-        <div className="hidden md:block text-sm text-slate-700">
+        <div className="hidden md:block text-sm text-text">
           {user.displayName}
         </div>
       </div>

@@ -49,7 +49,7 @@ export default function ConnectYahooButton({ onConnected }: ConnectYahooButtonPr
           </>
         )}
       </Button>
-      <p className="text-sm text-slate-600 mt-3">
+      <p className="text-sm text-textDim mt-3">
         Connect your Yahoo Fantasy account to import your leagues and rosters
       </p>
     </div>

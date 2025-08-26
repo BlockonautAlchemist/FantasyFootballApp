@@ -45,9 +45,9 @@ export default function Waivers() {
       </div>
 
       {/* Filters */}
-      <div className="bg-white/5 border border-white/10 rounded-2xl p-4 mb-6">
+      <div className="bg-surface border border-border rounded-2xl p-4 mb-6">
         <div className="flex items-center gap-4">
-          <label className="text-sm font-medium text-white">Filter by Position:</label>
+          <label className="text-sm font-medium text-text">Filter by Position:</label>
           <div className="flex gap-2">
             {positions.map((pos) => (
               <Button
@@ -66,18 +66,18 @@ export default function Waivers() {
 
       {isLoading ? (
         <div className="text-center py-8" data-testid="loading-waivers">
-          <i className="fas fa-spinner fa-spin text-2xl text-slate-400 mb-2"></i>
-          <p className="text-slate-600">Loading waiver recommendations...</p>
+          <i className="fas fa-spinner fa-spin text-2xl text-textDim mb-2"></i>
+          <p className="text-textDim">Loading waiver recommendations...</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Available Players */}
           <div className="lg:col-span-2">
-            <div className="bg-white/5 border border-white/10 rounded-2xl">
-              <div className="p-4 border-b border-white/10">
-                <h3 className="text-lg font-semibold text-white">Top Available Players</h3>
+            <div className="bg-surface border border-border rounded-2xl">
+              <div className="p-4 border-b border-border">
+                <h3 className="text-lg font-semibold text-text">Top Available Players</h3>
               </div>
-              <div className="divide-y divide-white/10">
+              <div className="divide-y divide-border">
                 {waiverData?.candidates.map((player) => {
                   const initials = player.name.split(" ").map(n => n[0]).join("").toUpperCase();
                   const tierColors = ["bg-primary/10", "bg-secondary/10", "bg-warning/10"];
@@ -85,25 +85,25 @@ export default function Waivers() {
                   const colorIndex = Math.floor(Math.random() * 3);
                   
                   return (
-                    <div key={player.id} className="p-4 hover:bg-gray-50" data-testid={`player-${player.id}`}>
+                    <div key={player.id} className="p-4 hover:bg-surface2" data-testid={`player-${player.id}`}>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
                           <div className={`w-8 h-8 ${tierColors[colorIndex]} rounded-full flex items-center justify-center text-xs font-bold ${iconColors[colorIndex]}`}>
                             {initials}
                           </div>
                           <div>
-                            <h4 className="font-medium text-slate-800">{player.name}</h4>
-                            <p className="text-sm text-slate-600">{player.team} {player.pos}</p>
+                            <h4 className="font-medium text-text">{player.name}</h4>
+                            <p className="text-sm text-textDim">{player.team} {player.pos}</p>
                           </div>
                         </div>
                         <div className="flex items-center space-x-4">
                           <div className="text-center">
-                            <div className="text-sm font-medium text-slate-800">{player.avail}%</div>
-                            <div className="text-xs text-slate-500">Available</div>
+                            <div className="text-sm font-medium text-text">{player.avail}%</div>
+                            <div className="text-xs text-textDim">Available</div>
                           </div>
                           <div className="text-center">
-                            <div className="text-sm font-medium text-slate-800">{player.proj}</div>
-                            <div className="text-xs text-slate-500">Proj</div>
+                            <div className="text-sm font-medium text-text">{player.proj}</div>
+                            <div className="text-xs text-textDim">Proj</div>
                           </div>
                           <TierBadge tier={getTierFromProj(player.proj)} />
                           <RiskChip risk={getRiskFromTrend(player.roleTrend, player.avail) as "Low" | "Med" | "High"} />
@@ -125,7 +125,7 @@ export default function Waivers() {
           {/* FAAB & Drops */}
           <div className="lg:col-span-1 space-y-6">
             {/* FAAB Guidance */}
-            <div className="bg-surface rounded-lg border border-gray-200 p-4">
+            <div className="bg-surface rounded-lg border border-border p-4">
               <h3 className="text-lg font-semibold text-slate-800 mb-4">FAAB Guidance</h3>
               <div className="space-y-4">
                 {waiverData?.faab.map((guidance) => (
@@ -135,7 +135,7 @@ export default function Waivers() {
             </div>
 
             {/* Suggested Drops */}
-            <div className="bg-surface rounded-lg border border-gray-200 p-4">
+            <div className="bg-surface rounded-lg border border-border p-4">
               <h3 className="text-lg font-semibold text-slate-800 mb-4">Suggested Drops</h3>
               <div className="space-y-3">
                 {waiverData?.drops.map((player) => {

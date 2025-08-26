@@ -23,7 +23,7 @@ export default function ComparisonPanel({ playerA, playerB, recommendation }: Co
   const getPlayerHeaderClass = (player: "A" | "B") => {
     return recommendation === player 
       ? "bg-secondary/10 p-4 rounded-lg" 
-      : "bg-slate-100 p-4 rounded-lg";
+      : "bg-surface2 p-4 rounded-lg";
   };
 
   const getStatClass = (valueA: number, valueB: number, isPlayerA: boolean) => {
@@ -33,23 +33,23 @@ export default function ComparisonPanel({ playerA, playerB, recommendation }: Co
   };
 
   return (
-    <div className="bg-surface rounded-lg border border-gray-200 p-6">
-      <h3 className="text-lg font-semibold text-slate-800 mb-4">Player Comparison</h3>
+    <div className="bg-surface rounded-lg border border-border p-6">
+      <h3 className="text-lg font-semibold text-text mb-4">Player Comparison</h3>
       
       {/* Player Headers */}
       <div className="grid grid-cols-2 gap-4 mb-6">
         <div className="text-center">
           <div className={getPlayerHeaderClass("A")}>
-            <h4 className="font-bold text-lg text-slate-800">{playerA.name}</h4>
-            <p className="text-sm text-slate-600">{playerA.team} {playerA.pos} vs {playerA.opp}</p>
-            <p className="text-xs text-slate-500">{playerA.inj}</p>
+            <h4 className="font-bold text-lg text-text">{playerA.name}</h4>
+            <p className="text-sm text-textDim">{playerA.team} {playerA.pos} vs {playerA.opp}</p>
+            <p className="text-xs text-textDim">{playerA.inj}</p>
           </div>
         </div>
         <div className="text-center">
           <div className={getPlayerHeaderClass("B")}>
-            <h4 className="font-bold text-lg text-slate-800">{playerB.name}</h4>
-            <p className="text-sm text-slate-600">{playerB.team} {playerB.pos} vs {playerB.opp}</p>
-            <p className="text-xs text-slate-500">{playerB.inj}</p>
+            <h4 className="font-bold text-lg text-text">{playerB.name}</h4>
+            <p className="text-sm text-textDim">{playerB.team} {playerB.pos} vs {playerB.opp}</p>
+            <p className="text-xs text-textDim">{playerB.inj}</p>
           </div>
         </div>
       </div>
@@ -58,15 +58,15 @@ export default function ComparisonPanel({ playerA, playerB, recommendation }: Co
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-gray-200">
-              <th className="text-left py-2 text-slate-700 font-medium">Stat</th>
-              <th className="text-center py-2 text-slate-700 font-medium">{playerA.name.split(" ")[0]}</th>
-              <th className="text-center py-2 text-slate-700 font-medium">{playerB.name.split(" ")[0]}</th>
+            <tr className="border-b border-border">
+              <th className="text-left py-2 text-text font-medium">Stat</th>
+              <th className="text-center py-2 text-text font-medium">{playerA.name.split(" ")[0]}</th>
+              <th className="text-center py-2 text-text font-medium">{playerB.name.split(" ")[0]}</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-border">
             <tr>
-              <td className="py-2 text-slate-600">Projection</td>
+              <td className="py-2 text-textDim">Projection</td>
               <td className={`text-center py-2 ${getStatClass(playerA.proj, playerB.proj, true)}`}>
                 {playerA.proj}
               </td>
@@ -75,7 +75,7 @@ export default function ComparisonPanel({ playerA, playerB, recommendation }: Co
               </td>
             </tr>
             <tr>
-              <td className="py-2 text-slate-600">Last 4 Avg</td>
+              <td className="py-2 text-textDim">Last 4 Avg</td>
               <td className={`text-center py-2 ${getStatClass(last4AvgA, last4AvgB, true)}`}>
                 {last4AvgA.toFixed(1)}
               </td>
@@ -84,7 +84,7 @@ export default function ComparisonPanel({ playerA, playerB, recommendation }: Co
               </td>
             </tr>
             <tr>
-              <td className="py-2 text-slate-600">Snap %</td>
+              <td className="py-2 text-textDim">Snap %</td>
               <td className={`text-center py-2 ${getStatClass(playerA.snap, playerB.snap, true)}`}>
                 {Math.round(playerA.snap * 100)}%
               </td>
@@ -93,7 +93,7 @@ export default function ComparisonPanel({ playerA, playerB, recommendation }: Co
               </td>
             </tr>
             <tr>
-              <td className="py-2 text-slate-600">Target Share</td>
+              <td className="py-2 text-textDim">Target Share</td>
               <td className={`text-center py-2 ${getStatClass(playerA.tgtShare, playerB.tgtShare, true)}`}>
                 {Math.round(playerA.tgtShare * 100)}%
               </td>

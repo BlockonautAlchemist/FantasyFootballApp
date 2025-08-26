@@ -44,10 +44,10 @@ export default function StartSit() {
       </div>
 
       {/* Input Form */}
-      <div className="bg-white/5 border border-white/10 rounded-2xl p-6 mb-8">
+      <div className="bg-surface border border-border rounded-2xl p-6 mb-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
           <div>
-            <label className="block text-sm font-medium text-white mb-2">Player A</label>
+            <label className="block text-sm font-medium text-text mb-2">Player A</label>
             <PlayerSearch 
               placeholder="Search player..." 
               value={playerA}
@@ -55,7 +55,7 @@ export default function StartSit() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-white mb-2">Player B</label>
+            <label className="block text-sm font-medium text-text mb-2">Player B</label>
             <PlayerSearch 
               placeholder="Search player..." 
               value={playerB}
@@ -63,7 +63,7 @@ export default function StartSit() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-white mb-2">Week</label>
+            <label className="block text-sm font-medium text-text mb-2">Week</label>
             <Select value={week} onValueChange={setWeek}>
               <SelectTrigger data-testid="select-week">
                 <SelectValue placeholder="Select week" />
@@ -76,7 +76,7 @@ export default function StartSit() {
             </Select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-white mb-2">Scoring</label>
+            <label className="block text-sm font-medium text-text mb-2">Scoring</label>
             <Select value={scoring} onValueChange={setScoring}>
               <SelectTrigger data-testid="select-scoring">
                 <SelectValue placeholder="Select scoring" />
@@ -105,20 +105,20 @@ export default function StartSit() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Recommendation */}
           <div className="lg:col-span-1">
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-              <h3 className="text-lg font-semibold text-slate-800 mb-4">Recommendation</h3>
+            <div className="bg-surface border border-border rounded-2xl p-6">
+              <h3 className="text-lg font-semibold text-text mb-4">Recommendation</h3>
               <div className="text-center mb-6">
                 <div className="bg-secondary/10 text-secondary text-lg font-bold py-3 px-4 rounded-lg mb-3">
                   START {result.recommendation === "A" ? result.facts.playerA.name.toUpperCase() : result.facts.playerB.name.toUpperCase()}
                 </div>
-                <div className="text-2xl font-bold text-slate-800 mb-1" data-testid="text-confidence">
+                <div className="text-2xl font-bold text-text mb-1" data-testid="text-confidence">
                   {Math.round(result.confidence * 100)}%
                 </div>
-                <div className="text-sm text-slate-600">Confidence</div>
+                <div className="text-sm text-textDim">Confidence</div>
               </div>
               <div className="space-y-3">
-                <h4 className="font-medium text-slate-800">Key Reasons:</h4>
-                <ul className="text-sm text-slate-600 space-y-2">
+                <h4 className="font-medium text-text">Key Reasons:</h4>
+                <ul className="text-sm text-textDim space-y-2">
                   {result.reasons?.map((reason: string, index: number) => (
                     <li key={index} className="flex items-start">
                       <i className="fas fa-check text-secondary text-xs mt-1 mr-2"></i>
@@ -128,8 +128,8 @@ export default function StartSit() {
                 </ul>
               </div>
               {result.pivots && (
-                <div className="mt-6 pt-4 border-t border-gray-200">
-                  <h4 className="font-medium text-slate-800 mb-2">Pivot Options:</h4>
+                <div className="mt-6 pt-4 border-t border-border">
+                  <h4 className="font-medium text-text mb-2">Pivot Options:</h4>
                   <div className="flex flex-wrap gap-2">
                     {result.pivots?.map((pivot: string, index: number) => (
                       <span key={index} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">

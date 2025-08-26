@@ -27,7 +27,7 @@ export default function Callout({ variant, icon, title, children }: CalloutProps
       {(icon || title) && (
         <div className="flex items-center mb-2">
           {icon && <i className={`${icon} mr-2`}></i>}
-          {title && <h4 className="font-display font-semibold text-white">{title}</h4>}
+          {title && <h4 className="font-display font-semibold">{title}</h4>}
         </div>
       )}
       <div>{children}</div>

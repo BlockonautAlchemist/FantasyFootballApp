@@ -72,7 +72,7 @@ export default function Dashboard() {
       <section className="min-h-screen flex items-center justify-center relative overflow-hidden">
         {/* Background Parallax Element */}
         <Parallax offset={100} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-5">
-          <div className="w-[800px] h-[800px] rounded-full bg-gradient-to-r from-white to-gray-300" />
+          <div className="w-[800px] h-[800px] rounded-full bg-gradient-to-r from-primary/20 to-accent/20" />
         </Parallax>
 
         <div className="container relative z-10 text-center">
@@ -85,14 +85,14 @@ export default function Dashboard() {
           </Reveal>
 
           <Reveal delay={0.2}>
-            <p className="text-xl md:text-2xl text-gray-400 mb-12 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-xl md:text-2xl text-textDim mb-12 max-w-2xl mx-auto leading-relaxed">
               AI-powered insights, real-time analysis, and championship-winning strategies 
               all in one beautiful interface.
             </p>
           </Reveal>
 
           <Reveal delay={0.4}>
-            <MagneticButton className="bg-white text-black px-8 py-4 rounded-full font-display font-semibold text-lg">
+            <MagneticButton className="bg-primary text-white px-8 py-4 rounded-full font-display font-semibold text-lg">
               <Link href="#tools" className="flex items-center space-x-2">
                 <span>Explore Tools</span>
                 <motion.div
@@ -110,7 +110,7 @@ export default function Dashboard() {
 
         {/* Scroll Indicator */}
         <motion.div
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 text-gray-500"
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 text-textDim"
           animate={{ y: [0, 10, 0] }}
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
         >
@@ -121,8 +121,8 @@ export default function Dashboard() {
       </section>
 
       {/* Marquee Section */}
-      <section className="py-8 border-y border-white/10 bg-white/5">
-        <Marquee className="text-6xl md:text-8xl font-display font-bold text-white">
+      <section className="py-8 border-y border-border bg-surface/30">
+        <Marquee className="text-6xl md:text-8xl font-display font-bold text-text">
           DOMINATE YOUR LEAGUE • WIN CHAMPIONSHIPS • ANALYZE EVERYTHING • 
         </Marquee>
       </section>
@@ -144,7 +144,7 @@ export default function Dashboard() {
           </Reveal>
 
           <Reveal delay={0.2}>
-            <p className="text-center text-gray-400 text-xl mb-20 max-w-2xl mx-auto">
+            <p className="text-center text-textDim text-xl mb-20 max-w-2xl mx-auto">
               Eight powerful tools designed to give you the competitive edge you need 
               to dominate your league.
             </p>
@@ -155,7 +155,7 @@ export default function Dashboard() {
               <Reveal key={tool.href} delay={0.1 * index}>
                 <Link href={tool.href}>
                   <motion.div
-                    className="group bg-white/5 border border-white/10 rounded-2xl p-6 cursor-pointer card-magnetic"
+                    className="group bg-surface border border-border rounded-2xl p-6 cursor-pointer card-magnetic"
                     whileHover={{ y: -8 }}
                     transition={{ duration: 0.3, ease: "easeOut" }}
                     data-testid={`tool-card-${tool.title.toLowerCase()}`}
@@ -164,16 +164,16 @@ export default function Dashboard() {
                       {tool.icon}
                     </div>
                     
-                    <h3 className="font-display font-semibold text-xl mb-2 text-white group-hover:text-gray-200 transition-colors">
+                    <h3 className="font-display font-semibold text-xl mb-2 text-text group-hover:text-textDim transition-colors">
                       {tool.title}
                     </h3>
                     
-                    <p className="text-gray-400 text-sm leading-relaxed">
+                    <p className="text-textDim text-sm leading-relaxed">
                       {tool.description}
                     </p>
 
                     <motion.div
-                      className="mt-4 text-gray-500 group-hover:text-white transition-colors"
+                      className="mt-4 text-textDim group-hover:text-text transition-colors"
                       whileHover={{ x: 4 }}
                       transition={{ duration: 0.2 }}
                     >
@@ -198,12 +198,12 @@ export default function Dashboard() {
                 <h2 className="mb-6">
                   Built for Champions
                 </h2>
-                <p className="text-gray-400 text-lg mb-8 leading-relaxed">
+                <p className="text-textDim text-lg mb-8 leading-relaxed">
                   Every feature is crafted with one goal in mind: helping you make the decisions 
                   that win championships. From advanced player comparisons to real-time market 
                   analysis, we've got you covered.
                 </p>
-                <MagneticButton className="bg-white/10 border border-white/20 text-white px-6 py-3 rounded-xl font-medium">
+                <MagneticButton className="bg-surface border border-border text-text px-6 py-3 rounded-xl font-medium">
                   Learn More
                 </MagneticButton>
               </div>
@@ -212,23 +212,23 @@ export default function Dashboard() {
             <Parallax offset={30}>
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-2xl blur-3xl" />
-                <div className="relative bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-sm">
+                <div className="relative bg-surface border border-border rounded-2xl p-8 backdrop-blur-sm">
                   <div className="grid grid-cols-2 gap-4 text-center">
                     <div className="p-4">
-                      <div className="text-3xl font-bold text-white mb-1">95%</div>
-                      <div className="text-sm text-gray-400">Accuracy Rate</div>
+                      <div className="text-3xl font-bold text-text mb-1">95%</div>
+                      <div className="text-sm text-textDim">Accuracy Rate</div>
                     </div>
                     <div className="p-4">
-                      <div className="text-3xl font-bold text-white mb-1">2.3x</div>
-                      <div className="text-sm text-gray-400">Win Rate Boost</div>
+                      <div className="text-3xl font-bold text-text mb-1">2.3x</div>
+                      <div className="text-sm text-textDim">Win Rate Boost</div>
                     </div>
                     <div className="p-4">
-                      <div className="text-3xl font-bold text-white mb-1">500K+</div>
-                      <div className="text-sm text-gray-400">Decisions Made</div>
+                      <div className="text-3xl font-bold text-text mb-1">500K+</div>
+                      <div className="text-sm text-textDim">Decisions Made</div>
                     </div>
                     <div className="p-4">
-                      <div className="text-3xl font-bold text-white mb-1">#1</div>
-                      <div className="text-sm text-gray-400">Fantasy Tool</div>
+                      <div className="text-3xl font-bold text-text mb-1">#1</div>
+                      <div className="text-sm text-textDim">Fantasy Tool</div>
                     </div>
                   </div>
                 </div>
@@ -239,8 +239,9 @@ export default function Dashboard() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-32 grain bg-gradient-to-r from-white/5 to-gray-800/5">
-        <div className="container text-center">
+      <section className="py-32 relative isolate">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(1200px_600px_at_50%_-10%,rgba(var(--accent),0.12),transparent_60%)]" />
+        <div className="container text-center relative">
           <Reveal>
             <h2 className="mb-6">
               Ready to Dominate?
@@ -248,7 +249,7 @@ export default function Dashboard() {
           </Reveal>
 
           <Reveal delay={0.2}>
-            <p className="text-gray-400 text-xl mb-12 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-textDim text-xl mb-12 max-w-2xl mx-auto leading-relaxed">
               Join thousands of fantasy players who have already transformed their game 
               with our intelligent insights.
             </p>
@@ -257,12 +258,12 @@ export default function Dashboard() {
           <Reveal delay={0.4}>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/connect">
-                <MagneticButton className="bg-white text-black px-8 py-4 rounded-full font-display font-semibold text-lg">
+                <MagneticButton className="bg-primary text-white px-8 py-4 rounded-full font-display font-semibold text-lg">
                   Connect Yahoo Account
                 </MagneticButton>
               </Link>
               <Link href="/start-sit">
-                <MagneticButton className="bg-white/10 border border-white/20 text-white px-8 py-4 rounded-full font-display font-semibold text-lg">
+                <MagneticButton className="bg-surface border border-border text-text px-8 py-4 rounded-full font-display font-semibold text-lg">
                   Try Start/Sit Tool
                 </MagneticButton>
               </Link>
@@ -272,30 +273,30 @@ export default function Dashboard() {
       </section>
 
       {/* Footer */}
-      <footer className="py-16 border-t border-white/10">
+      <footer className="py-16 border-t border-border">
         <div className="container">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="text-mono text-gray-500 mb-4 md:mb-0">
+            <div className="text-mono text-textDim mb-4 md:mb-0">
               © 2024 Fantasy Assistant. All rights reserved.
             </div>
-            <div className="flex space-x-6 text-gray-500">
+            <div className="flex space-x-6 text-textDim">
               <motion.a 
                 href="#" 
-                className="hover:text-white transition-colors"
+                className="hover:text-text transition-colors"
                 whileHover={{ scale: 1.1 }}
               >
                 Twitter
               </motion.a>
               <motion.a 
                 href="#" 
-                className="hover:text-white transition-colors"
+                className="hover:text-text transition-colors"
                 whileHover={{ scale: 1.1 }}
               >
                 Discord
               </motion.a>
               <motion.a 
                 href="#" 
-                className="hover:text-white transition-colors"
+                className="hover:text-text transition-colors"
                 whileHover={{ scale: 1.1 }}
               >
                 GitHub

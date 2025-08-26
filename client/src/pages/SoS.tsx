@@ -28,10 +28,10 @@ export default function SoS() {
       </div>
 
       {/* Controls */}
-      <div className="bg-surface rounded-lg border border-gray-200 p-4 mb-6">
+      <div className="bg-surface rounded-lg border border-border p-4 mb-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <label className="text-sm font-medium text-slate-700">View:</label>
+            <label className="text-sm font-medium text-text">View:</label>
             <div className="flex gap-2">
               <Button
                 variant={viewMode === "weekly" ? "default" : "outline"}
@@ -52,7 +52,7 @@ export default function SoS() {
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-slate-600">Legend:</span>
+            <span className="text-sm text-textDim">Legend:</span>
             <div className="flex items-center gap-2 text-xs">
               <div className="w-4 h-4 sos-very-easy rounded"></div>
               <span>Very Easy</span>
@@ -71,8 +71,8 @@ export default function SoS() {
 
       {isLoading ? (
         <div className="text-center py-8" data-testid="loading-sos">
-          <i className="fas fa-spinner fa-spin text-2xl text-slate-400 mb-2"></i>
-          <p className="text-slate-600">Loading strength of schedule data...</p>
+          <i className="fas fa-spinner fa-spin text-2xl text-textDim mb-2"></i>
+          <p className="text-textDim">Loading strength of schedule data...</p>
         </div>
       ) : sosData ? (
         <>
@@ -82,8 +82,8 @@ export default function SoS() {
           </div>
 
           {/* SoS Insights */}
-          <div className="bg-surface rounded-lg border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-slate-800 mb-4">Key Insights</h3>
+          <div className="bg-surface rounded-lg border border-border p-6">
+            <h3 className="text-lg font-semibold text-text mb-4">Key Insights</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Callout variant="success" icon="fas fa-thumbs-up" title="Favorable Matchups">
                 <ul className="text-sm space-y-1">

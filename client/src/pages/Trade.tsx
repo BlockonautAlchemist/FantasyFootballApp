@@ -58,8 +58,8 @@ export default function Trade() {
 
       {/* Trade Input */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-          <h3 className="text-lg font-semibold text-white mb-4 text-center">You Give</h3>
+        <div className="bg-surface border border-border rounded-2xl p-6">
+          <h3 className="text-lg font-semibold text-text mb-4 text-center">You Give</h3>
           <div className="space-y-3">
             {playersGive.map((player) => (
               <div key={player.id} className="flex items-center justify-between p-3 bg-red-600/10 border border-red-600/20 rounded-xl">
@@ -68,8 +68,8 @@ export default function Trade() {
                     {getPlayerInitials(player.name)}
                   </div>
                   <div>
-                    <p className="font-medium text-slate-800">{player.name}</p>
-                    <p className="text-sm text-slate-600">{player.team} {player.pos}</p>
+                    <p className="font-medium text-text">{player.name}</p>
+                    <p className="text-sm text-textDim">{player.team} {player.pos}</p>
                   </div>
                 </div>
                 <button 
@@ -82,7 +82,7 @@ export default function Trade() {
               </div>
             ))}
             <button 
-              className="w-full p-3 border-2 border-dashed border-gray-300 rounded text-slate-500 hover:border-gray-400 hover:text-slate-600"
+              className="w-full p-3 border-2 border-dashed border-border rounded text-textDim hover:border-border hover:text-text"
               data-testid="button-add-give-player"
             >
               <i className="fas fa-plus mr-2"></i>
@@ -91,8 +91,8 @@ export default function Trade() {
           </div>
         </div>
 
-        <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-          <h3 className="text-lg font-semibold text-white mb-4 text-center">You Receive</h3>
+        <div className="bg-surface border border-border rounded-2xl p-6">
+          <h3 className="text-lg font-semibold text-text mb-4 text-center">You Receive</h3>
           <div className="space-y-3">
             {playersReceive.map((player) => (
               <div key={player.id} className="flex items-center justify-between p-3 bg-green-600/10 border border-green-600/20 rounded-xl">
@@ -101,8 +101,8 @@ export default function Trade() {
                     {getPlayerInitials(player.name)}
                   </div>
                   <div>
-                    <p className="font-medium text-slate-800">{player.name}</p>
-                    <p className="text-sm text-slate-600">{player.team} {player.pos}</p>
+                    <p className="font-medium text-text">{player.name}</p>
+                    <p className="text-sm text-textDim">{player.team} {player.pos}</p>
                   </div>
                 </div>
                 <button 
@@ -115,7 +115,7 @@ export default function Trade() {
               </div>
             ))}
             <button 
-              className="w-full p-3 border-2 border-dashed border-gray-300 rounded text-slate-500 hover:border-gray-400 hover:text-slate-600"
+              className="w-full p-3 border-2 border-dashed border-border rounded text-textDim hover:border-border hover:text-text"
               data-testid="button-add-receive-player"
             >
               <i className="fas fa-plus mr-2"></i>
@@ -139,8 +139,8 @@ export default function Trade() {
 
       {/* Trade Analysis Results */}
       {tradeResult && (
-        <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-          <h3 className="text-xl font-semibold text-white mb-6">Trade Analysis</h3>
+        <div className="bg-surface border border-border rounded-2xl p-6">
+          <h3 className="text-xl font-semibold text-text mb-6">Trade Analysis</h3>
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Verdict */}
@@ -151,39 +151,39 @@ export default function Trade() {
               <div className="text-3xl font-bold text-secondary mb-2" data-testid="text-value-delta">
                 +{tradeResult.delta}
               </div>
-              <div className="text-sm text-slate-600">Value Delta (Points/Week)</div>
+              <div className="text-sm text-textDim">Value Delta (Points/Week)</div>
             </div>
 
             {/* Risk Assessment */}
             <div className="text-center">
               <div className="bg-warning/10 p-4 rounded-lg mb-4">
                 <i className="fas fa-exclamation-triangle text-warning text-2xl mb-2"></i>
-                <div className="font-semibold text-slate-800">Medium Risk</div>
+                <div className="font-semibold text-text">Medium Risk</div>
               </div>
-              <div className="text-2xl font-bold text-slate-800 mb-2" data-testid="text-risk-score">
+              <div className="text-2xl font-bold text-text mb-2" data-testid="text-risk-score">
                 {tradeResult.risk}/5
               </div>
-              <div className="text-sm text-slate-600">Risk Score</div>
+              <div className="text-sm text-textDim">Risk Score</div>
             </div>
 
             {/* ROS Impact */}
             <div className="text-center">
               <div className="bg-primary/10 p-4 rounded-lg mb-4">
                 <i className="fas fa-chart-line text-primary text-2xl mb-2"></i>
-                <div className="font-semibold text-slate-800">{tradeResult.rosImpact}</div>
+                <div className="font-semibold text-text">{tradeResult.rosImpact}</div>
               </div>
-              <div className="text-2xl font-bold text-slate-800 mb-2">+8%</div>
-              <div className="text-sm text-slate-600">Championship Odds</div>
+              <div className="text-2xl font-bold text-text mb-2">+8%</div>
+              <div className="text-sm text-textDim">Championship Odds</div>
             </div>
           </div>
 
-          <div className="mt-8 pt-6 border-t border-gray-200">
-            <h4 className="font-semibold text-slate-800 mb-4">Analysis Summary</h4>
+          <div className="mt-8 pt-6 border-t border-border">
+            <h4 className="font-semibold text-text mb-4">Analysis Summary</h4>
             <ul className="space-y-2">
               {tradeResult.reasons.map((reason, index) => (
                 <li key={index} className="flex items-start">
                   <i className={`fas ${index === 2 ? "fa-exclamation text-warning" : "fa-check text-secondary"} text-sm mt-1 mr-3`}></i>
-                  <span className="text-slate-600">{reason}</span>
+                  <span className="text-textDim">{reason}</span>
                 </li>
               ))}
             </ul>

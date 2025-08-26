@@ -19,7 +19,7 @@ export default function Navigation() {
 
   return (
     <motion.nav 
-      className="fixed top-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-sm border-b border-white/10"
+      className="fixed top-0 left-0 right-0 z-50 bg-bg/90 backdrop-blur supports-[backdrop-filter]:bg-bg/70 border-b border-border"
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.8, ease: "easeOut" }}
@@ -33,10 +33,10 @@ export default function Navigation() {
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.2 }}
             >
-              <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-                <span className="text-black font-bold text-sm">F</span>
+              <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                <span className="text-white font-bold text-sm">F</span>
               </div>
-              <span className="font-display font-semibold text-xl text-white">
+              <span className="font-display font-semibold text-xl text-text">
                 Fantasy
               </span>
             </motion.div>
@@ -60,8 +60,8 @@ export default function Navigation() {
                     className={cn(
                       "link-underline text-sm font-medium transition-colors cursor-pointer",
                       location === href
-                        ? "text-white"
-                        : "text-gray-400 hover:text-white"
+                        ? "text-text"
+                        : "text-textDim hover:text-text"
                     )}
                     data-testid={`nav-${label.toLowerCase()}`}
                   >
@@ -74,7 +74,7 @@ export default function Navigation() {
 
           {/* Mobile Menu Button */}
           <motion.button 
-            className="md:hidden p-2 text-white"
+            className="md:hidden p-2 text-text"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
             data-testid="mobile-menu"

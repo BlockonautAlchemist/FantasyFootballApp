@@ -4,6 +4,9 @@ import App from "./App";
 import "./index.css";
 import "./styles/theme.css";
 
+// Ensure dark mode is always applied
+document.documentElement.classList.add("dark");
+
 // Initialize Lenis smooth scroll
 const lenis = new Lenis({
   duration: 1.2,

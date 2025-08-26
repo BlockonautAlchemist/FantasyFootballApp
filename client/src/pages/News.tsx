@@ -22,11 +22,11 @@ export default function News() {
 
   const getTagColor = (tag: string) => {
     switch (tag) {
-      case "injury": return "bg-red-100 text-red-800";
-      case "role": return "bg-blue-100 text-blue-800";
-      case "matchup": return "bg-green-100 text-green-800";
-      case "other": return "bg-purple-100 text-purple-800";
-      default: return "bg-gray-100 text-gray-800";
+      case "injury": return "bg-danger/10 text-danger";
+      case "role": return "bg-blue-600/10 text-blue-400";
+      case "matchup": return "bg-success/10 text-success";
+      case "other": return "bg-purple-600/10 text-purple-400";
+      default: return "bg-surface2 text-textDim";
     }
   };
 
@@ -34,8 +34,8 @@ export default function News() {
     switch (impact) {
       case "High": return "fas fa-chart-line text-secondary";
       case "Medium": return "fas fa-chart-line text-warning";
-      case "Low": return "fas fa-chart-line text-slate-400";
-      default: return "fas fa-chart-line text-slate-400";
+      case "Low": return "fas fa-chart-line text-textDim";
+      default: return "fas fa-chart-line text-textDim";
     }
   };
 
@@ -52,9 +52,9 @@ export default function News() {
       </div>
 
       {/* News Filter */}
-      <div className="bg-surface rounded-lg border border-gray-200 p-4 mb-6">
+      <div className="bg-surface rounded-lg border border-border p-4 mb-6">
         <div className="flex items-center gap-4">
-          <label className="text-sm font-medium text-slate-700">Filter by:</label>
+          <label className="text-sm font-medium text-text">Filter by:</label>
           <div className="flex gap-2">
             {newsFilters.map((filter) => (
               <Button
@@ -73,8 +73,8 @@ export default function News() {
 
       {isLoading ? (
         <div className="text-center py-8" data-testid="loading-news">
-          <i className="fas fa-spinner fa-spin text-2xl text-slate-400 mb-2"></i>
-          <p className="text-slate-600">Loading latest news...</p>
+          <i className="fas fa-spinner fa-spin text-2xl text-textDim mb-2"></i>
+          <p className="text-textDim">Loading latest news...</p>
         </div>
       ) : (
         <>
@@ -83,7 +83,7 @@ export default function News() {
             {filteredNews?.map((item) => (
               <div 
                 key={item.id} 
-                className="bg-surface rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow"
+                className="bg-surface rounded-lg border border-border p-6 hover:shadow-lg transition-shadow"
                 data-testid={`news-item-${item.id}`}
               >
                 <div className="flex items-start justify-between mb-3">
@@ -97,23 +97,23 @@ export default function News() {
                       </span>
                     )}
                   </div>
-                  <span className="text-xs text-slate-500">{item.timestamp}</span>
+                  <span className="text-xs text-textDim">{item.timestamp}</span>
                 </div>
-                <h3 className="text-lg font-semibold text-slate-800 mb-2">
+                <h3 className="text-lg font-semibold text-text mb-2">
                   {item.title}
                 </h3>
-                <p className="text-slate-600 mb-4">
+                <p className="text-textDim mb-4">
                   {item.summary}
                 </p>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <i className={getImpactIcon(item.impact)}></i>
-                    <span className="text-sm text-slate-600">Impact: {item.impact}</span>
+                    <span className="text-sm text-textDim">Impact: {item.impact}</span>
                   </div>
                   {item.timeframe && (
                     <div className="flex items-center gap-2">
-                      <i className="fas fa-clock text-slate-400 text-sm"></i>
-                      <span className="text-sm text-slate-500">{item.timeframe}</span>
+                      <i className="fas fa-clock text-textDim text-sm"></i>
+                      <span className="text-sm text-textDim">{item.timeframe}</span>
                     </div>
                   )}
                 </div>

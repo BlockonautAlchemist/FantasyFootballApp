@@ -50,22 +50,22 @@ export default function Lineup() {
       </div>
 
       {/* My Roster */}
-      <div className="bg-white/5 border border-white/10 rounded-2xl p-6 mb-8">
-        <h3 className="text-lg font-semibold text-white mb-4">My Roster</h3>
+      <div className="bg-surface border border-border rounded-2xl p-6 mb-8">
+        <h3 className="text-lg font-semibold text-text mb-4">My Roster</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {positions.map(pos => (
             <div key={pos} className="space-y-2">
-              <h4 className="font-medium text-gray-400 text-sm">{pos}</h4>
+              <h4 className="font-medium text-textDim text-sm">{pos}</h4>
               {mockRoster.filter(player => player.pos === pos).map((player, index) => {
                 const initials = player.name.split(" ").map(n => n[0]).join("").toUpperCase();
                 return (
-                  <div key={index} className="flex items-center space-x-2 p-2 bg-white/10 rounded-xl" data-testid={`roster-player-${player.name.toLowerCase().replace(/\s+/g, "-")}`}>
+                  <div key={index} className="flex items-center space-x-2 p-2 bg-surface2 rounded-xl" data-testid={`roster-player-${player.name.toLowerCase().replace(/\s+/g, "-")}`}>
                     <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center text-xs font-bold text-primary">
                       {initials}
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-white">{player.name}</p>
-                      <p className="text-xs text-gray-400">{player.team}</p>
+                      <p className="text-sm font-medium text-text">{player.name}</p>
+                      <p className="text-xs text-textDim">{player.team}</p>
                     </div>
                   </div>
                 );
@@ -90,8 +90,8 @@ export default function Lineup() {
       {lineupRec && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Recommended Starters */}
-          <div className="bg-surface rounded-lg border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-slate-800 mb-4">
+          <div className="bg-surface rounded-lg border border-border p-6">
+            <h3 className="text-lg font-semibold text-text mb-4">
               <i className="fas fa-star text-secondary mr-2"></i>
               Recommended Starters
             </h3>
@@ -99,13 +99,13 @@ export default function Lineup() {
               {lineupRec.starters.map((player, index) => {
                 const initials = player.split(" ").map(n => n[0]).join("").toUpperCase();
                 return (
-                  <div key={index} className="flex items-center space-x-3 p-3 bg-green-50 border border-green-200 rounded" data-testid={`starter-${player.toLowerCase().replace(/\s+/g, "-")}`}>
+                  <div key={index} className="flex items-center space-x-3 p-3 bg-secondary/10 border border-secondary/20 rounded" data-testid={`starter-${player.toLowerCase().replace(/\s+/g, "-")}`}>
                     <div className="w-8 h-8 bg-secondary/10 rounded-full flex items-center justify-center text-xs font-bold text-secondary">
                       {initials}
                     </div>
                     <div>
-                      <p className="font-medium text-slate-800">{player}</p>
-                      <p className="text-xs text-slate-600">Starter</p>
+                      <p className="font-medium text-text">{player}</p>
+                      <p className="text-xs text-textDim">Starter</p>
                     </div>
                   </div>
                 );
@@ -116,20 +116,20 @@ export default function Lineup() {
           {/* Bench & Pivots */}
           <div className="space-y-6">
             {/* Bench */}
-            <div className="bg-surface rounded-lg border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-slate-800 mb-4">
-                <i className="fas fa-chair text-slate-500 mr-2"></i>
+            <div className="bg-surface rounded-lg border border-border p-6">
+              <h3 className="text-lg font-semibold text-text mb-4">
+                <i className="fas fa-chair text-textDim mr-2"></i>
                 Bench
               </h3>
               <div className="space-y-2">
                 {lineupRec.bench.map((player, index) => {
                   const initials = player.split(" ").map(n => n[0]).join("").toUpperCase();
                   return (
-                    <div key={index} className="flex items-center space-x-3 p-2 bg-gray-50 rounded">
-                      <div className="w-6 h-6 bg-slate-200 rounded-full flex items-center justify-center text-xs font-bold text-slate-600">
+                    <div key={index} className="flex items-center space-x-3 p-2 bg-surface2 rounded">
+                      <div className="w-6 h-6 bg-surface2 rounded-full flex items-center justify-center text-xs font-bold text-text">
                         {initials}
                       </div>
-                      <p className="text-sm text-slate-700">{player}</p>
+                      <p className="text-sm text-text">{player}</p>
                     </div>
                   );
                 })}
@@ -138,15 +138,15 @@ export default function Lineup() {
 
             {/* Pivot Options */}
             {lineupRec.pivots && (
-              <div className="bg-surface rounded-lg border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-slate-800 mb-4">
+              <div className="bg-surface rounded-lg border border-border p-6">
+                <h3 className="text-lg font-semibold text-text mb-4">
                   <i className="fas fa-exchange-alt text-warning mr-2"></i>
                   Pivot Options
                 </h3>
                 <div className="space-y-2">
                   {lineupRec.pivots.map((pivot, index) => (
-                    <div key={index} className="p-3 bg-yellow-50 border border-yellow-200 rounded">
-                      <p className="text-sm text-slate-700">{pivot}</p>
+                    <div key={index} className="p-3 bg-warning/10 border border-warning/20 rounded">
+                      <p className="text-sm text-text">{pivot}</p>
                     </div>
                   ))}
                 </div>
@@ -158,13 +158,13 @@ export default function Lineup() {
 
       {/* Reasoning */}
       {lineupRec && (
-        <div className="mt-8 bg-surface rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-slate-800 mb-4">Lineup Reasoning</h3>
+        <div className="mt-8 bg-surface rounded-lg border border-border p-6">
+          <h3 className="text-lg font-semibold text-text mb-4">Lineup Reasoning</h3>
           <ul className="space-y-2">
             {lineupRec.reasons.map((reason, index) => (
               <li key={index} className="flex items-start">
                 <i className="fas fa-lightbulb text-warning text-sm mt-1 mr-3"></i>
-                <span className="text-slate-600">{reason}</span>
+                <span className="text-textDim">{reason}</span>
               </li>
             ))}
           </ul>

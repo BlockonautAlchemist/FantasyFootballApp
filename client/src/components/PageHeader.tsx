@@ -6,8 +6,8 @@ interface PageHeaderProps {
 export default function PageHeader({ title, subtitle }: PageHeaderProps) {
   return (
     <div className="mb-8">
-      <h2 className="text-3xl font-bold text-slate-800 mb-2">{title}</h2>
-      <p className="text-slate-600">{subtitle}</p>
+      <h2 className="text-3xl font-bold text-text mb-2">{title}</h2>
+      <p className="text-textDim">{subtitle}</p>
     </div>
   );
 }
