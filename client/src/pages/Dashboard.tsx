@@ -122,7 +122,7 @@ export default function Dashboard() {
 
       {/* Marquee Section */}
       <section className="py-8 border-y border-white/10 bg-white/5">
-        <Marquee className="text-6xl md:text-8xl font-display font-bold text-white/10">
+        <Marquee className="text-6xl md:text-8xl font-display font-bold text-white">
           DOMINATE YOUR LEAGUE • WIN CHAMPIONSHIPS • ANALYZE EVERYTHING • 
         </Marquee>
       </section>
