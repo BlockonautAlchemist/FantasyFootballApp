@@ -15,6 +15,7 @@ import Marquee from "@/components/Marquee";
 import Parallax from "@/components/Parallax";
 import MagneticButton from "@/components/MagneticButton";
 import ConnectionCallout from "@/components/ConnectionCallout";
+import VideoHero from "@/components/VideoHero";
 
 const tools = [
   {
@@ -77,72 +78,20 @@ const tools = [
 
 export default function Dashboard() {
   return (
-    <>
-      {/* Hero Section */}
-      <section className="min-h-screen flex items-center justify-center relative overflow-hidden">
-        {/* Background Parallax Element */}
-        <Parallax offset={100} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-5">
-          <div className="w-[800px] h-[800px] rounded-full bg-gradient-to-r from-primary/20 to-accent/20" />
-        </Parallax>
-
-        <div className="container relative z-10 text-center">
-          <Reveal>
-            <h1 className="mb-8 gradient-text leading-tight">
-              Fantasy Football
-              <br />
-              Reimagined
-            </h1>
-          </Reveal>
-
-          <Reveal delay={0.2}>
-            <p className="text-xl md:text-2xl text-textDim mb-12 max-w-2xl mx-auto leading-relaxed">
-              AI-powered insights, real-time analysis, and championship-winning strategies 
-              all in one beautiful interface.
-            </p>
-          </Reveal>
-
-          <Reveal delay={0.4}>
-            <MagneticButton className="bg-primary text-white px-8 py-4 rounded-full font-display font-semibold text-lg">
-              <Link href="#tools" className="flex items-center space-x-2">
-                <span>Explore Tools</span>
-                <motion.div
-                  animate={{ y: [0, 4, 0] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path d="M7 13l3 3 7-7" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </motion.div>
-              </Link>
-            </MagneticButton>
-          </Reveal>
-        </div>
-
-        {/* Scroll Indicator */}
-        <motion.div
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 text-textDim"
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path d="M7 13l3 3 7-7" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </motion.div>
-      </section>
-
-      {/* Marquee Section */}
-      <section className="py-8 border-y border-border bg-surface/30">
-        <Marquee className="text-6xl md:text-8xl font-display font-bold text-text">
-          DOMINATE YOUR LEAGUE • WIN CHAMPIONSHIPS • ANALYZE EVERYTHING • 
-        </Marquee>
-      </section>
+    <div>
+      {/* Video Hero Section */}
+      <VideoHero
+        title="Your Fantasy Arsenal"
+        subtitle="Eight powerful tools designed to give you the competitive edge you need to dominate your league."
+        ctaText="Explore Tools"
+        ctaHref="#tools"
+        overlayOpacity={0.6}
+      />
 
       {/* Connection Status */}
-      <section className="py-16">
-        <div className="container">
-          <ConnectionCallout />
-        </div>
-      </section>
+      <div className="mb-6">
+        <ConnectionCallout />
+      </div>
 
       {/* Tools Grid */}
       <section id="tools" className="py-32">
@@ -315,6 +264,6 @@ export default function Dashboard() {
           </div>
         </div>
       </footer>
-    </>
+    </div>
   );
 }
