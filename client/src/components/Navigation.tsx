@@ -10,6 +10,7 @@ const navigationItems = [
   { href: "/lineup", label: "Lineup" },
   { href: "/sos", label: "SoS" },
   { href: "/news", label: "News" },
+  { href: "/chatbot", label: "Chatbot" },
   { href: "/connect", label: "Connect" },
 ];
 

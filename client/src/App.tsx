@@ -12,6 +12,7 @@ import Trade from "@/pages/Trade";
 import Lineup from "@/pages/Lineup";
 import SoS from "@/pages/SoS";
 import News from "@/pages/News";
+import Chatbot from "@/pages/Chatbot";
 import Connect from "@/pages/Connect";
 import NotFound from "@/pages/not-found";
 
@@ -28,6 +29,7 @@ function Router() {
           <Route path="/lineup" component={Lineup} />
           <Route path="/sos" component={SoS} />
           <Route path="/news" component={News} />
+          <Route path="/chatbot" component={Chatbot} />
           <Route path="/connect" component={Connect} />
           <Route component={NotFound} />
         </Switch>
