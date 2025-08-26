@@ -31,7 +31,7 @@ export default function MagneticButton({
       whileTap={{ scale: 0.98 }}
       data-testid="magnetic-button"
     >
-      {children}
+      <div>{children}</div>
     </Component>
   );
 }

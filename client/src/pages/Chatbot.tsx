@@ -140,18 +140,16 @@ export default function Chatbot() {
                     />
                   </div>
                   
-                  <MagneticButton>
-                    <button
-                      type="submit" 
-                      className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
-                      disabled={!inputMessage.trim()}
-                      data-testid="send-button"
-                    >
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    </button>
-                  </MagneticButton>
+                  <button
+                    type="submit" 
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-opacity hover:scale-105 hover:-translate-y-1 transition-all duration-200"
+                    disabled={!inputMessage.trim()}
+                    data-testid="send-button"
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </button>
                 </form>
               </div>
             </motion.div>

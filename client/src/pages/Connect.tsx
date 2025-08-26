@@ -61,13 +61,13 @@ export default function Connect() {
       />
 
       {!connected && !showLeaguePicker && (
-        <div className="bg-surface rounded-lg border border-gray-200 p-8 text-center mb-8">
+        <div className="bg-white/5 border border-white/10 rounded-2xl p-8 text-center mb-8">
           <div className="mb-6">
             <i className="fab fa-yahoo text-6xl text-purple-600 mb-4"></i>
-            <h3 className="text-xl font-semibold text-slate-800 mb-2">
+            <h3 className="text-xl font-semibold text-white mb-2">
               Connect with Yahoo Fantasy
             </h3>
-            <p className="text-slate-600">
+            <p className="text-gray-400">
               Authorize access to import your fantasy leagues and manage your teams
             </p>
           </div>
@@ -76,7 +76,7 @@ export default function Connect() {
       )}
 
       {connected && showLeaguePicker && (
-        <div className="bg-surface rounded-lg border border-gray-200 p-6 mb-8">
+        <div className="bg-white/5 border border-white/10 rounded-2xl p-6 mb-8">
           <LeaguePicker onLeagueSelected={handleLeagueSelected} />
         </div>
       )}

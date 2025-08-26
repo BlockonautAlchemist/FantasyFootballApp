@@ -44,10 +44,10 @@ export default function StartSit() {
       </div>
 
       {/* Input Form */}
-      <div className="bg-surface rounded-lg border border-gray-200 p-6 mb-8">
+      <div className="bg-white/5 border border-white/10 rounded-2xl p-6 mb-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Player A</label>
+            <label className="block text-sm font-medium text-white mb-2">Player A</label>
             <PlayerSearch 
               placeholder="Search player..." 
               value={playerA}
@@ -55,7 +55,7 @@ export default function StartSit() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Player B</label>
+            <label className="block text-sm font-medium text-white mb-2">Player B</label>
             <PlayerSearch 
               placeholder="Search player..." 
               value={playerB}
@@ -63,7 +63,7 @@ export default function StartSit() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Week</label>
+            <label className="block text-sm font-medium text-white mb-2">Week</label>
             <Select value={week} onValueChange={setWeek}>
               <SelectTrigger data-testid="select-week">
                 <SelectValue placeholder="Select week" />
@@ -76,7 +76,7 @@ export default function StartSit() {
             </Select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Scoring</label>
+            <label className="block text-sm font-medium text-white mb-2">Scoring</label>
             <Select value={scoring} onValueChange={setScoring}>
               <SelectTrigger data-testid="select-scoring">
                 <SelectValue placeholder="Select scoring" />
@@ -105,7 +105,7 @@ export default function StartSit() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Recommendation */}
           <div className="lg:col-span-1">
-            <div className="bg-surface rounded-lg border border-gray-200 p-6">
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
               <h3 className="text-lg font-semibold text-slate-800 mb-4">Recommendation</h3>
               <div className="text-center mb-6">
                 <div className="bg-secondary/10 text-secondary text-lg font-bold py-3 px-4 rounded-lg mb-3">

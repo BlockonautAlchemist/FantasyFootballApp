@@ -58,11 +58,11 @@ export default function Trade() {
 
       {/* Trade Input */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <div className="bg-surface rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-slate-800 mb-4 text-center">You Give</h3>
+        <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+          <h3 className="text-lg font-semibold text-white mb-4 text-center">You Give</h3>
           <div className="space-y-3">
             {playersGive.map((player) => (
-              <div key={player.id} className="flex items-center justify-between p-3 bg-red-50 border border-red-200 rounded">
+              <div key={player.id} className="flex items-center justify-between p-3 bg-red-600/10 border border-red-600/20 rounded-xl">
                 <div className="flex items-center space-x-3">
                   <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-xs font-bold text-primary">
                     {getPlayerInitials(player.name)}
@@ -91,11 +91,11 @@ export default function Trade() {
           </div>
         </div>
 
-        <div className="bg-surface rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-slate-800 mb-4 text-center">You Receive</h3>
+        <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+          <h3 className="text-lg font-semibold text-white mb-4 text-center">You Receive</h3>
           <div className="space-y-3">
             {playersReceive.map((player) => (
-              <div key={player.id} className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded">
+              <div key={player.id} className="flex items-center justify-between p-3 bg-green-600/10 border border-green-600/20 rounded-xl">
                 <div className="flex items-center space-x-3">
                   <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-xs font-bold text-primary">
                     {getPlayerInitials(player.name)}
@@ -139,8 +139,8 @@ export default function Trade() {
 
       {/* Trade Analysis Results */}
       {tradeResult && (
-        <div className="bg-surface rounded-lg border border-gray-200 p-6">
-          <h3 className="text-xl font-semibold text-slate-800 mb-6">Trade Analysis</h3>
+        <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+          <h3 className="text-xl font-semibold text-white mb-6">Trade Analysis</h3>
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Verdict */}

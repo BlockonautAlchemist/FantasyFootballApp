@@ -45,9 +45,9 @@ export default function Waivers() {
       </div>
 
       {/* Filters */}
-      <div className="bg-surface rounded-lg border border-gray-200 p-4 mb-6">
+      <div className="bg-white/5 border border-white/10 rounded-2xl p-4 mb-6">
         <div className="flex items-center gap-4">
-          <label className="text-sm font-medium text-slate-700">Filter by Position:</label>
+          <label className="text-sm font-medium text-white">Filter by Position:</label>
           <div className="flex gap-2">
             {positions.map((pos) => (
               <Button
@@ -73,11 +73,11 @@ export default function Waivers() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Available Players */}
           <div className="lg:col-span-2">
-            <div className="bg-surface rounded-lg border border-gray-200">
-              <div className="p-4 border-b border-gray-200">
-                <h3 className="text-lg font-semibold text-slate-800">Top Available Players</h3>
+            <div className="bg-white/5 border border-white/10 rounded-2xl">
+              <div className="p-4 border-b border-white/10">
+                <h3 className="text-lg font-semibold text-white">Top Available Players</h3>
               </div>
-              <div className="divide-y divide-gray-100">
+              <div className="divide-y divide-white/10">
                 {waiverData?.candidates.map((player) => {
                   const initials = player.name.split(" ").map(n => n[0]).join("").toUpperCase();
                   const tierColors = ["bg-primary/10", "bg-secondary/10", "bg-warning/10"];

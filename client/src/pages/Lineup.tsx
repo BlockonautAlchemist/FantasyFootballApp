@@ -50,22 +50,22 @@ export default function Lineup() {
       </div>
 
       {/* My Roster */}
-      <div className="bg-surface rounded-lg border border-gray-200 p-6 mb-8">
-        <h3 className="text-lg font-semibold text-slate-800 mb-4">My Roster</h3>
+      <div className="bg-white/5 border border-white/10 rounded-2xl p-6 mb-8">
+        <h3 className="text-lg font-semibold text-white mb-4">My Roster</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {positions.map(pos => (
             <div key={pos} className="space-y-2">
-              <h4 className="font-medium text-slate-700 text-sm">{pos}</h4>
+              <h4 className="font-medium text-gray-400 text-sm">{pos}</h4>
               {mockRoster.filter(player => player.pos === pos).map((player, index) => {
                 const initials = player.name.split(" ").map(n => n[0]).join("").toUpperCase();
                 return (
-                  <div key={index} className="flex items-center space-x-2 p-2 bg-gray-50 rounded" data-testid={`roster-player-${player.name.toLowerCase().replace(/\s+/g, "-")}`}>
+                  <div key={index} className="flex items-center space-x-2 p-2 bg-white/10 rounded-xl" data-testid={`roster-player-${player.name.toLowerCase().replace(/\s+/g, "-")}`}>
                     <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center text-xs font-bold text-primary">
                       {initials}
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-slate-800">{player.name}</p>
-                      <p className="text-xs text-slate-600">{player.team}</p>
+                      <p className="text-sm font-medium text-white">{player.name}</p>
+                      <p className="text-xs text-gray-400">{player.team}</p>
                     </div>
                   </div>
                 );

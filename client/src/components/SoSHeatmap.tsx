@@ -22,22 +22,22 @@ export default function SoSHeatmap({ data, viewMode }: SoSHeatmapProps) {
   };
 
   return (
-    <div className="bg-surface rounded-lg border border-gray-200 overflow-x-auto">
+    <div className="bg-white/5 border border-white/10 rounded-2xl overflow-x-auto">
       <table className="w-full">
-        <thead className="bg-gray-50">
+        <thead className="bg-white/10">
           <tr>
-            <th className="text-left p-4 font-medium text-slate-700">Position</th>
+            <th className="text-left p-4 font-medium text-white">Position</th>
             {weeks.map(week => (
-              <th key={week} className="text-center p-4 font-medium text-slate-700">
+              <th key={week} className="text-center p-4 font-medium text-white">
                 Week {week}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-100">
+        <tbody className="divide-y divide-white/10">
           {positions.map(pos => (
             <tr key={pos}>
-              <td className="p-4 font-medium text-slate-800">{pos}</td>
+              <td className="p-4 font-medium text-white">{pos}</td>
               {weeks.map(week => {
                 const cellData = getDataForCell(pos, week);
                 const strength = cellData?.strength || 3.0;
