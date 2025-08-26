@@ -1,5 +1,15 @@
 import { motion } from "framer-motion";
 import { Link } from "wouter";
+import { 
+  Scale, 
+  Diamond, 
+  Handshake, 
+  BarChart3, 
+  Calendar, 
+  Newspaper, 
+  Bot, 
+  Link as LinkIcon 
+} from "lucide-react";
 import Reveal from "@/components/Reveal";
 import Marquee from "@/components/Marquee";
 import Parallax from "@/components/Parallax";
@@ -11,56 +21,56 @@ const tools = [
     title: "Start/Sit",
     description: "Compare players with AI-powered insights",
     href: "/start-sit",
-    icon: "⚖️",
+    icon: Scale,
     gradient: "from-blue-600 to-purple-600"
   },
   {
     title: "Waivers",
     description: "Discover hidden gems on the wire",
     href: "/waivers",
-    icon: "💎",
+    icon: Diamond,
     gradient: "from-emerald-600 to-teal-600"
   },
   {
     title: "Trade",
     description: "Analyze trades with precision",
     href: "/trade",
-    icon: "🤝",
+    icon: Handshake,
     gradient: "from-orange-600 to-red-600"
   },
   {
     title: "Lineup",
     description: "Optimize your starting lineup",
     href: "/lineup",
-    icon: "📊",
+    icon: BarChart3,
     gradient: "from-pink-600 to-rose-600"
   },
   {
     title: "Schedule",
     description: "Plan ahead with matchup data",
     href: "/sos",
-    icon: "📅",
+    icon: Calendar,
     gradient: "from-indigo-600 to-blue-600"
   },
   {
     title: "News",
     description: "Stay updated with the latest",
     href: "/news",
-    icon: "📰",
+    icon: Newspaper,
     gradient: "from-yellow-600 to-orange-600"
   },
   {
     title: "Assistant",
     description: "Chat with your fantasy AI",
     href: "/chatbot",
-    icon: "🤖",
+    icon: Bot,
     gradient: "from-purple-600 to-pink-600"
   },
   {
     title: "Connect",
     description: "Link your Yahoo account",
     href: "/connect",
-    icon: "🔗",
+    icon: LinkIcon,
     gradient: "from-cyan-600 to-blue-600"
   }
 ];
@@ -160,8 +170,8 @@ export default function Dashboard() {
                     transition={{ duration: 0.3, ease: "easeOut" }}
                     data-testid={`tool-card-${tool.title.toLowerCase()}`}
                   >
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${tool.gradient} flex items-center justify-center mb-4 text-xl`}>
-                      {tool.icon}
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${tool.gradient} flex items-center justify-center mb-4 text-white`}>
+                      <tool.icon size={24} />
                     </div>
                     
                     <h3 className="font-display font-semibold text-xl mb-2 text-text group-hover:text-textDim transition-colors">

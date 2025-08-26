@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { Loader2, ArrowUp, ArrowDown, Minus } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import TierBadge from "@/components/TierBadge";
 import RiskChip from "@/components/RiskChip";
@@ -66,7 +67,7 @@ export default function Waivers() {
 
       {isLoading ? (
         <div className="text-center py-8" data-testid="loading-waivers">
-          <i className="fas fa-spinner fa-spin text-2xl text-textDim mb-2"></i>
+          <Loader2 className="mx-auto text-2xl text-textDim mb-2 animate-spin" />
           <p className="text-textDim">Loading waiver recommendations...</p>
         </div>
       ) : (
@@ -111,7 +112,13 @@ export default function Waivers() {
                       </div>
                       {player.notes && (
                         <div className="mt-2 flex items-center">
-                          <i className={`fas ${player.roleTrend === "up" ? "fa-arrow-up text-secondary" : player.roleTrend === "down" ? "fa-arrow-down text-danger" : "fa-minus text-slate-400"} text-xs mr-1`}></i>
+                          {player.roleTrend === "up" ? (
+                            <ArrowUp className="text-secondary text-xs mr-1" />
+                          ) : player.roleTrend === "down" ? (
+                            <ArrowDown className="text-danger text-xs mr-1" />
+                          ) : (
+                            <Minus className="text-slate-400 text-xs mr-1" />
+                          )}
                           <span className="text-xs text-slate-600">{player.notes}</span>
                         </div>
                       )}
