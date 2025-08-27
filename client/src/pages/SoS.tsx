@@ -29,7 +29,8 @@ export default function SoS() {
 
       {/* Controls */}
       <div className="bg-surface rounded-lg border border-border p-4 mb-6">
-        <div className="flex items-center justify-between">
+        <div className="space-y-4">
+          {/* View Controls */}
           <div className="flex items-center gap-4">
             <label className="text-sm font-medium text-text">View:</label>
             <div className="flex gap-2">
@@ -51,19 +52,31 @@ export default function SoS() {
               </Button>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-textDim">Legend:</span>
-            <div className="flex items-center gap-2 text-xs">
-              <div className="w-4 h-4 sos-very-easy rounded"></div>
-              <span>Very Easy</span>
-              <div className="w-4 h-4 sos-easy rounded"></div>
-              <span>Easy</span>
-              <div className="w-4 h-4 sos-neutral rounded"></div>
-              <span>Neutral</span>
-              <div className="w-4 h-4 sos-hard rounded"></div>
-              <span>Hard</span>
-              <div className="w-4 h-4 sos-very-hard rounded"></div>
-              <span>Very Hard</span>
+          
+          {/* Legend */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+            <span className="text-sm font-medium text-textDim whitespace-nowrap">Legend:</span>
+            <div className="flex flex-wrap items-center gap-2 text-xs">
+              <div className="flex items-center gap-1">
+                <div className="w-4 h-4 sos-very-easy rounded"></div>
+                <span>Very Easy</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-4 h-4 sos-easy rounded"></div>
+                <span>Easy</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-4 h-4 sos-neutral rounded"></div>
+                <span>Neutral</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-4 h-4 sos-hard rounded"></div>
+                <span>Hard</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-4 h-4 sos-very-hard rounded"></div>
+                <span>Very Hard</span>
+              </div>
             </div>
           </div>
         </div>

@@ -1,35 +1,57 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import PageHeader from "@/components/PageHeader";
-import PlayerSearch from "@/components/PlayerSearch";
+import PlayerPicker from "@/components/PlayerPicker";
 import ComparisonPanel from "@/components/ComparisonPanel";
 import ConnectionCallout from "@/components/ConnectionCallout";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { comparePlayers } from "@/services/api";
-import { StartSitInput } from "@/services/types";
+import { StartSitInput, PlayerSummary } from "@/services/types";
 
 export default function StartSit() {
-  const [playerA, setPlayerA] = useState("Jaylen Waddle");
-  const [playerB, setPlayerB] = useState("Courtland Sutton");
+  const [playerA, setPlayerA] = useState<PlayerSummary | null>({ 
+    id: "nfl.p.1234", 
+    name: "Jaylen Waddle", 
+    pos: "WR", 
+    team: "MIA" 
+  });
+  const [playerB, setPlayerB] = useState<PlayerSummary | null>({ 
+    id: "nfl.p.5678", 
+    name: "Courtland Sutton", 
+    pos: "WR", 
+    team: "DEN" 
+  });
   const [week, setWeek] = useState("8");
   const [scoring, setScoring] = useState("half_ppr");
   const [submitted, setSubmitted] = useState(false);
 
   const { data: result, isLoading } = useQuery({
-    queryKey: ["/api/start-sit", playerA, playerB, week, scoring],
-    queryFn: () => comparePlayers({
-      playerAId: "nfl.p.1234",
-      playerBId: "nfl.p.5678", 
-      week: parseInt(week),
-      scoring: scoring as "standard" | "half_ppr" | "ppr"
-    }),
-    enabled: submitted,
+    queryKey: ["/api/start-sit", playerA?.id, playerB?.id, week, scoring],
+    queryFn: () => {
+      if (!playerA?.id || !playerB?.id) {
+        throw new Error("Player IDs are required");
+      }
+      return comparePlayers({
+        playerAId: playerA.id,
+        playerBId: playerB.id,
+        week: parseInt(week),
+        scoring: scoring as "standard" | "half_ppr" | "ppr"
+      });
+    },
+    enabled: submitted && !!playerA?.id && !!playerB?.id,
   });
 
   const handleSubmit = () => {
-    setSubmitted(true);
+    if (playerA?.id && playerB?.id) {
+      setSubmitted(true);
+    }
   };
+
+  // Reset submitted state when players change
+  useEffect(() => {
+    setSubmitted(false);
+  }, [playerA?.id, playerB?.id]);
 
   return (
     <div>
@@ -48,18 +70,18 @@ export default function StartSit() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
           <div>
             <label className="block text-sm font-medium text-text mb-2">Player A</label>
-            <PlayerSearch 
+            <PlayerPicker 
               placeholder="Search player..." 
-              value={playerA}
-              onChange={setPlayerA}
+              value={playerA?.name || ""}
+              onSelect={setPlayerA}
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-text mb-2">Player B</label>
-            <PlayerSearch 
+            <PlayerPicker 
               placeholder="Search player..." 
-              value={playerB}
-              onChange={setPlayerB}
+              value={playerB?.name || ""}
+              onSelect={setPlayerB}
             />
           </div>
           <div>
@@ -92,7 +114,7 @@ export default function StartSit() {
         <Button 
           onClick={handleSubmit} 
           className="btn-primary"
-          disabled={isLoading}
+          disabled={isLoading || !playerA || !playerB}
           data-testid="button-compare-players"
         >
           <i className="fas fa-search mr-2"></i>
