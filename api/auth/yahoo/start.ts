@@ -24,21 +24,33 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       'HMAC-SHA1'
     );
 
-    // Get request token - try with explicit callback URL
+    // Get request token - try with both standard callback and OOB fallback
     const { requestToken, requestSecret } = await new Promise<{requestToken: string, requestSecret: string}>((resolve, reject) => {
-      // Try with callback URL parameter and additional OAuth parameters
+      // First try with the standard callback URL
       oauth.getOAuthRequestToken(
         process.env.YAHOO_REDIRECT_URI!,
-        { oauth_callback: process.env.YAHOO_REDIRECT_URI! },
         (error, requestToken, requestSecret) => {
           if (error) {
-            console.error('OAuth request token error details:', error);
-            console.error('Error data:', (error as any).data);
-            console.error('Error statusCode:', (error as any).statusCode);
-            reject(new Error(`Error getting request token: ${(error as any).data || (error as any).message || error}`));
+            console.error('Standard callback failed, trying OOB method...', error);
+            
+            // Fallback to out-of-band (OOB) method for serverless environments
+            oauth.getOAuthRequestToken(
+              'oob',
+              (oobError, oobRequestToken, oobRequestSecret) => {
+                if (oobError) {
+                  console.error('OOB OAuth request token error:', oobError);
+                  console.error('Error data:', (oobError as any).data);
+                  console.error('Error statusCode:', (oobError as any).statusCode);
+                  reject(new Error(`Both callback methods failed. Last error: ${(oobError as any).data || (oobError as any).message || oobError}`));
+                  return;
+                }
+                console.log('Successfully obtained OOB request token:', oobRequestToken);
+                resolve({ requestToken: oobRequestToken, requestSecret: oobRequestSecret });
+              }
+            );
             return;
           }
-          console.log('Successfully obtained request token:', requestToken);
+          console.log('Successfully obtained standard request token:', requestToken);
           resolve({ requestToken, requestSecret });
         }
       );
@@ -48,9 +60,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // For serverless, we'll encode it in the state parameter
     const state = Buffer.from(JSON.stringify({ requestSecret })).toString('base64');
     
-    // Don't include oauth_callback in the auth URL since it's already registered with the request token
-    const authUrl = `https://api.login.yahoo.com/oauth/v2/request_auth?oauth_token=${requestToken}&state=${state}`;
+    // Build the authorization URL - include callback for standard flow
+    const authUrl = `https://api.login.yahoo.com/oauth/v2/request_auth?oauth_token=${requestToken}&oauth_callback=${encodeURIComponent(process.env.YAHOO_REDIRECT_URI!)}&state=${state}`;
     
+    console.log('Generated auth URL:', authUrl);
     res.json({ authUrl });
   } catch (error) {
     console.error('Yahoo OAuth start error:', error);
