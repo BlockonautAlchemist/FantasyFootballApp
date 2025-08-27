@@ -1,14 +1,16 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { listYahooLeagues } from "@/services/auth";
+import { listYahooLeagues, linkYahooLeague } from "@/services/auth";
 import { useLeague } from "@/context/LeagueContext";
 
 interface League {
+  id: string;
   leagueKey: string;
   leagueName: string;
   season: string;
   teamKey?: string;
   teamName?: string;
+  isLinked: boolean;
 }
 
 interface LeaguePickerProps {
@@ -18,6 +20,7 @@ interface LeaguePickerProps {
 export default function LeaguePicker({ onLeagueSelected }: LeaguePickerProps) {
   const [leagues, setLeagues] = useState<League[]>([]);
   const [loading, setLoading] = useState(true);
+  const [linking, setLinking] = useState<string | null>(null);
   const { setLinkedLeague } = useLeague();
 
   useEffect(() => {
@@ -35,14 +38,17 @@ export default function LeaguePicker({ onLeagueSelected }: LeaguePickerProps) {
     }
   };
 
-  const handleSelectLeague = (league: League) => {
-    setLinkedLeague({
-      leagueKey: league.leagueKey,
-      leagueName: league.leagueName,
-      teamKey: league.teamKey,
-      teamName: league.teamName
-    });
-    onLeagueSelected();
+  const handleSelectLeague = async (league: League) => {
+    setLinking(league.id);
+    try {
+      const linkedLeague = await linkYahooLeague(league.id);
+      setLinkedLeague(linkedLeague);
+      onLeagueSelected();
+    } catch (error) {
+      console.error('Failed to link league:', error);
+    } finally {
+      setLinking(null);
+    }
   };
 
   if (loading) {
@@ -73,10 +79,20 @@ export default function LeaguePicker({ onLeagueSelected }: LeaguePickerProps) {
             </div>
             <Button
               onClick={() => handleSelectLeague(league)}
+              disabled={linking === league.id}
               className="w-full btn-primary"
               data-testid={`select-league-${league.leagueKey}`}
             >
-              Select League
+              {linking === league.id ? (
+                <>
+                  <i className="fas fa-spinner fa-spin mr-2"></i>
+                  Linking...
+                </>
+              ) : league.isLinked ? (
+                'Currently Selected'
+              ) : (
+                'Select League'
+              )}
             </Button>
           </div>
         ))}

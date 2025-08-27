@@ -1,25 +1,33 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { getCurrentUser, getLinkedLeague, logout } from "@/services/auth";
 
 interface User {
   id: string;
   displayName: string;
+  yahooUserId?: string;
 }
 
 interface LinkedLeague {
+  id?: string;
   leagueKey: string;
   leagueName: string;
+  season?: string;
   teamKey?: string;
   teamName?: string;
+  teamLogo?: string;
+  isLinked?: boolean;
 }
 
 interface LeagueContextType {
   connected: boolean;
   user: User | null;
   linkedLeague: LinkedLeague | null;
+  loading: boolean;
   setConnected: (connected: boolean) => void;
   setUser: (user: User | null) => void;
   setLinkedLeague: (league: LinkedLeague | null) => void;
   disconnect: () => void;
+  refreshData: () => Promise<void>;
 }
 
 const LeagueContext = createContext<LeagueContextType | undefined>(undefined);
@@ -34,23 +42,71 @@ export function LeagueProvider({ children }: { children: ReactNode }) {
   const [connected, setConnectedState] = useState<boolean>(false);
   const [user, setUserState] = useState<User | null>(null);
   const [linkedLeague, setLinkedLeagueState] = useState<LinkedLeague | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  // Load from localStorage on mount
+  // Check for existing session on mount
   useEffect(() => {
-    const savedConnected = localStorage.getItem(STORAGE_KEYS.connected);
-    const savedUser = localStorage.getItem(STORAGE_KEYS.user);
-    const savedLeague = localStorage.getItem(STORAGE_KEYS.linkedLeague);
-
-    if (savedConnected) {
-      setConnectedState(JSON.parse(savedConnected));
-    }
-    if (savedUser) {
-      setUserState(JSON.parse(savedUser));
-    }
-    if (savedLeague) {
-      setLinkedLeagueState(JSON.parse(savedLeague));
-    }
+    checkExistingSession();
   }, []);
+
+  const checkExistingSession = async () => {
+    setLoading(true);
+    try {
+      // Check if user is already authenticated via session
+      const sessionUser = await getCurrentUser();
+      
+      if (sessionUser) {
+        setConnectedState(true);
+        setUserState(sessionUser);
+        
+        // Get linked league from backend
+        const backendLinkedLeague = await getLinkedLeague();
+        if (backendLinkedLeague) {
+          setLinkedLeagueState(backendLinkedLeague);
+        } else {
+          // Fallback to localStorage for backward compatibility
+          const savedLeague = localStorage.getItem(STORAGE_KEYS.linkedLeague);
+          if (savedLeague) {
+            setLinkedLeagueState(JSON.parse(savedLeague));
+          }
+        }
+      } else {
+        // No session, check localStorage for fallback
+        const savedConnected = localStorage.getItem(STORAGE_KEYS.connected);
+        const savedUser = localStorage.getItem(STORAGE_KEYS.user);
+        const savedLeague = localStorage.getItem(STORAGE_KEYS.linkedLeague);
+
+        if (savedConnected && savedUser) {
+          setConnectedState(JSON.parse(savedConnected));
+          setUserState(JSON.parse(savedUser));
+        }
+        if (savedLeague) {
+          setLinkedLeagueState(JSON.parse(savedLeague));
+        }
+      }
+    } catch (error) {
+      console.error('Error checking existing session:', error);
+      // Clear any stale localStorage data
+      localStorage.removeItem(STORAGE_KEYS.connected);
+      localStorage.removeItem(STORAGE_KEYS.user);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const refreshData = async () => {
+    try {
+      const sessionUser = await getCurrentUser();
+      if (sessionUser) {
+        setUserState(sessionUser);
+        
+        const backendLinkedLeague = await getLinkedLeague();
+        setLinkedLeagueState(backendLinkedLeague);
+      }
+    } catch (error) {
+      console.error('Error refreshing data:', error);
+    }
+  };
 
   const setConnected = (connected: boolean) => {
     setConnectedState(connected);
@@ -75,7 +131,15 @@ export function LeagueProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const disconnect = () => {
+  const disconnect = async () => {
+    try {
+      // Call backend logout
+      await logout();
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
+    
+    // Clear frontend state
     setConnectedState(false);
     setUserState(null);
     setLinkedLeagueState(null);
@@ -89,10 +153,12 @@ export function LeagueProvider({ children }: { children: ReactNode }) {
       connected,
       user,
       linkedLeague,
+      loading,
       setConnected,
       setUser,
       setLinkedLeague,
-      disconnect
+      disconnect,
+      refreshData
     }}>
       {children}
     </LeagueContext.Provider>

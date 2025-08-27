@@ -2,26 +2,78 @@ import { StartSitInput, StartSitResult, WaiverItem, PlayerSummary, FAABGuidance,
 
 // Frontend contracts for API calls - signatures remain stable when moving to real backend
 
-export async function getMe(): Promise<{id: string; displayName: string} | null> {
-  // Currently reads from localStorage, replace with HTTP call to /api/me
-  const user = localStorage.getItem('fantasy-assistant-user');
-  return user ? JSON.parse(user) : null;
+export async function getMe(): Promise<{id: string; displayName: string; yahooUserId?: string} | null> {
+  try {
+    const response = await fetch('/api/auth/me', {
+      method: 'GET',
+      credentials: 'include',
+    });
+
+    if (response.status === 401) {
+      return null; // Not authenticated
+    }
+
+    if (!response.ok) {
+      throw new Error('Failed to get current user');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error getting current user:', error);
+    return null;
+  }
 }
 
 export async function listYahooLeagues(): Promise<any[]> {
-  // Currently returns mocks, replace with HTTP call to /api/yahoo/leagues
-  const mockData = await import("../mocks/mockLeagues.json");
-  return mockData.default;
+  try {
+    const response = await fetch('/api/yahoo/leagues', {
+      method: 'GET',
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to get Yahoo leagues');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error getting Yahoo leagues:', error);
+    // Fallback to mock data for development
+    const mockData = await import("../mocks/mockLeagues.json");
+    return mockData.default;
+  }
 }
 
 export async function setYahooLeague(payload: {
+  id?: string;
   leagueKey: string; 
   leagueName: string; 
   teamKey?: string; 
   teamName?: string;
 }): Promise<void> {
-  // Currently persists to localStorage, replace with HTTP call to /api/yahoo/league
-  localStorage.setItem('fantasy-assistant-league', JSON.stringify(payload));
+  if (!payload.id) {
+    // For backward compatibility, store in localStorage if no ID
+    localStorage.setItem('fantasy-assistant-league', JSON.stringify(payload));
+    return;
+  }
+
+  try {
+    const response = await fetch(`/api/yahoo/leagues/${payload.id}/link`, {
+      method: 'POST',
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to link Yahoo league');
+    }
+
+    // Update localStorage for frontend compatibility
+    localStorage.setItem('fantasy-assistant-league', JSON.stringify(payload));
+  } catch (error) {
+    console.error('Error linking Yahoo league:', error);
+    // Fallback to localStorage
+    localStorage.setItem('fantasy-assistant-league', JSON.stringify(payload));
+  }
 }
 
 export async function getRoster(week: number): Promise<any[]> {

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import PageHeader from "@/components/PageHeader";
 import ConnectYahooButton from "@/components/ConnectYahooButton";
@@ -6,11 +6,24 @@ import LeaguePicker from "@/components/LeaguePicker";
 import Callout from "@/components/Callout";
 import { Button } from "@/components/ui/button";
 import { useLeague } from "@/context/LeagueContext";
+import { checkYahooConfig } from "@/services/auth";
 
 export default function Connect() {
   const [showLeaguePicker, setShowLeaguePicker] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const { connected, linkedLeague } = useLeague();
+  const [configStatus, setConfigStatus] = useState<{ configured: boolean; clientId?: string } | null>(null);
+  const { connected, linkedLeague, loading } = useLeague();
+
+  useEffect(() => {
+    console.log('Connect page - connected:', connected, 'linkedLeague:', linkedLeague, 'loading:', loading);
+    checkConfiguration();
+  }, [connected, linkedLeague, loading]);
+
+  const checkConfiguration = async () => {
+    const status = await checkYahooConfig();
+    console.log('Config status:', status);
+    setConfigStatus(status);
+  };
 
   const handleConnected = () => {
     setShowLeaguePicker(true);
@@ -20,6 +33,24 @@ export default function Connect() {
     setShowSuccess(true);
     setShowLeaguePicker(false);
   };
+
+  // Show loading state while checking session
+  if (loading) {
+    return (
+      <div className="min-h-screen">
+        <div className="pt-24 px-4">
+          <PageHeader 
+            title="Connect Your Yahoo Account" 
+            subtitle="Link your Yahoo Fantasy account to access your leagues and rosters" 
+          />
+          <div className="text-center py-8">
+            <i className="fas fa-spinner fa-spin text-2xl text-textDim mb-2"></i>
+            <p className="text-textDim">Loading...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // If already connected and has league, show success immediately
   if (connected && linkedLeague && !showLeaguePicker) {
@@ -54,22 +85,49 @@ export default function Connect() {
   }
 
   return (
-    <div>
-      <PageHeader 
-        title="Connect Your Yahoo Account" 
-        subtitle="Link your Yahoo Fantasy account to access your leagues and rosters" 
-      />
+    <div className="min-h-screen">
+      <div className="pt-24 px-4">
+        <PageHeader 
+          title="Connect Your Yahoo Account" 
+          subtitle="Link your Yahoo Fantasy account to access your leagues and rosters" 
+        />
 
       {!connected && !showLeaguePicker && (
-        <div className="bg-surface border border-border rounded-2xl p-8 text-center mb-8">
+        <div className="bg-gray-800 border border-gray-700 rounded-2xl p-8 text-center mb-8">
           <div className="mb-6">
             <i className="fab fa-yahoo text-6xl text-purple-600 mb-4"></i>
-            <h3 className="text-xl font-semibold text-text mb-2">
+            <h3 className="text-xl font-semibold text-white mb-2">
               Connect with Yahoo Fantasy
             </h3>
-            <p className="text-textDim">
+            <p className="text-gray-300">
               Authorize access to import your fantasy leagues and manage your teams
             </p>
+            
+            {/* Configuration Status */}
+            {configStatus !== null && (
+              <div className="mt-4 p-3 rounded-lg border">
+                {configStatus.configured ? (
+                  <div className="flex items-center justify-center gap-2 text-green-600">
+                    <i className="fas fa-check-circle"></i>
+                    <span className="text-sm">Yahoo OAuth configured ({configStatus.clientId})</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center gap-2 text-red-600">
+                    <i className="fas fa-exclamation-triangle"></i>
+                    <span className="text-sm">Yahoo OAuth not configured</span>
+                  </div>
+                )}
+              </div>
+            )}
+            
+            {configStatus === null && (
+              <div className="mt-4 p-3 rounded-lg border border-gray-300">
+                <div className="flex items-center justify-center gap-2 text-gray-500">
+                  <i className="fas fa-spinner fa-spin"></i>
+                  <span className="text-sm">Checking configuration...</span>
+                </div>
+              </div>
+            )}
           </div>
           <ConnectYahooButton onConnected={handleConnected} />
         </div>
@@ -95,6 +153,83 @@ export default function Connect() {
         </Callout>
       )}
 
+      {/* Setup Guide */}
+      {!connected && configStatus !== null && !configStatus.configured && (
+        <div className="bg-surface border border-border rounded-2xl p-6 mt-8">
+          <h3 className="text-xl font-semibold text-text mb-4">
+            <i className="fas fa-cog mr-2"></i>
+            Yahoo OAuth Setup Required
+          </h3>
+          <p className="text-textDim mb-4">
+            To connect with Yahoo Fantasy Sports, you'll need to configure Yahoo OAuth credentials in your environment. 
+            Follow these steps:
+          </p>
+          <div className="space-y-3 text-sm">
+            <div className="flex items-start gap-3">
+              <span className="bg-primary text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold mt-0.5">1</span>
+              <div>
+                <p className="text-text font-medium">Create a Yahoo Developer App</p>
+                <p className="text-textDim">Visit <a href="https://developer.yahoo.com" target="_blank" rel="noopener noreferrer" className="text-primary underline">developer.yahoo.com</a> and create a new app with Fantasy Sports API access</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <span className="bg-primary text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold mt-0.5">2</span>
+              <div>
+                <p className="text-text font-medium">Configure Environment Variables</p>
+                <p className="text-textDim">Copy .env.example to .env and add your Yahoo Client ID and Secret</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <span className="bg-primary text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold mt-0.5">3</span>
+              <div>
+                <p className="text-text font-medium">Restart the Server</p>
+                <p className="text-textDim">Restart your development server to load the new environment variables</p>
+              </div>
+            </div>
+          </div>
+          <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <p className="text-sm text-yellow-800">
+              <i className="fas fa-info-circle mr-2"></i>
+              See <strong>YAHOO_OAUTH_SETUP.md</strong> for detailed setup instructions
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Fallback Connect Section - Always show for debugging */}
+      <div className="bg-blue-900 border border-blue-700 rounded-2xl p-8 text-center mb-8">
+        <h3 className="text-xl font-semibold text-white mb-4">Debug: Yahoo Connection</h3>
+        <p className="text-blue-200 mb-4">
+          Loading: {loading ? 'Yes' : 'No'} | 
+          Connected: {connected ? 'Yes' : 'No'} | 
+          Show League Picker: {showLeaguePicker ? 'Yes' : 'No'} | 
+          Config Status: {configStatus ? JSON.stringify(configStatus) : 'Loading...'}
+        </p>
+        {!loading && (
+          <div className="space-y-3">
+            {!connected ? (
+              <ConnectYahooButton onConnected={handleConnected} />
+            ) : (
+              <div className="space-y-2">
+                <p className="text-green-200">✓ Already connected to Yahoo</p>
+                <button 
+                  onClick={() => {
+                    // Clear the connection state for testing
+                    localStorage.removeItem('fantasy-assistant-connected');
+                    localStorage.removeItem('fantasy-assistant-user');
+                    localStorage.removeItem('fantasy-assistant-league');
+                    window.location.reload();
+                  }}
+                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
+                >
+                  Disconnect & Test OAuth
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
       {/* Info Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
         <div className="text-center p-6">
@@ -118,6 +253,7 @@ export default function Connect() {
             Manage multiple fantasy leagues from a single dashboard. Switch between leagues easily.
           </p>
         </div>
+      </div>
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { completeYahooConnect } from "@/services/auth";
+import { startYahooConnect, completeYahooConnect, checkOAuthReturn, clearOAuthReturn, isConnecting as getIsConnecting } from "@/services/auth";
 import { useLeague } from "@/context/LeagueContext";
 
 interface ConnectYahooButtonProps {
@@ -11,20 +11,51 @@ export default function ConnectYahooButton({ onConnected }: ConnectYahooButtonPr
   const [isConnecting, setIsConnecting] = useState(false);
   const { setConnected, setUser } = useLeague();
 
-  const handleConnect = async () => {
+  useEffect(() => {
+    // Check if we're returning from OAuth
+    const { success, error } = checkOAuthReturn();
+    
+    if (success) {
+      // OAuth success - complete the connection
+      handleOAuthSuccess();
+      clearOAuthReturn();
+    } else if (error) {
+      // OAuth error
+      setIsConnecting(false);
+      console.error('OAuth authentication failed');
+      clearOAuthReturn();
+    }
+
+    // Check if we're in the middle of connecting
+    if (getIsConnecting()) {
+      setIsConnecting(true);
+    }
+  }, []);
+
+  const handleOAuthSuccess = async () => {
     setIsConnecting(true);
     
     try {
-      // Simulate connection delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
       const user = await completeYahooConnect();
       setConnected(true);
       setUser(user);
       onConnected();
     } catch (error) {
-      console.error('Connection failed:', error);
+      console.error('Connection completion failed:', error);
     } finally {
+      setIsConnecting(false);
+    }
+  };
+
+  const handleConnect = async () => {
+    setIsConnecting(true);
+    
+    try {
+      await startYahooConnect();
+      // The user will be redirected to Yahoo OAuth, so this component will unmount
+    } catch (error) {
+      console.error('Connection failed:', error);
+      alert('Unable to connect to Yahoo. Please ensure the Yahoo OAuth credentials are configured in the environment variables. See YAHOO_OAUTH_SETUP.md for setup instructions.');
       setIsConnecting(false);
     }
   };
