@@ -25,7 +25,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       client_id: clientId,
       redirect_uri: redirectUri,
       response_type: 'code',
-      scope: 'fspt-r', // Fantasy Sports read permission
+      // Remove scope temporarily to test basic OAuth flow
       state: state,
       language: 'en-us'
     });
