@@ -7,6 +7,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
+    console.log('Starting Yahoo OAuth process...');
+    console.log('Environment check:', {
+      clientId: process.env.YAHOO_CLIENT_ID ? 'SET' : 'MISSING',
+      clientSecret: process.env.YAHOO_CLIENT_SECRET ? 'SET' : 'MISSING',
+      redirectUri: process.env.YAHOO_REDIRECT_URI ? 'SET' : 'MISSING'
+    });
+
     const oauth = new OAuth(
       'https://api.login.yahoo.com/oauth/v2/get_request_token',
       'https://api.login.yahoo.com/oauth/v2/get_token',
@@ -17,17 +24,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       'HMAC-SHA1'
     );
 
-    // Get request token with callback URL properly registered
+    // Get request token - try with explicit callback URL
     const { requestToken, requestSecret } = await new Promise<{requestToken: string, requestSecret: string}>((resolve, reject) => {
-      // Pass the callback URL as the first parameter to getOAuthRequestToken
-      oauth.getOAuthRequestToken(process.env.YAHOO_REDIRECT_URI!, (error, requestToken, requestSecret) => {
-        if (error) {
-          console.error('OAuth request token error details:', error);
-          reject(new Error(`Error getting request token: ${(error as any).data || (error as any).message || error}`));
-          return;
+      // Try with callback URL parameter and additional OAuth parameters
+      oauth.getOAuthRequestToken(
+        process.env.YAHOO_REDIRECT_URI!,
+        { oauth_callback: process.env.YAHOO_REDIRECT_URI! },
+        (error, requestToken, requestSecret) => {
+          if (error) {
+            console.error('OAuth request token error details:', error);
+            console.error('Error data:', (error as any).data);
+            console.error('Error statusCode:', (error as any).statusCode);
+            reject(new Error(`Error getting request token: ${(error as any).data || (error as any).message || error}`));
+            return;
+          }
+          console.log('Successfully obtained request token:', requestToken);
+          resolve({ requestToken, requestSecret });
         }
-        resolve({ requestToken, requestSecret });
-      });
+      );
     });
 
     // Store request secret in a way we can retrieve it later
