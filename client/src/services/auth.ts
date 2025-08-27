@@ -24,14 +24,19 @@ export async function startYahooConnect(): Promise<void> {
   try {
     const response = await fetch('/api/auth/yahoo/start', {
       method: 'GET',
-      credentials: 'include',
     });
 
     if (!response.ok) {
-      throw new Error('Failed to start Yahoo authentication');
+      const errorText = await response.text();
+      console.error('Start OAuth error response:', errorText);
+      throw new Error(`Failed to start Yahoo authentication: ${response.status}`);
     }
 
     const { authUrl } = await response.json();
+    
+    if (!authUrl) {
+      throw new Error('No authorization URL received');
+    }
     
     // Store connecting state
     localStorage.setItem('fantasy-assistant-connecting', 'true');
