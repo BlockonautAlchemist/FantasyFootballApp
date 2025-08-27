@@ -28,7 +28,7 @@ export class YahooAPIClient {
     return new Promise((resolve, reject) => {
       this.oauth.getOAuthRequestToken((error, requestToken, requestSecret) => {
         if (error) {
-          reject(new Error(`Error getting request token: ${error.data || error.message}`));
+          reject(new Error(`Error getting request token: ${(error as any).data || (error as any).message || error}`));
           return;
         }
 
@@ -53,7 +53,7 @@ export class YahooAPIClient {
         verifier,
         (error, accessToken, accessSecret, results) => {
           if (error) {
-            reject(new Error(`Error getting access token: ${error.data || error.message}`));
+            reject(new Error(`Error getting access token: ${(error as any).data || (error as any).message || error}`));
             return;
           }
 
@@ -75,7 +75,7 @@ export class YahooAPIClient {
         token.sessionHandle,
         (error, accessToken, accessSecret) => {
           if (error) {
-            reject(new Error(`Error refreshing token: ${error.data || error.message}`));
+            reject(new Error(`Error refreshing token: ${(error as any).data || (error as any).message || error}`));
             return;
           }
 
@@ -102,7 +102,7 @@ export class YahooAPIClient {
                 .catch(reject);
               return;
             }
-            reject(new Error(`API request failed: ${error.data || error.message}`));
+            reject(new Error(`API request failed: ${(error as any).data || (error as any).message || error}`));
             return;
           }
 
@@ -130,7 +130,7 @@ export class YahooAPIClient {
                   .catch(reject);
                 return;
               }
-              reject(new Error(`API request failed: ${error.data || error.message}`));
+              reject(new Error(`API request failed: ${(error as any).data || (error as any).message || error}`));
               return;
             }
 

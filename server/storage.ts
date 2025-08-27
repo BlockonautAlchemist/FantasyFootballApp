@@ -100,7 +100,8 @@ export class MemStorage implements IStorage {
       ...insertToken, 
       id,
       createdAt: now,
-      updatedAt: now
+      updatedAt: now,
+      expiresAt: insertToken.expiresAt || null
     };
     this.yahooTokens.set(id, token);
     return token;
@@ -146,7 +147,11 @@ export class MemStorage implements IStorage {
       ...insertLeague, 
       id,
       createdAt: now,
-      updatedAt: now
+      updatedAt: now,
+      teamKey: insertLeague.teamKey || null,
+      teamName: insertLeague.teamName || null,
+      teamLogo: insertLeague.teamLogo || null,
+      isLinked: insertLeague.isLinked || null
     };
     this.yahooLeagues.set(id, league);
     return league;

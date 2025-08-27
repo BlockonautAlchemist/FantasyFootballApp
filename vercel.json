@@ -11,10 +11,7 @@
     },
     {
       "src": "server/index.ts",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": ["server/**", "shared/**", "node_modules/**"]
-      }
+      "use": "@vercel/node"
     }
   ],
   "routes": [
