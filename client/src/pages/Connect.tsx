@@ -109,7 +109,7 @@ export default function Connect() {
                 {configStatus.configured ? (
                   <div className="flex items-center justify-center gap-2 text-green-600">
                     <i className="fas fa-check-circle"></i>
-                    <span className="text-sm">Yahoo OAuth configured ({configStatus.clientId})</span>
+                    <span className="text-sm">Yahoo OAuth configured</span>
                   </div>
                 ) : (
                   <div className="flex items-center justify-center gap-2 text-red-600">
