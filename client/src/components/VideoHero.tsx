@@ -198,7 +198,7 @@ export default function VideoHero({
             <a 
               href={ctaHref}
               onClick={handleCTAClick}
-              className="inline-block px-8 py-4 bg-white text-black font-semibold text-lg rounded-full hover:bg-gray-100 transition-all duration-300 hover:scale-105 hover:shadow-2xl transform cursor-pointer"
+              className="btn-primary text-lg px-8 py-4 font-semibold rounded-full hover:scale-105 hover:shadow-2xl transform cursor-pointer"
             >
               {ctaText}
             </a>

@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 
 interface CalloutProps {
   variant: "success" | "warning" | "error" | "info";
-  icon?: string;
+  icon?: ReactNode;
   title?: string;
   children: ReactNode;
 }
@@ -23,11 +23,11 @@ export default function Callout({ variant, icon, title, children }: CalloutProps
   };
 
   return (
-    <div className={`border rounded-2xl p-6 backdrop-blur-sm ${getVariantClasses()}`} data-testid={`callout-${variant}`}>
+    <div className={`border rounded-2xl p-8 backdrop-blur-sm ${getVariantClasses()}`} data-testid={`callout-${variant}`}>
       {(icon || title) && (
-        <div className="flex items-center mb-2">
-          {icon && <i className={`${icon} mr-2`}></i>}
-          {title && <h4 className="font-display font-semibold">{title}</h4>}
+        <div className="flex items-center mb-4">
+          {icon && <div className="mr-3 text-blue-400">{icon}</div>}
+          {title && <h4 className="font-display font-semibold text-xl">{title}</h4>}
         </div>
       )}
       <div>{children}</div>

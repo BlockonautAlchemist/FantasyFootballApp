@@ -1,6 +1,8 @@
 import { Link, useLocation } from "wouter";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { Trophy, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
 
 const navigationItems = [
   { href: "/", label: "Home" },
@@ -16,6 +18,15 @@ const navigationItems = [
 
 export default function Navigation() {
   const [location] = useLocation();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+  };
 
   return (
     <motion.nav 
@@ -27,22 +38,22 @@ export default function Navigation() {
       <div className="container">
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
-          <Link href="/">
+          <Link href="/" onClick={closeMobileMenu}>
             <motion.div 
               className="flex items-center space-x-3 cursor-pointer"
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.2 }}
             >
               <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-sm">F</span>
+                <Trophy className="w-5 h-5 text-white" />
               </div>
               <span className="font-display font-semibold text-xl text-text">
-                Fantasy
+                Nemetz's Fantasy App
               </span>
             </motion.div>
           </Link>
 
-          {/* Navigation */}
+          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             {navigationItems.map(({ href, label }, index) => (
               <motion.div
@@ -58,7 +69,7 @@ export default function Navigation() {
                 <Link href={href}>
                   <span
                     className={cn(
-                      "link-underline text-sm font-medium transition-colors cursor-pointer",
+                      "text-sm font-medium transition-colors cursor-pointer",
                       location === href
                         ? "text-text"
                         : "text-textDim hover:text-text"
@@ -74,16 +85,62 @@ export default function Navigation() {
 
           {/* Mobile Menu Button */}
           <motion.button 
-            className="md:hidden p-2 text-text"
+            className="md:hidden p-2 text-text hover:text-primary transition-colors"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
+            onClick={toggleMobileMenu}
             data-testid="mobile-menu"
+            aria-label="Toggle mobile menu"
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path d="M3 6h18M3 12h18M3 18h18" strokeWidth={2} strokeLinecap="round"/>
-            </svg>
+            {isMobileMenuOpen ? (
+              <X className="w-6 h-6" />
+            ) : (
+              <Menu className="w-6 h-6" />
+            )}
           </motion.button>
         </div>
+
+        {/* Mobile Navigation Menu */}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div
+              className="md:hidden border-t border-border bg-bg/95 backdrop-blur-sm"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+            >
+              <div className="py-4 space-y-2">
+                {navigationItems.map(({ href, label }, index) => (
+                  <motion.div
+                    key={href}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ 
+                      duration: 0.3, 
+                      delay: index * 0.05,
+                      ease: "easeOut" 
+                    }}
+                  >
+                    <Link href={href} onClick={closeMobileMenu}>
+                      <div
+                        className={cn(
+                          "px-4 py-3 text-sm font-medium transition-colors cursor-pointer hover:bg-surface2 rounded-lg mx-2",
+                          location === href
+                            ? "text-primary bg-primary/10"
+                            : "text-textDim hover:text-text"
+                        )}
+                        data-testid={`mobile-nav-${label.toLowerCase()}`}
+                      >
+                        {label}
+                      </div>
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </motion.nav>
   );

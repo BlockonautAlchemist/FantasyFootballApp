@@ -81,17 +81,19 @@ export default function Dashboard() {
     <div>
       {/* Video Hero Section */}
       <VideoHero
-        title="Your Fantasy Arsenal"
-        subtitle="Eight powerful tools designed to give you the competitive edge you need to dominate your league."
-        ctaText="Explore Tools"
+        title="DOMINATE YOUR LEAGUE"
+        subtitle="AI-powered fantasy football insights, real-time analysis, and championship strategies. Stop guessing, start winning."
+        ctaText="Unlock Your Edge"
         ctaHref="#tools"
         overlayOpacity={0.6}
       />
 
-      {/* Connection Status */}
-      <div className="mb-6">
-        <ConnectionCallout />
-      </div>
+      {/* Connection Status - Centered and Well-Positioned */}
+      <section className="py-16 px-4">
+        <div className="max-w-4xl mx-auto">
+          <ConnectionCallout />
+        </div>
+      </section>
 
       {/* Tools Grid */}
       <section id="tools" className="py-32">
