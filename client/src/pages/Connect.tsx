@@ -196,39 +196,7 @@ export default function Connect() {
         </div>
       )}
 
-      {/* Fallback Connect Section - Always show for debugging */}
-      <div className="bg-blue-900 border border-blue-700 rounded-2xl p-8 text-center mb-8">
-        <h3 className="text-xl font-semibold text-white mb-4">Debug: Yahoo Connection</h3>
-        <p className="text-blue-200 mb-4">
-          Loading: {loading ? 'Yes' : 'No'} | 
-          Connected: {connected ? 'Yes' : 'No'} | 
-          Show League Picker: {showLeaguePicker ? 'Yes' : 'No'} | 
-          Config Status: {configStatus ? JSON.stringify(configStatus) : 'Loading...'}
-        </p>
-        {!loading && (
-          <div className="space-y-3">
-            {!connected ? (
-              <ConnectYahooButton onConnected={handleConnected} />
-            ) : (
-              <div className="space-y-2">
-                <p className="text-green-200">✓ Already connected to Yahoo</p>
-                <button 
-                  onClick={() => {
-                    // Clear the connection state for testing
-                    localStorage.removeItem('fantasy-assistant-connected');
-                    localStorage.removeItem('fantasy-assistant-user');
-                    localStorage.removeItem('fantasy-assistant-league');
-                    window.location.reload();
-                  }}
-                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
-                >
-                  Disconnect & Test OAuth
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+
 
       {/* Info Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
