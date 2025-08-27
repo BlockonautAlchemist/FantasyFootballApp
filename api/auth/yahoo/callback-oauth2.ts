@@ -11,14 +11,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     console.log('=== Yahoo OAuth 2.0 Callback ===');
     console.log('Callback parameters:', { code: code ? 'PRESENT' : 'MISSING', state, error });
 
+    const baseUrl = process.env.NODE_ENV === 'production' 
+      ? 'https://fantasy-football-app-psi.vercel.app' 
+      : 'http://localhost:5000';
+
     if (error) {
       console.error('OAuth error from Yahoo:', error);
-      return res.redirect(`${process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5000'}?auth=error&error=${encodeURIComponent(error as string)}`);
+      return res.redirect(`${baseUrl}?auth=error&error=${encodeURIComponent(error as string)}`);
     }
 
     if (!code) {
       console.error('No authorization code received');
-      return res.redirect(`${process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5000'}?auth=error&error=no_code`);
+      return res.redirect(`${baseUrl}?auth=error&error=no_code`);
     }
 
     // Exchange authorization code for access token
@@ -46,7 +50,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (!tokenResponse.ok) {
       const errorText = await tokenResponse.text();
       console.error('Token exchange failed:', errorText);
-      return res.redirect(`${process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5000'}?auth=error&error=token_exchange_failed`);
+      return res.redirect(`${baseUrl}?auth=error&error=token_exchange_failed`);
     }
 
     const tokenData = await tokenResponse.json();
@@ -74,13 +78,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // Store tokens securely (in a real app, you'd save to database)
     // For now, redirect with success and include token info
-    const successUrl = `${process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5000'}?auth=success&access_token=${encodeURIComponent(tokenData.access_token)}`;
+    const baseUrl = process.env.NODE_ENV === 'production' 
+      ? 'https://fantasy-football-app-psi.vercel.app' 
+      : 'http://localhost:5000';
+    const successUrl = `${baseUrl}?auth=success&access_token=${encodeURIComponent(tokenData.access_token)}`;
     
-    console.log('Redirecting to success URL');
+    console.log('Redirecting to success URL:', successUrl);
     res.redirect(successUrl);
 
   } catch (error) {
     console.error('Yahoo OAuth 2.0 callback error:', error);
-    res.redirect(`${process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5000'}?auth=error&error=callback_error`);
+    const baseUrl = process.env.NODE_ENV === 'production' 
+      ? 'https://fantasy-football-app-psi.vercel.app' 
+      : 'http://localhost:5000';
+    res.redirect(`${baseUrl}?auth=error&error=callback_error`);
   }
 }
