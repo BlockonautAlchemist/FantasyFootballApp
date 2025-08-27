@@ -17,10 +17,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       'HMAC-SHA1'
     );
 
-    // Get request token
+    // Get request token with callback URL properly registered
     const { requestToken, requestSecret } = await new Promise<{requestToken: string, requestSecret: string}>((resolve, reject) => {
-      oauth.getOAuthRequestToken((error, requestToken, requestSecret) => {
+      // Pass the callback URL as the first parameter to getOAuthRequestToken
+      oauth.getOAuthRequestToken(process.env.YAHOO_REDIRECT_URI!, (error, requestToken, requestSecret) => {
         if (error) {
+          console.error('OAuth request token error details:', error);
           reject(new Error(`Error getting request token: ${(error as any).data || (error as any).message || error}`));
           return;
         }
@@ -32,7 +34,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // For serverless, we'll encode it in the state parameter
     const state = Buffer.from(JSON.stringify({ requestSecret })).toString('base64');
     
-    const authUrl = `https://api.login.yahoo.com/oauth/v2/request_auth?oauth_token=${requestToken}&oauth_callback=${encodeURIComponent(process.env.YAHOO_REDIRECT_URI!)}&state=${state}`;
+    // Don't include oauth_callback in the auth URL since it's already registered with the request token
+    const authUrl = `https://api.login.yahoo.com/oauth/v2/request_auth?oauth_token=${requestToken}&state=${state}`;
     
     res.json({ authUrl });
   } catch (error) {

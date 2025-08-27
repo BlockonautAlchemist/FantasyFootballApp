@@ -26,8 +26,10 @@ export class YahooAPIClient {
    */
   async getAuthUrl(): Promise<{ authUrl: string; requestToken: string; requestSecret: string }> {
     return new Promise((resolve, reject) => {
-      this.oauth.getOAuthRequestToken((error, requestToken, requestSecret) => {
+      // Pass the callback URL as the first parameter to getOAuthRequestToken
+      this.oauth.getOAuthRequestToken(process.env.YAHOO_REDIRECT_URI!, (error, requestToken, requestSecret) => {
         if (error) {
+          console.error('OAuth request token error details:', error);
           reject(new Error(`Error getting request token: ${(error as any).data || (error as any).message || error}`));
           return;
         }
