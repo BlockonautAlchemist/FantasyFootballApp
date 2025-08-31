@@ -1,7 +1,7 @@
 import { OAuth } from 'oauth';
 import fetch from 'node-fetch';
-import { storage } from './storage';
-import type { YahooToken, User } from '../shared/schema';
+import { storage } from './storage.js';
+import type { YahooToken, User } from '../shared/schema.js';
 
 const YAHOO_API_BASE = 'https://fantasysports.yahooapis.com/fantasy/v2';
 const YAHOO_LOGIN_BASE = 'https://api.login.yahoo.com/oauth/v2';

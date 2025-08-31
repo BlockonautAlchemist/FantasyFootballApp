@@ -1,10 +1,10 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
-import { yahooApi } from "./yahoo-api";
-import yahooAuthRouter from "./authYahoo";
+import { storage } from "./storage.js";
+import { yahooApi } from "./yahoo-api.js";
+import yahooAuthRouter from "./authYahoo.js";
 import session from "express-session";
-import "./types"; // Import session type declarations
+import "./types.js"; // Import session type declarations
 
 export async function registerRoutes(app: Express): Promise<Server | void> {
   // Session middleware for OAuth state management
@@ -70,7 +70,7 @@ export async function registerRoutes(app: Express): Promise<Server | void> {
       });
     } catch (error) {
       console.error('Get user error:', error);
-      res.status(500).json({ error: 'Failed to get user', details: error.message });
+      res.status(500).json({ error: 'Failed to get user', details: (error as Error).message });
     }
   });
 

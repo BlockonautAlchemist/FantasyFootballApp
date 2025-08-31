@@ -1,30 +1,15 @@
 import { Router } from 'express';
 import fetch from 'node-fetch';
-import { randomBytes, createHash } from 'crypto';
+import { randomBytes } from 'crypto';
 import type { Request, Response } from 'express';
-import { storage } from './storage';
+import { storage } from './storage.js';
 
 // In-memory storage for OAuth state (in production, use Redis or database)
-const oauthStates = new Map<string, { codeVerifier: string; expiresAt: number }>();
+const oauthStates = new Map<string, { expiresAt: number }>();
 
 // Yahoo OAuth 2.0 endpoints (from official documentation)
 const YAHOO_AUTHORIZE_URL = 'https://api.login.yahoo.com/oauth2/request_auth';
 const YAHOO_TOKEN_URL = 'https://api.login.yahoo.com/oauth2/get_token';
-
-/**
- * Generate a random code verifier for PKCE
- */
-function generateCodeVerifier(): string {
-  return randomBytes(32).toString('base64url');
-}
-
-/**
- * Generate code challenge from code verifier using S256 method
- */
-function generateCodeChallenge(codeVerifier: string): string {
-  const hash = createHash('sha256').update(codeVerifier).digest();
-  return hash.toString('base64url');
-}
 
 /**
  * Generate a random state string for CSRF protection
@@ -38,7 +23,7 @@ function generateState(): string {
  */
 function cleanupExpiredStates(): void {
   const now = Date.now();
-  for (const [state, data] of oauthStates.entries()) {
+  for (const [state, data] of Array.from(oauthStates.entries())) {
     if (data.expiresAt < now) {
       oauthStates.delete(state);
     }
@@ -49,21 +34,18 @@ export const yahooAuthRouter = Router();
 
 /**
  * GET /auth/yahoo/start
- * Initiates the OAuth 2.0 flow with PKCE
+ * Initiates the OAuth 2.0 flow
  */
 yahooAuthRouter.get('/start', (req: Request, res: Response) => {
   try {
     // Clean up expired states periodically
     cleanupExpiredStates();
 
-    // Generate PKCE values
-    const codeVerifier = generateCodeVerifier();
-    const codeChallenge = generateCodeChallenge(codeVerifier);
+    // Generate state for CSRF protection
     const state = generateState();
 
-    // Store state and code verifier (expires in 10 minutes)
+    // Store state (expires in 10 minutes)
     oauthStates.set(state, {
-      codeVerifier,
       expiresAt: Date.now() + (10 * 60 * 1000)
     });
 
@@ -113,7 +95,7 @@ yahooAuthRouter.get('/callback', async (req: Request, res: Response) => {
     oauthStates.delete(state as string);
 
     // Exchange code for tokens
-    const tokenResponse = await exchangeCodeForTokens(code as string, stateData.codeVerifier);
+    const tokenResponse = await exchangeCodeForTokens(code as string);
 
     if (!tokenResponse) {
       return res.redirect(`${process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5000'}?auth=error&reason=token_exchange_failed`);
@@ -244,8 +226,10 @@ yahooAuthRouter.post('/refresh', async (req: Request, res: Response) => {
 /**
  * Exchange authorization code for tokens (matching Yahoo OAuth 2.0 specification)
  */
-async function exchangeCodeForTokens(code: string, codeVerifier: string): Promise<any> {
+async function exchangeCodeForTokens(code: string): Promise<any> {
   try {
+    console.log('Exchanging code for tokens:', { code: code.substring(0, 10) + '...' });
+    
     const response = await fetch(YAHOO_TOKEN_URL, {
       method: 'POST',
       headers: {
@@ -261,13 +245,20 @@ async function exchangeCodeForTokens(code: string, codeVerifier: string): Promis
       })
     });
 
+    console.log('Token exchange response status:', response.status);
+
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Token exchange failed:', response.status, errorText);
       return null;
     }
 
-    const tokenData = await response.json();
+    const tokenData = await response.json() as any;
+    console.log('Token exchange successful:', { 
+      hasAccessToken: !!tokenData.access_token,
+      hasRefreshToken: !!tokenData.refresh_token,
+      expiresIn: tokenData.expires_in
+    });
     return tokenData;
   } catch (error) {
     console.error('Token exchange error:', error);
