@@ -62,7 +62,7 @@ yahooAuthRouter.get('/start', (req: Request, res: Response) => {
     // Build authorization URL for Yahoo Fantasy Football OAuth 2.0
     const params = new URLSearchParams({
       client_id: process.env.YAHOO_CLIENT_ID!,
-      redirect_uri: process.env.YAHOO_REDIRECT_URI!.trim()!.trim(),
+      redirect_uri: process.env.YAHOO_REDIRECT_URI!.trim(),
       response_type: 'code',
       scope: 'fspt-r fspt-w profile email openid',
       state,
@@ -308,7 +308,7 @@ async function exchangeCodeForTokens(code: string): Promise<any> {
       body: new URLSearchParams({
         grant_type: 'authorization_code',
         code,
-        redirect_uri: process.env.YAHOO_REDIRECT_URI!.trim().trim()!
+        redirect_uri: process.env.YAHOO_REDIRECT_URI!.trim()
       })
     });
 
@@ -358,7 +358,7 @@ async function refreshAccessToken(refreshToken: string): Promise<any> {
       body: new URLSearchParams({
         grant_type: 'refresh_token',
         refresh_token: refreshToken,
-        redirect_uri: process.env.YAHOO_REDIRECT_URI!.trim().trim()!
+        redirect_uri: process.env.YAHOO_REDIRECT_URI!.trim()
       })
     });
 
