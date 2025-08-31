@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage.js";
 import { yahooApi } from "./yahoo-api.js";
 import yahooAuthRouter from "./authYahoo.js";
-import * as session from "express-session";
+import session from "express-session";
 import "./types.js"; // Import session type declarations
 
 export async function registerRoutes(app: Express): Promise<Server | void> {

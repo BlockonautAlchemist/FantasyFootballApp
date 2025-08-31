@@ -3,20 +3,14 @@
   "builds": [
     {
       "src": "api/index.ts",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": "server/**"
-      }
-    },
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist/public"
-      }
+      "use": "@vercel/node"
     }
   ],
   "routes": [
+    {
+      "src": "/api/auth/yahoo/(.*)",
+      "dest": "/api/index.ts"
+    },
     {
       "src": "/api/(.*)",
       "dest": "/api/index.ts"
