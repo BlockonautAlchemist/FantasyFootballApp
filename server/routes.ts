@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage.js";
 import { yahooApi } from "./yahoo-api.js";
 import yahooAuthRouter from "./authYahoo.js";
-import session from "express-session";
+import * as session from "express-session";
 import "./types.js"; // Import session type declarations
 
 export async function registerRoutes(app: Express): Promise<Server | void> {
@@ -22,18 +22,16 @@ export async function registerRoutes(app: Express): Promise<Server | void> {
   // Yahoo OAuth 2.0 Routes
   app.use('/api/auth/yahoo', yahooAuthRouter);
 
-  // Check Yahoo OAuth configuration
+  // Check Yahoo OAuth configuration (Public Client - no client secret)
   app.get('/api/auth/yahoo/config', (req, res) => {
     const isConfigured = !!(
       process.env.YAHOO_CLIENT_ID &&
-      process.env.YAHOO_CLIENT_SECRET &&
       process.env.YAHOO_REDIRECT_URI
     );
 
     // Debug logging
-    console.log('Environment check:', {
+    console.log('Environment check (Public Client):', {
       hasClientId: !!process.env.YAHOO_CLIENT_ID,
-      hasClientSecret: !!process.env.YAHOO_CLIENT_SECRET,
       hasRedirectUri: !!process.env.YAHOO_REDIRECT_URI,
       clientIdPreview: process.env.YAHOO_CLIENT_ID ? `${process.env.YAHOO_CLIENT_ID.substring(0, 8)}...` : 'null'
     });

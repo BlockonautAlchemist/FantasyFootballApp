@@ -38,32 +38,50 @@ export const yahooAuthRouter = Router();
  */
 yahooAuthRouter.get('/start', (req: Request, res: Response) => {
   try {
+    console.log('=== YAHOO OAUTH START ===');
+    console.log('Environment check:', {
+      hasClientId: !!process.env.YAHOO_CLIENT_ID,
+      hasRedirectUri: !!process.env.YAHOO_REDIRECT_URI,
+      clientIdPreview: process.env.YAHOO_CLIENT_ID ? `${process.env.YAHOO_CLIENT_ID.substring(0, 8)}...` : 'MISSING',
+      redirectUri: process.env.YAHOO_REDIRECT_URI
+    });
+
     // Clean up expired states periodically
     cleanupExpiredStates();
 
     // Generate state for CSRF protection
     const state = generateState();
+    console.log('Generated OAuth state:', state.substring(0, 8) + '...');
 
     // Store state (expires in 10 minutes)
     oauthStates.set(state, {
       expiresAt: Date.now() + (10 * 60 * 1000)
     });
 
-    // Build authorization URL (matching Yahoo OAuth 2.0 specification)
+    // Build authorization URL for Yahoo Fantasy Football OAuth 2.0
     const params = new URLSearchParams({
       client_id: process.env.YAHOO_CLIENT_ID!,
       redirect_uri: process.env.YAHOO_REDIRECT_URI!,
       response_type: 'code',
-      scope: 'openid profile',
+      scope: 'fspt-r fspt-w profile email openid',
       state,
       language: 'en-us'
     });
 
+    console.log('OAuth authorization URL params:', {
+      client_id: process.env.YAHOO_CLIENT_ID ? `${process.env.YAHOO_CLIENT_ID.substring(0, 8)}...` : 'MISSING',
+      redirect_uri: process.env.YAHOO_REDIRECT_URI,
+      scope: 'fspt-r fspt-w profile email openid'
+    });
+
     const authUrl = `${YAHOO_AUTHORIZE_URL}?${params.toString()}`;
+    console.log('Generated authorization URL:', authUrl);
+    console.log('=== OAUTH START COMPLETE ===');
 
     res.json({ authUrl });
   } catch (error) {
-    console.error('Yahoo OAuth start error:', error);
+    console.error('=== YAHOO OAUTH START ERROR ===');
+    console.error('Error details:', error);
     res.status(500).json({ error: 'Failed to initiate Yahoo authentication' });
   }
 });
@@ -74,13 +92,19 @@ yahooAuthRouter.get('/start', (req: Request, res: Response) => {
  */
 yahooAuthRouter.get('/callback', async (req: Request, res: Response) => {
   try {
+    console.log('=== YAHOO OAUTH CALLBACK ===');
     const { code, state, error: oauthError } = req.query;
 
     console.log('OAuth callback received:', {
       hasCode: !!code,
       hasState: !!state,
       hasError: !!oauthError,
-      query: req.query
+      query: req.query,
+      url: req.url,
+      headers: {
+        userAgent: req.get('User-Agent'),
+        referer: req.get('Referer')
+      }
     });
 
     // Handle OAuth errors
@@ -190,12 +214,19 @@ yahooAuthRouter.get('/callback', async (req: Request, res: Response) => {
 
     // Store user in session
     (req.session as any).userId = user.id;
+    console.log('User session established:', { userId: user.id, yahooUserId });
 
     // Redirect to frontend with success
-    res.redirect(`${process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5000'}?auth=success`);
+    const redirectUrl = `${process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5000'}?auth=success`;
+    console.log('Redirecting to:', redirectUrl);
+    console.log('=== OAUTH CALLBACK SUCCESS ===');
+    res.redirect(redirectUrl);
   } catch (error) {
-    console.error('Yahoo OAuth callback error:', error);
-    res.redirect(`${process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5000'}?auth=error`);
+    console.error('=== YAHOO OAUTH CALLBACK ERROR ===');
+    console.error('Error details:', error);
+    const errorRedirectUrl = `${process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5000'}?auth=error`;
+    console.log('Redirecting to error URL:', errorRedirectUrl);
+    res.redirect(errorRedirectUrl);
   }
 });
 
@@ -251,24 +282,29 @@ yahooAuthRouter.post('/refresh', async (req: Request, res: Response) => {
 });
 
 /**
- * Exchange authorization code for tokens (matching Yahoo OAuth 2.0 specification)
+ * Exchange authorization code for tokens (Public Client - no client secret)
  */
 async function exchangeCodeForTokens(code: string): Promise<any> {
   try {
-    console.log('Exchanging code for tokens:', { code: code.substring(0, 10) + '...' });
+    console.log('Exchanging code for tokens (Public Client):', { 
+      code: code.substring(0, 10) + '...',
+      client_id: process.env.YAHOO_CLIENT_ID ? `${process.env.YAHOO_CLIENT_ID.substring(0, 8)}...` : 'MISSING',
+      redirect_uri: process.env.YAHOO_REDIRECT_URI
+    });
     
     const response = await fetch(YAHOO_TOKEN_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': `Basic ${Buffer.from(`${process.env.YAHOO_CLIENT_ID}:${process.env.YAHOO_CLIENT_SECRET}`).toString('base64')}`
+        'Accept': 'application/json',
+        'User-Agent': 'FantasyFootballApp/1.0'
       },
       body: new URLSearchParams({
         grant_type: 'authorization_code',
         code,
         redirect_uri: process.env.YAHOO_REDIRECT_URI!,
-        client_id: process.env.YAHOO_CLIENT_ID!,
-        client_secret: process.env.YAHOO_CLIENT_SECRET!
+        client_id: process.env.YAHOO_CLIENT_ID!
+        // Note: No client_secret for public client
       })
     });
 
@@ -294,22 +330,28 @@ async function exchangeCodeForTokens(code: string): Promise<any> {
 }
 
 /**
- * Refresh access token using refresh token (matching Yahoo OAuth 2.0 specification)
+ * Refresh access token using refresh token (Public Client - no client secret)
  */
 async function refreshAccessToken(refreshToken: string): Promise<any> {
   try {
+    console.log('Refreshing access token (Public Client):', {
+      client_id: process.env.YAHOO_CLIENT_ID ? `${process.env.YAHOO_CLIENT_ID.substring(0, 8)}...` : 'MISSING',
+      redirect_uri: process.env.YAHOO_REDIRECT_URI
+    });
+    
     const response = await fetch(YAHOO_TOKEN_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': `Basic ${Buffer.from(`${process.env.YAHOO_CLIENT_ID}:${process.env.YAHOO_CLIENT_SECRET}`).toString('base64')}`
+        'Accept': 'application/json',
+        'User-Agent': 'FantasyFootballApp/1.0'
       },
       body: new URLSearchParams({
         grant_type: 'refresh_token',
         refresh_token: refreshToken,
         redirect_uri: process.env.YAHOO_REDIRECT_URI!,
-        client_id: process.env.YAHOO_CLIENT_ID!,
-        client_secret: process.env.YAHOO_CLIENT_SECRET!
+        client_id: process.env.YAHOO_CLIENT_ID!
+        // Note: No client_secret for public client
       })
     });
 

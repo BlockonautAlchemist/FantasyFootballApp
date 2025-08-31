@@ -10,11 +10,16 @@ export class YahooAPIClient {
   private oauth: OAuth;
 
   constructor() {
+    // Note: This OAuth 1.0A implementation is deprecated in favor of OAuth 2.0
+    // For OAuth 2.0 public client, use the authYahoo.ts implementation instead
+    console.warn('YahooAPIClient: OAuth 1.0A is deprecated. Use OAuth 2.0 implementation in authYahoo.ts');
+    
+    // This will fail without client secret, but keeping for backward compatibility
     this.oauth = new OAuth(
       `${YAHOO_LOGIN_BASE}/get_request_token`,
       `${YAHOO_LOGIN_BASE}/get_token`,
       process.env.YAHOO_CLIENT_ID!,
-      process.env.YAHOO_CLIENT_SECRET!,
+      '', // No client secret for public client
       '1.0A',
       process.env.YAHOO_REDIRECT_URI!,
       'HMAC-SHA1'

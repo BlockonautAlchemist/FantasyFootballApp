@@ -5,7 +5,7 @@ import {
   type InsertYahooToken,
   type YahooLeague,
   type InsertYahooLeague
-} from "@shared/schema.js";
+} from "../shared/schema.js";
 import { randomUUID } from "crypto";
 
 // modify the interface with any CRUD methods
