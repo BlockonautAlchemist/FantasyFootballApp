@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { yahooApi } from "./yahoo-api";
+import yahooAuthRouter from "./authYahoo";
 import session from "express-session";
 import "./types"; // Import session type declarations
 
@@ -18,136 +19,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   }));
 
-  // Yahoo OAuth Routes
-  
+  // Yahoo OAuth 2.0 Routes
+  app.use('/api/auth/yahoo', yahooAuthRouter);
+
   // Check Yahoo OAuth configuration
   app.get('/api/auth/yahoo/config', (req, res) => {
     const isConfigured = !!(
-      process.env.YAHOO_CLIENT_ID && 
-      process.env.YAHOO_CLIENT_SECRET && 
+      process.env.YAHOO_CLIENT_ID &&
+      process.env.YAHOO_CLIENT_SECRET &&
       process.env.YAHOO_REDIRECT_URI
     );
-    
-    res.json({ 
+
+    // Debug logging
+    console.log('Environment check:', {
+      hasClientId: !!process.env.YAHOO_CLIENT_ID,
+      hasClientSecret: !!process.env.YAHOO_CLIENT_SECRET,
+      hasRedirectUri: !!process.env.YAHOO_REDIRECT_URI,
+      clientIdPreview: process.env.YAHOO_CLIENT_ID ? `${process.env.YAHOO_CLIENT_ID.substring(0, 8)}...` : 'null'
+    });
+
+    res.json({
       configured: isConfigured,
       clientId: process.env.YAHOO_CLIENT_ID ? `${process.env.YAHOO_CLIENT_ID.substring(0, 8)}...` : null
     });
-  });
-  
-  // Start Yahoo OAuth flow
-  app.get('/api/auth/yahoo/start', async (req, res) => {
-    try {
-      const { authUrl, requestToken, requestSecret } = await yahooApi.getAuthUrl();
-      
-      // Store request token and secret in session
-      req.session.yahooRequestToken = requestToken;
-      req.session.yahooRequestSecret = requestSecret;
-      
-      res.json({ authUrl });
-    } catch (error) {
-      console.error('Yahoo OAuth start error:', error);
-      res.status(500).json({ error: 'Failed to initiate Yahoo authentication' });
-    }
-  });
-
-  // Handle Yahoo OAuth callback
-  app.get('/api/auth/yahoo/callback', async (req, res) => {
-    try {
-      const { oauth_token, oauth_verifier } = req.query;
-      const { yahooRequestToken, yahooRequestSecret } = req.session;
-
-      if (!oauth_token || !oauth_verifier || !yahooRequestToken || !yahooRequestSecret) {
-        return res.status(400).json({ error: 'Missing OAuth parameters' });
-      }
-
-      // Exchange for access token
-      const { accessToken, accessSecret, sessionHandle } = await yahooApi.getAccessToken(
-        yahooRequestToken,
-        yahooRequestSecret,
-        oauth_verifier as string
-      );
-
-      // Get user profile from Yahoo
-      const tempToken = {
-        id: '',
-        userId: '',
-        accessToken,
-        refreshToken: '',
-        tokenSecret: accessSecret,
-        sessionHandle,
-        expiresAt: null,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
-
-      const userProfile = await yahooApi.getUserProfile(tempToken);
-      const yahooUserId = userProfile.fantasy_content?.users[0]?.user[0]?.guid || userProfile.fantasy_content?.users[0]?.user?.guid;
-      const displayName = userProfile.fantasy_content?.users[0]?.user[0]?.nickname || userProfile.fantasy_content?.users[0]?.user?.nickname;
-
-      if (!yahooUserId) {
-        return res.status(400).json({ error: 'Failed to get Yahoo user ID' });
-      }
-
-      // Check if user already exists
-      let user = await storage.getUserByYahooId(yahooUserId);
-      
-      if (!user) {
-        // Create new user
-        user = await storage.createUser({
-          username: `yahoo_${yahooUserId}`,
-          password: '', // Yahoo users don't need password
-        });
-        
-        // Update with Yahoo data
-        user = await storage.updateUser(user.id, {
-          yahooUserId,
-          displayName: displayName || `Yahoo User ${yahooUserId}`,
-        });
-      } else {
-        // Update existing user with latest display name
-        user = await storage.updateUser(user.id, {
-          displayName: displayName || user.displayName,
-        });
-      }
-
-      if (!user) {
-        return res.status(500).json({ error: 'Failed to create or update user' });
-      }
-
-      // Store or update Yahoo token
-      const existingToken = await storage.getYahooToken(user.id);
-      
-      if (existingToken) {
-        await storage.updateYahooToken(user.id, {
-          accessToken,
-          tokenSecret: accessSecret,
-          sessionHandle,
-          refreshToken: '', // Yahoo doesn't use refresh tokens in the traditional sense
-        });
-      } else {
-        await storage.createYahooToken({
-          userId: user.id,
-          accessToken,
-          refreshToken: '', // Yahoo doesn't use refresh tokens in the traditional sense
-          tokenSecret: accessSecret,
-          sessionHandle,
-          expiresAt: null, // Yahoo tokens don't have explicit expiry, they're refreshed as needed
-        });
-      }
-
-      // Store user in session
-      req.session.userId = user.id;
-
-      // Clear OAuth temp data
-      delete req.session.yahooRequestToken;
-      delete req.session.yahooRequestSecret;
-
-      // Redirect to frontend with success
-      res.redirect(`${process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5000'}?auth=success`);
-    } catch (error) {
-      console.error('Yahoo OAuth callback error:', error);
-      res.redirect(`${process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5000'}?auth=error`);
-    }
   });
 
   // Get current user

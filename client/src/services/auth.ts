@@ -22,8 +22,9 @@ export interface User {
  */
 export async function startYahooConnect(): Promise<void> {
   try {
-    const response = await fetch('/api/auth/yahoo/start-oauth2', {
+    const response = await fetch('/api/auth/yahoo/start', {
       method: 'GET',
+      credentials: 'include',
     });
 
     if (!response.ok) {
