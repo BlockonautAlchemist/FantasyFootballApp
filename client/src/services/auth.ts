@@ -22,7 +22,7 @@ export interface User {
  */
 export async function startYahooConnect(): Promise<void> {
   try {
-    const response = await fetch('/api/auth/yahoo/start', {
+    const response = await fetch('/api/auth/yahoo/authorize', {
       method: 'GET',
       credentials: 'include',
     });
@@ -33,9 +33,9 @@ export async function startYahooConnect(): Promise<void> {
       throw new Error(`Failed to start Yahoo authentication: ${response.status}`);
     }
 
-    const { authUrl } = await response.json();
+    const { authorizeUrl } = await response.json();
     
-    if (!authUrl) {
+    if (!authorizeUrl) {
       throw new Error('No authorization URL received');
     }
     
@@ -43,7 +43,7 @@ export async function startYahooConnect(): Promise<void> {
     localStorage.setItem('fantasy-assistant-connecting', 'true');
     
     // Redirect to Yahoo OAuth
-    window.location.href = authUrl;
+    window.location.href = authorizeUrl;
   } catch (error) {
     localStorage.removeItem('fantasy-assistant-connecting');
     console.error('Error starting Yahoo OAuth:', error);
@@ -56,7 +56,7 @@ export async function startYahooConnect(): Promise<void> {
  */
 export async function completeYahooConnect(): Promise<User> {
   try {
-    const response = await fetch('/api/auth/me', {
+    const response = await fetch('/api/yahoo/me', {
       method: 'GET',
       credentials: 'include',
     });
@@ -65,8 +65,15 @@ export async function completeYahooConnect(): Promise<User> {
       throw new Error('Authentication failed or user not found');
     }
 
-    const user = await response.json();
+    const data = await response.json();
     localStorage.removeItem('fantasy-assistant-connecting');
+    
+    // Extract user data from Yahoo API response
+    const user: User = {
+      id: data.user?.guid || 'yahoo-user',
+      displayName: data.user?.nickname || 'Yahoo User',
+      yahooUserId: data.user?.guid
+    };
     
     return user;
   } catch (error) {
@@ -81,7 +88,7 @@ export async function completeYahooConnect(): Promise<User> {
  */
 export async function getCurrentUser(): Promise<User | null> {
   try {
-    const response = await fetch('/api/auth/me', {
+    const response = await fetch('/api/yahoo/me', {
       method: 'GET',
       credentials: 'include',
     });
@@ -94,7 +101,16 @@ export async function getCurrentUser(): Promise<User | null> {
       throw new Error('Failed to get current user');
     }
 
-    return await response.json();
+    const data = await response.json();
+    
+    // Extract user data from Yahoo API response
+    const user: User = {
+      id: data.user?.guid || 'yahoo-user',
+      displayName: data.user?.nickname || 'Yahoo User',
+      yahooUserId: data.user?.guid
+    };
+    
+    return user;
   } catch (error) {
     console.error('Error getting current user:', error);
     return null;
@@ -209,26 +225,7 @@ export function isConnecting(): boolean {
   return localStorage.getItem('fantasy-assistant-connecting') === 'true';
 }
 
-/**
- * Check Yahoo OAuth configuration status
- */
-export async function checkYahooConfig(): Promise<{ configured: boolean; clientId?: string }> {
-  try {
-    const response = await fetch('/api/auth/yahoo/config', {
-      method: 'GET',
-      credentials: 'include',
-    });
 
-    if (!response.ok) {
-      return { configured: false };
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error('Error checking Yahoo config:', error);
-    return { configured: false };
-  }
-}
 
 /**
  * Check for OAuth return parameters in URL

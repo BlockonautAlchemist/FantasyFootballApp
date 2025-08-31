@@ -55,7 +55,7 @@ export default function ConnectYahooButton({ onConnected }: ConnectYahooButtonPr
       // The user will be redirected to Yahoo OAuth, so this component will unmount
     } catch (error) {
       console.error('Connection failed:', error);
-      alert('Unable to connect to Yahoo. Please ensure the Yahoo OAuth credentials are configured in the environment variables. See YAHOO_OAUTH_SETUP.md for setup instructions.');
+      alert('Unable to connect to Yahoo at this time. Please try again later or contact support if the issue persists.');
       setIsConnecting(false);
     }
   };

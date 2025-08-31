@@ -6,24 +6,15 @@ import LeaguePicker from "@/components/LeaguePicker";
 import Callout from "@/components/Callout";
 import { Button } from "@/components/ui/button";
 import { useLeague } from "@/context/LeagueContext";
-import { checkYahooConfig } from "@/services/auth";
 
 export default function Connect() {
   const [showLeaguePicker, setShowLeaguePicker] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [configStatus, setConfigStatus] = useState<{ configured: boolean; clientId?: string } | null>(null);
   const { connected, linkedLeague, loading } = useLeague();
 
   useEffect(() => {
     console.log('Connect page - connected:', connected, 'linkedLeague:', linkedLeague, 'loading:', loading);
-    checkConfiguration();
   }, [connected, linkedLeague, loading]);
-
-  const checkConfiguration = async () => {
-    const status = await checkYahooConfig();
-    console.log('Config status:', status);
-    setConfigStatus(status);
-  };
 
   const handleConnected = () => {
     setShowLeaguePicker(true);
@@ -102,32 +93,6 @@ export default function Connect() {
             <p className="text-gray-300">
               Authorize access to import your fantasy leagues and manage your teams
             </p>
-            
-            {/* Configuration Status */}
-            {configStatus !== null && (
-              <div className="mt-4 p-3 rounded-lg border">
-                {configStatus.configured ? (
-                  <div className="flex items-center justify-center gap-2 text-green-600">
-                    <i className="fas fa-check-circle"></i>
-                    <span className="text-sm">Yahoo OAuth configured</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-center gap-2 text-red-600">
-                    <i className="fas fa-exclamation-triangle"></i>
-                    <span className="text-sm">Yahoo OAuth not configured</span>
-                  </div>
-                )}
-              </div>
-            )}
-            
-            {configStatus === null && (
-              <div className="mt-4 p-3 rounded-lg border border-gray-300">
-                <div className="flex items-center justify-center gap-2 text-gray-500">
-                  <i className="fas fa-spinner fa-spin"></i>
-                  <span className="text-sm">Checking configuration...</span>
-                </div>
-              </div>
-            )}
           </div>
           <ConnectYahooButton onConnected={handleConnected} />
         </div>
@@ -153,48 +118,7 @@ export default function Connect() {
         </Callout>
       )}
 
-      {/* Setup Guide */}
-      {!connected && configStatus !== null && !configStatus.configured && (
-        <div className="bg-surface border border-border rounded-2xl p-6 mt-8">
-          <h3 className="text-xl font-semibold text-text mb-4">
-            <i className="fas fa-cog mr-2"></i>
-            Yahoo OAuth Setup Required
-          </h3>
-          <p className="text-textDim mb-4">
-            To connect with Yahoo Fantasy Sports, you'll need to configure Yahoo OAuth credentials in your environment. 
-            Follow these steps:
-          </p>
-          <div className="space-y-3 text-sm">
-            <div className="flex items-start gap-3">
-              <span className="bg-primary text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold mt-0.5">1</span>
-              <div>
-                <p className="text-text font-medium">Create a Yahoo Developer App</p>
-                <p className="text-textDim">Visit <a href="https://developer.yahoo.com" target="_blank" rel="noopener noreferrer" className="text-primary underline">developer.yahoo.com</a> and create a new app with Fantasy Sports API access</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <span className="bg-primary text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold mt-0.5">2</span>
-              <div>
-                <p className="text-text font-medium">Configure Environment Variables</p>
-                <p className="text-textDim">Copy .env.example to .env and add your Yahoo Client ID and Secret</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <span className="bg-primary text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold mt-0.5">3</span>
-              <div>
-                <p className="text-text font-medium">Restart the Server</p>
-                <p className="text-textDim">Restart your development server to load the new environment variables</p>
-              </div>
-            </div>
-          </div>
-          <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <p className="text-sm text-yellow-800">
-              <i className="fas fa-info-circle mr-2"></i>
-              See <strong>YAHOO_OAUTH_SETUP.md</strong> for detailed setup instructions
-            </p>
-          </div>
-        </div>
-      )}
+
 
 
 
