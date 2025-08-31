@@ -10,8 +10,6 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
   if (error) {
     return res.status(400).json({
       receivedCode: false,
-      codeLen: 0,
-      state: state || null,
       error: error,
       error_description: error_description || null
     });
@@ -25,9 +23,7 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).json({
       receivedCode: true,
       codeLen: (code as string).length,
-      state: state || null,
-      error: null,
-      error_description: null
+      state: state || null
     });
   }
 
@@ -35,8 +31,6 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
   // This indicates an invalid callback request
   return res.status(400).json({
     receivedCode: false,
-    codeLen: 0,
-    state: null,
     error: 'invalid_callback',
     error_description: 'No authorization code or error received'
   });
