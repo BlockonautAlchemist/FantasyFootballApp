@@ -2,25 +2,9 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { randomBytes } from 'crypto';
 
 export default function handler(req: VercelRequest, res: VercelResponse) {
-  // Step 1: Verify required environment variables are present
-  const clientId = process.env.YAHOO_CLIENT_ID;
-  const redirectUri = process.env.YAHOO_REDIRECT_URI;
-  
-  if (!clientId) {
-    return res.status(500).json({ 
-      error: 'YAHOO_CLIENT_ID environment variable is missing',
-      hasClientId: false,
-      hasRedirectUri: !!redirectUri
-    });
-  }
-  
-  if (!redirectUri) {
-    return res.status(500).json({ 
-      error: 'YAHOO_REDIRECT_URI environment variable is missing',
-      hasClientId: true,
-      hasRedirectUri: false
-    });
-  }
+  // Step 1: Read environment variables with non-null assertion and trim
+  const clientId = process.env.YAHOO_CLIENT_ID!;
+  const redirectUri = process.env.YAHOO_REDIRECT_URI!.trim();
 
   // Step 2: Generate random state for CSRF protection
   // This proves we can generate secure random values for OAuth state
@@ -41,15 +25,13 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
 
   const authorizeUrl = `${base}?${params.toString()}`;
 
-  // Step 4: Return exact JSON structure with parameter echo for verification
+  // Step 4: Return standardized JSON structure with parameter echo for verification
   res.status(200).json({
     authorizeUrl,
     echo: {
       clientIdLast6: clientId.slice(-6), // Last 6 chars for verification without exposing full ID
       redirectUri: redirectUri,
-      scope: "fspt-r",
-      responseType: "code",
-      state: state
+      scope: "fspt-r"
     }
   });
 }

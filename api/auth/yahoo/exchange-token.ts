@@ -17,9 +17,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   // Step 3: Verify all required environment variables are present
-  const clientId = process.env.YAHOO_CLIENT_ID;
-  const clientSecret = process.env.YAHOO_CLIENT_SECRET;
-  const redirectUri = process.env.YAHOO_REDIRECT_URI;
+  const clientId = process.env.YAHOO_CLIENT_ID!;
+  const clientSecret = process.env.YAHOO_CLIENT_SECRET!;
+  const redirectUri = process.env.YAHOO_REDIRECT_URI!.trim();
   
   const missingVars = [];
   if (!clientId) missingVars.push('YAHOO_CLIENT_ID');

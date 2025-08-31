@@ -62,7 +62,7 @@ yahooAuthRouter.get('/start', (req: Request, res: Response) => {
     // Build authorization URL for Yahoo Fantasy Football OAuth 2.0
     const params = new URLSearchParams({
       client_id: process.env.YAHOO_CLIENT_ID!,
-      redirect_uri: process.env.YAHOO_REDIRECT_URI!,
+      redirect_uri: process.env.YAHOO_REDIRECT_URI!.trim()!.trim(),
       response_type: 'code',
       scope: 'fspt-r fspt-w profile email openid',
       state,
@@ -71,7 +71,7 @@ yahooAuthRouter.get('/start', (req: Request, res: Response) => {
 
     console.log('OAuth authorization URL params:', {
       client_id: process.env.YAHOO_CLIENT_ID ? `${process.env.YAHOO_CLIENT_ID.substring(0, 8)}...` : 'MISSING',
-      redirect_uri: process.env.YAHOO_REDIRECT_URI,
+      redirect_uri: process.env.YAHOO_REDIRECT_URI!.trim(),
       scope: 'fspt-r fspt-w profile email openid'
     });
 
@@ -291,7 +291,7 @@ async function exchangeCodeForTokens(code: string): Promise<any> {
       code: code.substring(0, 10) + '...',
       client_id: process.env.YAHOO_CLIENT_ID ? `${process.env.YAHOO_CLIENT_ID.substring(0, 8)}...` : 'MISSING',
       has_client_secret: !!process.env.YAHOO_CLIENT_SECRET,
-      redirect_uri: process.env.YAHOO_REDIRECT_URI
+      redirect_uri: process.env.YAHOO_REDIRECT_URI!.trim()
     });
     
     // Create HTTP Basic auth header
@@ -308,7 +308,7 @@ async function exchangeCodeForTokens(code: string): Promise<any> {
       body: new URLSearchParams({
         grant_type: 'authorization_code',
         code,
-        redirect_uri: process.env.YAHOO_REDIRECT_URI!
+        redirect_uri: process.env.YAHOO_REDIRECT_URI!.trim().trim()!
       })
     });
 
@@ -341,7 +341,7 @@ async function refreshAccessToken(refreshToken: string): Promise<any> {
     console.log('Refreshing access token (HTTP Basic Auth):', {
       client_id: process.env.YAHOO_CLIENT_ID ? `${process.env.YAHOO_CLIENT_ID.substring(0, 8)}...` : 'MISSING',
       has_client_secret: !!process.env.YAHOO_CLIENT_SECRET,
-      redirect_uri: process.env.YAHOO_REDIRECT_URI
+      redirect_uri: process.env.YAHOO_REDIRECT_URI!.trim()
     });
     
     // Create HTTP Basic auth header
@@ -358,7 +358,7 @@ async function refreshAccessToken(refreshToken: string): Promise<any> {
       body: new URLSearchParams({
         grant_type: 'refresh_token',
         refresh_token: refreshToken,
-        redirect_uri: process.env.YAHOO_REDIRECT_URI!
+        redirect_uri: process.env.YAHOO_REDIRECT_URI!.trim().trim()!
       })
     });
 
