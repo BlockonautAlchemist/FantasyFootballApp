@@ -1,4 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { randomBytes } from 'crypto';
 
 export default function handler(req: VercelRequest, res: VercelResponse) {
   // Step 1: Verify required environment variables are present
@@ -21,26 +22,35 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
     });
   }
 
-  // Step 2: Build Yahoo OAuth 2.0 authorization URL
-  // This verifies that we can construct the proper OAuth flow URL
+  // Step 2: Generate random state for CSRF protection
+  // This proves we can generate secure random values for OAuth state
+  const state = randomBytes(8).toString('hex'); // 16 hex characters
+
+  // Step 3: Build Yahoo OAuth 2.0 authorization URL with exact parameters
+  // This verifies proper URL construction and parameter encoding
   const YAHOO_AUTHORIZE_URL = 'https://api.login.yahoo.com/oauth2/request_auth';
   
   const params = new URLSearchParams({
     client_id: clientId,
-    redirect_uri: redirectUri,
+    redirect_uri: redirectUri, // URLSearchParams automatically URL-encodes
     response_type: 'code',
     scope: 'fspt-r fspt-w openid email profile',
+    state: state,
     language: 'en-us'
   });
 
   const authorizeUrl = `${YAHOO_AUTHORIZE_URL}?${params.toString()}`;
 
-  // Step 3: Return the authorization URL for testing
-  // This allows manual testing of the OAuth flow without automatic redirects
+  // Step 4: Return exact JSON structure with parameter echo for verification
+  // This allows comparison of sent vs received parameters in callback
   res.status(200).json({
     authorizeUrl,
-    clientId: `${clientId.substring(0, 8)}...`, // Show partial ID for verification
-    redirectUri,
-    scopes: 'fspt-r fspt-w openid email profile'
+    paramsEcho: {
+      clientIdLast6: clientId.slice(-6), // Last 6 chars for verification without exposing full ID
+      redirectUri: redirectUri,
+      scopes: "fspt-r fspt-w openid email profile",
+      responseType: "code",
+      state: state
+    }
   });
 }
