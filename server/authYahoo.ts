@@ -41,6 +41,7 @@ yahooAuthRouter.get('/start', (req: Request, res: Response) => {
     console.log('=== YAHOO OAUTH START ===');
     console.log('Environment check:', {
       hasClientId: !!process.env.YAHOO_CLIENT_ID,
+      hasClientSecret: !!process.env.YAHOO_CLIENT_SECRET,
       hasRedirectUri: !!process.env.YAHOO_REDIRECT_URI,
       clientIdPreview: process.env.YAHOO_CLIENT_ID ? `${process.env.YAHOO_CLIENT_ID.substring(0, 8)}...` : 'MISSING',
       redirectUri: process.env.YAHOO_REDIRECT_URI
@@ -282,29 +283,32 @@ yahooAuthRouter.post('/refresh', async (req: Request, res: Response) => {
 });
 
 /**
- * Exchange authorization code for tokens (Public Client - no client secret)
+ * Exchange authorization code for tokens using HTTP Basic auth
  */
 async function exchangeCodeForTokens(code: string): Promise<any> {
   try {
-    console.log('Exchanging code for tokens (Public Client):', { 
+    console.log('Exchanging code for tokens (HTTP Basic Auth):', { 
       code: code.substring(0, 10) + '...',
       client_id: process.env.YAHOO_CLIENT_ID ? `${process.env.YAHOO_CLIENT_ID.substring(0, 8)}...` : 'MISSING',
+      has_client_secret: !!process.env.YAHOO_CLIENT_SECRET,
       redirect_uri: process.env.YAHOO_REDIRECT_URI
     });
+    
+    // Create HTTP Basic auth header
+    const credentials = Buffer.from(`${process.env.YAHOO_CLIENT_ID}:${process.env.YAHOO_CLIENT_SECRET}`).toString('base64');
     
     const response = await fetch(YAHOO_TOKEN_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
         'Accept': 'application/json',
+        'Authorization': `Basic ${credentials}`,
         'User-Agent': 'FantasyFootballApp/1.0'
       },
       body: new URLSearchParams({
         grant_type: 'authorization_code',
         code,
-        redirect_uri: process.env.YAHOO_REDIRECT_URI!,
-        client_id: process.env.YAHOO_CLIENT_ID!
-        // Note: No client_secret for public client
+        redirect_uri: process.env.YAHOO_REDIRECT_URI!
       })
     });
 
@@ -330,28 +334,31 @@ async function exchangeCodeForTokens(code: string): Promise<any> {
 }
 
 /**
- * Refresh access token using refresh token (Public Client - no client secret)
+ * Refresh access token using refresh token with HTTP Basic auth
  */
 async function refreshAccessToken(refreshToken: string): Promise<any> {
   try {
-    console.log('Refreshing access token (Public Client):', {
+    console.log('Refreshing access token (HTTP Basic Auth):', {
       client_id: process.env.YAHOO_CLIENT_ID ? `${process.env.YAHOO_CLIENT_ID.substring(0, 8)}...` : 'MISSING',
+      has_client_secret: !!process.env.YAHOO_CLIENT_SECRET,
       redirect_uri: process.env.YAHOO_REDIRECT_URI
     });
+    
+    // Create HTTP Basic auth header
+    const credentials = Buffer.from(`${process.env.YAHOO_CLIENT_ID}:${process.env.YAHOO_CLIENT_SECRET}`).toString('base64');
     
     const response = await fetch(YAHOO_TOKEN_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
         'Accept': 'application/json',
+        'Authorization': `Basic ${credentials}`,
         'User-Agent': 'FantasyFootballApp/1.0'
       },
       body: new URLSearchParams({
         grant_type: 'refresh_token',
         refresh_token: refreshToken,
-        redirect_uri: process.env.YAHOO_REDIRECT_URI!,
-        client_id: process.env.YAHOO_CLIENT_ID!
-        // Note: No client_secret for public client
+        redirect_uri: process.env.YAHOO_REDIRECT_URI!
       })
     });
 
