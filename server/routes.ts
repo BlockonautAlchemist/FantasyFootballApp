@@ -6,7 +6,7 @@ import yahooAuthRouter from "./authYahoo";
 import session from "express-session";
 import "./types"; // Import session type declarations
 
-export async function registerRoutes(app: Express): Promise<Server> {
+export async function registerRoutes(app: Express): Promise<Server | void> {
   // Session middleware for OAuth state management
   app.use(session({
     secret: process.env.SESSION_SECRET || 'your-session-secret',
@@ -231,7 +231,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  const httpServer = createServer(app);
-
-  return httpServer;
+  // Only create HTTP server in development
+  if (process.env.NODE_ENV !== 'production') {
+    const httpServer = createServer(app);
+    return httpServer;
+  }
+  
+  // In production (Vercel), just return void
+  return;
 }
