@@ -54,6 +54,7 @@ yahooAuthRouter.get('/start', (req: Request, res: Response) => {
       client_id: process.env.YAHOO_CLIENT_ID!,
       redirect_uri: process.env.YAHOO_REDIRECT_URI!,
       response_type: 'code',
+      scope: 'openid profile',
       state,
       language: 'en-us'
     });
@@ -75,6 +76,13 @@ yahooAuthRouter.get('/callback', async (req: Request, res: Response) => {
   try {
     const { code, state, error: oauthError } = req.query;
 
+    console.log('OAuth callback received:', {
+      hasCode: !!code,
+      hasState: !!state,
+      hasError: !!oauthError,
+      query: req.query
+    });
+
     // Handle OAuth errors
     if (oauthError) {
       console.error('Yahoo OAuth error:', oauthError);
@@ -82,6 +90,7 @@ yahooAuthRouter.get('/callback', async (req: Request, res: Response) => {
     }
 
     if (!code || !state) {
+      console.error('Missing authorization code or state:', { code: !!code, state: !!state });
       return res.status(400).json({ error: 'Missing authorization code or state' });
     }
 
@@ -98,18 +107,36 @@ yahooAuthRouter.get('/callback', async (req: Request, res: Response) => {
     const tokenResponse = await exchangeCodeForTokens(code as string);
 
     if (!tokenResponse) {
+      console.error('Token exchange failed - redirecting with error');
       return res.redirect(`${process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5000'}?auth=error&reason=token_exchange_failed`);
     }
 
+    console.log('Token response received:', {
+      hasAccessToken: !!tokenResponse.access_token,
+      hasRefreshToken: !!tokenResponse.refresh_token,
+      expiresIn: tokenResponse.expires_in
+    });
+
     // Get user profile using access token
+    console.log('About to fetch profile...');
     const userProfile = await getYahooUserProfile(tokenResponse.access_token);
+    console.log('Profile fetch result:', userProfile);
 
     if (!userProfile) {
+      console.error('Failed to get user profile - redirecting with error');
       return res.redirect(`${process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5000'}?auth=error&reason=profile_fetch_failed`);
     }
 
-    const yahooUserId = userProfile.guid;
-    const displayName = userProfile.nickname || `Yahoo User ${yahooUserId}`;
+    // Extract user information from profile (handle different response formats)
+    const yahooUserId = userProfile.guid || userProfile.sub || userProfile.id;
+    const displayName = userProfile.nickname || userProfile.name || userProfile.displayName || `Yahoo User ${yahooUserId}`;
+    
+    console.log('Extracted user info:', { yahooUserId, displayName });
+    
+    if (!yahooUserId) {
+      console.error('No user ID found in profile:', userProfile);
+      return res.redirect(`${process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5000'}?auth=error&reason=invalid_profile`);
+    }
 
     // Handle user creation/update
     let user = await storage.getUserByYahooId(yahooUserId);
@@ -305,18 +332,45 @@ async function refreshAccessToken(refreshToken: string): Promise<any> {
  */
 async function getYahooUserProfile(accessToken: string): Promise<any> {
   try {
-    const response = await fetch('https://api.login.yahoo.com/openid/v1/userinfo', {
+    console.log('Fetching profile with token:', accessToken.substring(0, 10) + '...');
+    
+    // Try the OpenID Connect userinfo endpoint first
+    let response = await fetch('https://api.login.yahoo.com/openid/v1/userinfo', {
       headers: {
-        'Authorization': `Bearer ${accessToken}`
+        'Authorization': `Bearer ${accessToken}`,
+        'Accept': 'application/json',
+        'User-Agent': 'FantasyFootballApp/1.0'
       }
     });
 
+    console.log('Profile response status:', response.status);
+    console.log('Profile response headers:', Object.fromEntries(response.headers.entries()));
+
     if (!response.ok) {
-      console.error('Profile fetch failed:', response.status);
-      return null;
+      const errorText = await response.text();
+      console.error('Profile fetch failed:', response.status, errorText);
+      
+      // If OpenID endpoint fails, try the legacy Yahoo profile endpoint
+      console.log('Trying fallback profile endpoint...');
+      response = await fetch('https://api.login.yahoo.com/v1/user/profile', {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Accept': 'application/json',
+          'User-Agent': 'FantasyFootballApp/1.0'
+        }
+      });
+
+      console.log('Fallback profile response status:', response.status);
+      
+      if (!response.ok) {
+        const fallbackErrorText = await response.text();
+        console.error('Fallback profile fetch also failed:', response.status, fallbackErrorText);
+        return null;
+      }
     }
 
     const profile = await response.json();
+    console.log('Profile data received:', profile);
     return profile;
   } catch (error) {
     console.error('Profile fetch error:', error);
