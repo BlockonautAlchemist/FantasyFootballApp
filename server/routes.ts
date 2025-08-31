@@ -47,16 +47,21 @@ export async function registerRoutes(app: Express): Promise<Server | void> {
   // Get current user
   app.get('/api/auth/me', async (req, res) => {
     try {
+      console.log('GET /api/auth/me - Session:', req.session);
       const userId = req.session.userId;
       if (!userId) {
+        console.log('No userId in session');
         return res.status(401).json({ error: 'Not authenticated' });
       }
 
+      console.log('Getting user with ID:', userId);
       const user = await storage.getUser(userId);
       if (!user) {
+        console.log('User not found for ID:', userId);
         return res.status(401).json({ error: 'User not found' });
       }
 
+      console.log('User found:', { id: user.id, displayName: user.displayName });
       // Return user data without sensitive information
       res.json({
         id: user.id,
@@ -65,7 +70,7 @@ export async function registerRoutes(app: Express): Promise<Server | void> {
       });
     } catch (error) {
       console.error('Get user error:', error);
-      res.status(500).json({ error: 'Failed to get user' });
+      res.status(500).json({ error: 'Failed to get user', details: error.message });
     }
   });
 
