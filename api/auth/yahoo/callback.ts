@@ -1,37 +1,84 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
-export default function handler(req: VercelRequest, res: VercelResponse) {
-  // Step 1: Extract query parameters from the OAuth callback
-  // This verifies that Yahoo is properly redirecting to our callback URL
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // Read query parameters
   const { code, state, error, error_description } = req.query;
   
-  // Step 2: Handle OAuth errors (user denied access, invalid request, etc.)
-  // This proves we can handle OAuth error responses from Yahoo
+  // Handle OAuth errors
   if (error) {
     return res.status(400).json({
-      receivedCode: false,
       error: error,
       error_description: error_description || null
     });
   }
 
-  // Step 3: Handle successful authorization code
-  // This proves the OAuth flow completed successfully and we received a valid code
-  if (code) {
-    // Step 4: Return diagnostic information without logging the actual code
-    // This verifies code reception while maintaining security
-    return res.status(200).json({
-      receivedCode: true,
-      codeLen: (code as string).length,
-      state: state || null
+  // Verify state cookie matches
+  const stateCookie = req.cookies.yahoo_state;
+  if (!stateCookie || stateCookie !== state) {
+    return res.status(400).json({
+      error: 'invalid_state',
+      error_description: 'State parameter does not match stored state'
     });
   }
 
-  // Step 5: Handle case where neither code nor error is present
-  // This indicates an invalid callback request
-  return res.status(400).json({
-    receivedCode: false,
-    error: 'invalid_callback',
-    error_description: 'No authorization code or error received'
-  });
+  // Check if nonce cookie exists when openid scopes were used
+  const nonceCookie = req.cookies.yahoo_nonce;
+  const scope = process.env.YAHOO_REQUESTED_SCOPES || 'fspt-r';
+  if (scope.includes('openid') && !nonceCookie) {
+    return res.status(400).json({
+      error: 'missing_nonce',
+      error_description: 'Nonce cookie required for OpenID Connect flow'
+    });
+  }
+
+  // Exchange code for token
+  const clientId = process.env.YAHOO_CLIENT_ID!;
+  const clientSecret = process.env.YAHOO_CLIENT_SECRET!;
+  const redirectUri = process.env.YAHOO_REDIRECT_URI!.trim();
+
+  try {
+    const credentials = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
+    
+    const response = await fetch('https://api.login.yahoo.com/oauth2/get_token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': `Basic ${credentials}`
+      },
+      body: new URLSearchParams({
+        grant_type: 'authorization_code',
+        code: code as string,
+        redirect_uri: redirectUri
+      })
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      return res.status(400).json({
+        error: 'token_exchange_failed',
+        error_description: errorText
+      });
+    }
+
+    const tokenData = await response.json();
+    
+    // Set access token cookie
+    res.setHeader('Set-Cookie', [
+      `yahoo_access=${tokenData.access_token}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${tokenData.expires_in}`,
+      ...(tokenData.refresh_token ? [`yahoo_refresh=${tokenData.refresh_token}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=2592000`] : []),
+      // Clear state and nonce cookies
+      'yahoo_state=; HttpOnly; Secure; Path=/; SameSite=Lax; Max-Age=0',
+      'yahoo_nonce=; HttpOnly; Secure; Path=/; SameSite=Lax; Max-Age=0'
+    ]);
+
+    // Redirect to connect page with success indicator
+    return res.redirect(302, '/connect?connected=1');
+
+  } catch (error) {
+    console.error('Token exchange error:', error);
+    return res.status(500).json({
+      error: 'internal_error',
+      error_description: 'Failed to exchange authorization code for token'
+    });
+  }
 }

@@ -1,17 +1,19 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 export default function handler(req: VercelRequest, res: VercelResponse) {
-  // Step 1: Check environment variable configuration
-  // This verifies that all required OAuth environment variables are properly set
+  // Check environment variable configuration
   const clientId = process.env.YAHOO_CLIENT_ID;
   const clientSecret = process.env.YAHOO_CLIENT_SECRET;
   const redirectUri = process.env.YAHOO_REDIRECT_URI;
+  const requestedScopes = process.env.YAHOO_REQUESTED_SCOPES;
 
-  // Step 2: Return diagnostic information without exposing sensitive data
-  // This allows verification of environment setup without security risks
+  // Return diagnostic information without exposing sensitive data
   res.status(200).json({
-    envClientIdLast6: clientId ? clientId.slice(-6) : "", // Last 6 chars for verification without exposing full ID
-    hasSecret: !!clientSecret, // Boolean check without exposing the actual secret
-    envRedirect: redirectUri || "" // Full redirect URI is safe to show as it's not secret
+    envClientIdLast6: clientId ? clientId.slice(-6) : "",
+    hasSecret: !!clientSecret,
+    envRedirect: redirectUri || "",
+    requestedScopes: requestedScopes || "fspt-r",
+    hasOpenId: requestedScopes?.includes('openid') || false,
+    allRequiredVarsPresent: !!(clientId && clientSecret && redirectUri)
   });
 }
