@@ -151,7 +151,8 @@ export class MemStorage implements IStorage {
       teamKey: insertLeague.teamKey || null,
       teamName: insertLeague.teamName || null,
       teamLogo: insertLeague.teamLogo || null,
-      isLinked: insertLeague.isLinked || null
+      isLinked: insertLeague.isLinked || null,
+      leagueData: insertLeague.leagueData || null
     };
     this.yahooLeagues.set(id, league);
     return league;
