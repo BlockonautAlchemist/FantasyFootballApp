@@ -4,7 +4,99 @@ import { storage } from "./storage.js";
 import { yahooApi } from "./yahoo-api.js";
 import yahooAuthRouter from "./authYahoo.js";
 import session from "express-session";
+import fetch from "node-fetch";
 import "./types.js"; // Import session type declarations
+
+/**
+ * Make a request to Yahoo Fantasy Sports API using OAuth 2.0 Bearer token
+ */
+async function makeYahooApiRequest(path: string, accessToken: string): Promise<any> {
+  const url = `https://fantasysports.yahooapis.com/fantasy/v2/${path}`;
+  
+  const response = await fetch(url, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Accept': 'application/json',
+      'User-Agent': 'FantasyFootballApp/1.0'
+    }
+  });
+
+  if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error('401 - Token expired or invalid');
+    }
+    throw new Error(`Yahoo API error: ${response.status}`);
+  }
+
+  return await response.json();
+}
+
+/**
+ * Parse Yahoo's nested JSON structure to extract leagues
+ */
+function parseLeaguesFromYahooJson(json: any): Array<{
+  league_key: string;
+  league_id: string;
+  name: string;
+  season: string;
+  url?: string;
+  scoring_type?: string;
+  num_teams?: number;
+}> {
+  const out: Array<{
+    league_key: string;
+    league_id: string;
+    name: string;
+    season: string;
+    url?: string;
+    scoring_type?: string;
+    num_teams?: number;
+  }> = [];
+  
+  const users = json?.fantasy_content?.users;
+  if (!users) return out;
+
+  // users["0"].user[1].games is commonly where the games live
+  const userObj = users?.[0]?.user ?? users?.['0']?.user ?? null;
+  if (!userObj) return out;
+
+  // find games node
+  const gamesNode = userObj.find((n: any) => n?.games) ?? userObj?.[1]?.games;
+  const games = gamesNode?.[0] ?? gamesNode; // tolerate structures
+
+  if (!games) return out;
+
+  // traverse games -> leagues
+  const gameCount = Number(games?.count ?? Object.keys(games).length ?? 0);
+  for (let gi = 0; gi < gameCount; gi++) {
+    const game = games?.[gi]?.game;
+    if (!game) continue;
+
+    const leaguesNode = game.find((n: any) => n?.leagues)?.leagues;
+    if (!leaguesNode) continue;
+
+    const leagueCount = Number(leaguesNode?.count ?? Object.keys(leaguesNode).length ?? 0);
+    for (let li = 0; li < leagueCount; li++) {
+      const league = leaguesNode?.[li]?.league;
+      if (!league) continue;
+
+      // league is an array; its [0] often has key props
+      const meta = Object.assign({}, ...league.filter((x: any) => typeof x === 'object'));
+      const league_key = meta?.league_key ?? meta?.['league_key'];
+      const league_id = meta?.league_id ?? '';
+      const name = meta?.name ?? '';
+      const season = meta?.season ?? meta?.season_value ?? '';
+      const url = meta?.url;
+      const scoring_type = meta?.scoring_type;
+      const num_teams = Number(meta?.num_teams ?? 0);
+
+      if (league_key && name) {
+        out.push({ league_key, league_id, name, season: String(season), url, scoring_type, num_teams });
+      }
+    }
+  }
+  return out;
+}
 
 export async function registerRoutes(app: Express): Promise<Server | void> {
   // Session middleware for OAuth state management
@@ -103,76 +195,21 @@ export async function registerRoutes(app: Express): Promise<Server | void> {
         return res.status(401).json({ error: 'Yahoo token not found' });
       }
 
-      // Get leagues from Yahoo API
-      const yahooLeagues = await yahooApi.getUserLeagues(token, 'nfl'); // Focus on NFL for now
+      // Get leagues from Yahoo API using OAuth 2.0
+      const yahooLeagues = await makeYahooApiRequest(
+        'users;use_login=1/games;game_keys=nfl/leagues?format=json',
+        token.accessToken
+      );
       
-      // Transform and store leagues
-      const leagues = [];
-      const fantasyContent = yahooLeagues.fantasy_content;
-      
-      if (fantasyContent?.users?.[0]?.user?.[0]?.games?.[0]?.game?.[0]?.leagues) {
-        const yahooLeagueData = fantasyContent.users[0].user[0].games[0].game[0].leagues[0].league;
-        
-        for (const leagueData of yahooLeagueData) {
-          const leagueKey = leagueData.league_key[0];
-          const leagueName = leagueData.name[0];
-          const season = leagueData.season[0];
-          
-          // Get team information
-          let teamKey = '';
-          let teamName = '';
-          
-          if (leagueData.teams?.[0]?.team?.[0]) {
-            teamKey = leagueData.teams[0].team[0].team_key[0];
-            teamName = leagueData.teams[0].team[0].name[0];
-          }
-
-          // Create or update league in storage
-          const existingLeagues = await storage.getUserYahooLeagues(userId);
-          const existingLeague = existingLeagues.find(l => l.leagueKey === leagueKey);
-          
-          let savedLeague;
-          if (existingLeague) {
-            savedLeague = await storage.updateYahooLeague(existingLeague.id, {
-              leagueName,
-              season,
-              teamKey,
-              teamName,
-              leagueData: leagueData,
-            });
-          } else {
-            savedLeague = await storage.createYahooLeague({
-              userId,
-              leagueKey,
-              leagueName,
-              season,
-              teamKey,
-              teamName,
-              teamLogo: null,
-              isLinked: 'false',
-              gameCode: 'nfl',
-              leagueData: leagueData,
-            });
-          }
-
-          if (savedLeague) {
-            leagues.push({
-              id: savedLeague.id,
-              leagueKey: savedLeague.leagueKey,
-              leagueName: savedLeague.leagueName,
-              season: savedLeague.season,
-              teamKey: savedLeague.teamKey,
-              teamName: savedLeague.teamName,
-              teamLogo: savedLeague.teamLogo,
-              isLinked: savedLeague.isLinked === 'true',
-            });
-          }
-        }
-      }
+      // Parse the leagues using the safe parser
+      const leagues = parseLeaguesFromYahooJson(yahooLeagues);
 
       res.json(leagues);
     } catch (error) {
       console.error('Get Yahoo leagues error:', error);
+      if (error instanceof Error && error.message?.includes('401')) {
+        return res.status(401).json({ error: 'Yahoo token expired' });
+      }
       res.status(500).json({ error: 'Failed to get Yahoo leagues' });
     }
   });
@@ -236,6 +273,79 @@ export async function registerRoutes(app: Express): Promise<Server | void> {
     } catch (error) {
       console.error('Get linked league error:', error);
       res.status(500).json({ error: 'Failed to get linked league' });
+    }
+  });
+
+  // Yahoo API proxy for client-side requests
+  app.get('/api/yahoo/proxy', async (req, res) => {
+    try {
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ error: 'Not authenticated' });
+      }
+
+      const { path } = req.query;
+      if (!path || typeof path !== 'string') {
+        return res.status(400).json({ error: 'Path parameter required' });
+      }
+
+      const token = await storage.getYahooToken(userId);
+      if (!token) {
+        return res.status(401).json({ error: 'Yahoo token not found' });
+      }
+
+      // Make request to Yahoo API using OAuth 2.0 Bearer token
+      const yahooResponse = await makeYahooApiRequest(path, token.accessToken);
+      res.json(yahooResponse);
+    } catch (error) {
+      console.error('Yahoo API proxy error:', error);
+      if (error instanceof Error && error.message?.includes('401')) {
+        return res.status(401).json({ error: 'Yahoo token expired' });
+      }
+      res.status(500).json({ error: 'Failed to fetch from Yahoo API' });
+    }
+  });
+
+  // Set selected league (new endpoint for league selector)
+  app.post('/api/league', async (req, res) => {
+    try {
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ error: 'Not authenticated' });
+      }
+
+      const { league_key } = req.body;
+      if (!league_key || typeof league_key !== 'string') {
+        return res.status(400).json({ error: 'invalid_league_key' });
+      }
+
+      // Find the league by league_key
+      const userLeagues = await storage.getUserYahooLeagues(userId);
+      const league = userLeagues.find(l => l.leagueKey === league_key);
+      
+      if (!league) {
+        return res.status(404).json({ error: 'League not found' });
+      }
+
+      // Link the league
+      const success = await storage.linkYahooLeague(userId, league.id);
+      if (!success) {
+        return res.status(400).json({ error: 'Failed to link league' });
+      }
+
+      // Set HTTP-only cookie for additional persistence
+      res.cookie('yahoo_league_key', league_key, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 60 * 60 * 24 * 365 // 1 year
+      });
+
+      res.json({ ok: true });
+    } catch (error) {
+      console.error('Set league error:', error);
+      res.status(500).json({ error: 'Failed to set league' });
     }
   });
 

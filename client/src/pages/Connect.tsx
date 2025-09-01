@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import PageHeader from "@/components/PageHeader";
 import YahooConnectionStatus from "@/components/YahooConnectionStatus";
 import LeaguePicker from "@/components/LeaguePicker";
@@ -11,9 +11,19 @@ export default function Connect() {
   const [showLeaguePicker, setShowLeaguePicker] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const { connected, linkedLeague, loading } = useLeague();
+  const [location] = useLocation();
 
   useEffect(() => {
     console.log('Connect page - connected:', connected, 'linkedLeague:', linkedLeague, 'loading:', loading);
+    
+    // Check for OAuth success parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const authStatus = urlParams.get('auth');
+    
+    if (authStatus === 'success' && connected && !linkedLeague) {
+      // OAuth successful but no league selected yet - show league picker
+      setShowLeaguePicker(true);
+    }
   }, [connected, linkedLeague, loading]);
 
   const handleConnected = () => {
@@ -83,17 +93,17 @@ export default function Connect() {
           subtitle="Manage your Yahoo Fantasy account connection" 
         />
 
-      {!showLeaguePicker && (
+      {!showLeaguePicker && !connected && (
         <div className="bg-gray-800 border border-gray-700 rounded-2xl p-8 text-center mb-8">
           <YahooConnectionStatus onConnected={handleConnected} />
         </div>
       )}
 
-      {connected && showLeaguePicker && (
+      {(connected && showLeaguePicker) || (connected && !linkedLeague) ? (
         <div className="bg-surface border border-border rounded-2xl p-6 mb-8">
           <LeaguePicker onLeagueSelected={handleLeagueSelected} />
         </div>
-      )}
+      ) : null}
 
       {showSuccess && (
         <Callout variant="success" icon="fas fa-check-circle" title="League Selected Successfully">

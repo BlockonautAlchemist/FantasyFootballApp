@@ -1,27 +1,30 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from 'react';
+import { useLocation } from 'wouter';
 import { Button } from "@/components/ui/button";
-import { listYahooLeagues, linkYahooLeague } from "@/services/auth";
 import { useLeague } from "@/context/LeagueContext";
 
-interface League {
-  id: string;
-  leagueKey: string;
-  leagueName: string;
+type League = {
+  league_key: string;
+  league_id: string;
+  name: string;
   season: string;
-  teamKey?: string;
-  teamName?: string;
-  isLinked: boolean;
-}
+  url?: string;
+  scoring_type?: string;
+  num_teams?: number;
+};
 
 interface LeaguePickerProps {
-  onLeagueSelected: () => void;
+  onLeagueSelected?: () => void;
 }
 
 export default function LeaguePicker({ onLeagueSelected }: LeaguePickerProps) {
-  const [leagues, setLeagues] = useState<League[]>([]);
+  const [, setLocation] = useLocation();
+  const [leagues, setLeagues] = useState<League[] | null>(null);
   const [loading, setLoading] = useState(true);
-  const [linking, setLinking] = useState<string | null>(null);
-  const { setLinkedLeague } = useLeague();
+  const [error, setError] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string>('');
+  const [saving, setSaving] = useState(false);
+  const { setLinkedLeague, refreshData } = useLeague();
 
   useEffect(() => {
     loadLeagues();
@@ -29,25 +32,66 @@ export default function LeaguePicker({ onLeagueSelected }: LeaguePickerProps) {
 
   const loadLeagues = async () => {
     try {
-      const data = await listYahooLeagues();
-      setLeagues(data);
-    } catch (error) {
-      console.error('Failed to load leagues:', error);
+      const res = await fetch('/api/yahoo/leagues', { 
+        method: 'GET',
+        credentials: 'include',
+        cache: 'no-store' 
+      });
+      
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error ?? 'failed_fetch');
+      }
+      
+      const data = await res.json();
+      setLeagues(data || []);
+    } catch (e: any) {
+      setError(e?.message ?? 'failed_fetch');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSelectLeague = async (league: League) => {
-    setLinking(league.id);
+  const onContinue = async () => {
+    if (!selected) return;
+    
+    setSaving(true);
     try {
-      const linkedLeague = await linkYahooLeague(league.id);
-      setLinkedLeague(linkedLeague);
-      onLeagueSelected();
-    } catch (error) {
-      console.error('Failed to link league:', error);
+      const res = await fetch('/api/league', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ league_key: selected }),
+      });
+      
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err?.error ?? 'save_failed');
+      }
+
+      // Find the selected league to update context
+      const selectedLeague = leagues?.find(l => l.league_key === selected);
+      if (selectedLeague) {
+        setLinkedLeague({
+          leagueKey: selectedLeague.league_key,
+          leagueName: selectedLeague.name,
+          season: selectedLeague.season,
+        });
+      }
+
+      // Refresh data from backend
+      await refreshData();
+      
+      if (onLeagueSelected) {
+        onLeagueSelected();
+      } else {
+        // Default behavior - redirect to dashboard
+        setLocation('/');
+      }
+    } catch (e: any) {
+      setError(e?.message ?? 'save_failed');
     } finally {
-      setLinking(null);
+      setSaving(false);
     }
   };
 
@@ -60,43 +104,69 @@ export default function LeaguePicker({ onLeagueSelected }: LeaguePickerProps) {
     );
   }
 
+  if (error) {
+    return (
+      <div className="text-center py-8">
+        <div className="text-red-400 mb-4">
+          <i className="fas fa-exclamation-triangle text-2xl mb-2"></i>
+          <p>Error: {error}</p>
+        </div>
+        <Button onClick={loadLeagues} variant="outline">
+          Try Again
+        </Button>
+      </div>
+    );
+  }
+
+  if (!leagues || leagues.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <i className="fas fa-info-circle text-2xl text-textDim mb-2"></i>
+        <p className="text-textDim">No leagues found for NFL.</p>
+      </div>
+    );
+  }
+
   return (
-    <div>
-      <h3 className="text-xl font-semibold text-text mb-4">Select Your League</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {leagues.map((league) => (
-          <div 
-            key={league.leagueKey} 
-            className="bg-surface border border-border rounded-lg p-6 hover:shadow-lg transition-shadow"
-            data-testid={`league-card-${league.leagueKey}`}
+    <div className="space-y-4">
+      <div className="text-lg font-semibold text-text">Select your league</div>
+      <div className="space-y-2">
+        {leagues.map((l) => (
+          <label 
+            key={l.league_key} 
+            className="flex items-center gap-3 p-3 rounded-xl border border-neutral-700 hover:bg-neutral-900 cursor-pointer transition-colors"
           >
-            <div className="mb-4">
-              <h4 className="font-semibold text-text text-lg mb-2">{league.leagueName}</h4>
-              <p className="text-sm text-textDim mb-1">Season: {league.season}</p>
-              {league.teamName && (
-                <p className="text-sm text-textDim">Team: {league.teamName}</p>
-              )}
+            <input
+              type="radio"
+              name="league"
+              value={l.league_key}
+              checked={selected === l.league_key}
+              onChange={() => setSelected(l.league_key)}
+              className="text-primary"
+            />
+            <div className="flex flex-col flex-1">
+              <span className="font-medium text-text">{l.name}</span>
+              <span className="text-xs opacity-70 text-textDim">
+                {l.season} • {l.scoring_type ?? 'scoring'} • {l.num_teams ?? '?'} teams
+              </span>
             </div>
-            <Button
-              onClick={() => handleSelectLeague(league)}
-              disabled={linking === league.id}
-              className="w-full btn-primary"
-              data-testid={`select-league-${league.leagueKey}`}
-            >
-              {linking === league.id ? (
-                <>
-                  <i className="fas fa-spinner fa-spin mr-2"></i>
-                  Linking...
-                </>
-              ) : league.isLinked ? (
-                'Currently Selected'
-              ) : (
-                'Select League'
-              )}
-            </Button>
-          </div>
+          </label>
         ))}
       </div>
+      <Button
+        onClick={onContinue}
+        disabled={!selected || saving}
+        className="w-full px-4 py-2 rounded-xl bg-yellow-400/90 disabled:opacity-50 text-black font-semibold"
+      >
+        {saving ? (
+          <>
+            <i className="fas fa-spinner fa-spin mr-2"></i>
+            Saving...
+          </>
+        ) : (
+          'Continue'
+        )}
+      </Button>
     </div>
   );
 }
