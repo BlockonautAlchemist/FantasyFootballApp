@@ -314,7 +314,7 @@ const getMockLineupData = (leagueName: string, teamName: string): OptimalLineupR
 
 async function fetchUserLeagues(): Promise<LeagueResponse> {
   try {
-    const response = await fetch('/api/leagues', {
+    const response = await fetch('/api/fantasy?action=leagues', {
       credentials: 'include'
     });
     
