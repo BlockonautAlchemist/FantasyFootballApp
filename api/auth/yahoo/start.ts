@@ -1,50 +1,49 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getRequestToken, getAuthorizationUrl } from '../../../shared/oauth';
+
+function buildAuthorizeUrl(req: VercelRequest, res: VercelResponse, scopeOverride?: string) {
+  const clientId = process.env.YAHOO_CLIENT_ID!;
+  const redirectUri = process.env.YAHOO_REDIRECT_URI!.trim();
+  const DEFAULT = (process.env.YAHOO_REQUESTED_SCOPES || 'openid profile email fspt-w').trim();
+
+  const raw = (scopeOverride && scopeOverride.trim()) ||
+              (typeof req.query.scope === 'string' && req.query.scope.trim()) ||
+              DEFAULT;
+
+  // sanitize to allowed scopes
+  const ALLOWED = new Set(['fspt-r','fspt-w','openid','email','profile']);
+  const scope = raw.replace(/[,\s;]+/g,' ').trim().split(' ').filter(s => ALLOWED.has(s)).join(' ');
+
+  const state = crypto.randomUUID().replace(/-/g,'').slice(0,16);
+  const needsOIDC = /\bopenid\b/.test(scope);
+  const nonce = needsOIDC ? crypto.randomUUID().replace(/-/g,'').slice(0,16) : undefined;
+
+  // CSRF/OIDC cookies
+  const cookies = [
+    `yahoo_state=${state}; HttpOnly; Secure; Path=/; SameSite=Lax; Max-Age=300`,
+  ];
+  if (needsOIDC) cookies.push(`yahoo_nonce=${nonce}; HttpOnly; Secure; Path=/; SameSite=Lax; Max-Age=300`);
+  res.setHeader('Set-Cookie', cookies);
+
+  // Single-encode via URLSearchParams
+  const params = new URLSearchParams({
+    response_type: 'code',
+    client_id: clientId,
+    redirect_uri: redirectUri,
+    scope,
+    state
+  });
+  if (needsOIDC) params.set('nonce', nonce!);
+
+  const authorizeUrl = `https://api.login.yahoo.com/oauth2/request_auth?${params.toString()}`;
+  return authorizeUrl;
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'method_not_allowed' });
-  }
-
   try {
-    // Check if OAuth credentials are configured
-    const consumer_key = process.env.YAHOO_CLIENT_ID;
-    const consumer_secret = process.env.YAHOO_CLIENT_SECRET;
-    const callback_url = process.env.YAHOO_REDIRECT_URI;
-
-    if (!consumer_key || !consumer_secret || !callback_url) {
-      return res.status(500).json({ 
-        error: 'oauth_not_configured',
-        message: 'Yahoo OAuth credentials not configured. Please set YAHOO_CLIENT_ID, YAHOO_CLIENT_SECRET, and YAHOO_REDIRECT_URI environment variables.'
-      });
-    }
-
-    // Get request token from Yahoo
-    const requestToken = await getRequestToken({
-      consumer_key,
-      consumer_secret,
-      callback_url
-    });
-
-    // Store tokens in session or temporary storage
-    // For now, we'll store them in cookies (in production, use a proper session store)
-    res.setHeader('Set-Cookie', [
-      `yahoo_oauth_token=${requestToken.oauth_token}; Path=/; HttpOnly; SameSite=Lax`,
-      `yahoo_oauth_token_secret=${requestToken.oauth_token_secret}; Path=/; HttpOnly; SameSite=Lax`
-    ]);
-
-    // Generate authorization URL
-    const authUrl = getAuthorizationUrl(requestToken.oauth_token);
-
-    // Redirect user to Yahoo authorization page
-    res.redirect(authUrl);
-
-  } catch (error) {
-    console.error('Yahoo OAuth start error:', error);
-    return res.status(500).json({ 
-      error: 'oauth_start_failed',
-      message: 'Failed to start Yahoo OAuth flow',
-      detail: String(error)
-    });
+    const authorizeUrl = buildAuthorizeUrl(req, res);
+    // 302 redirect to Yahoo
+    res.status(302).setHeader('Location', authorizeUrl).end();
+  } catch (e) {
+    res.status(500).json({ error: 'start_failed', message: (e as Error).message });
   }
 }

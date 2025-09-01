@@ -176,11 +176,41 @@ export async function registerRoutes(app: Express): Promise<Server | void> {
 
   // Yahoo League Routes
   
-  // Get user's Yahoo leagues (now handled by /api/yahoo-proxy)
+  // Get user's Yahoo leagues
   app.get('/api/yahoo/leagues', async (req, res) => {
-    // Redirect to the new proxy endpoint
-    const proxyUrl = `/api/yahoo-proxy?action=leagues`;
-    res.redirect(proxyUrl);
+    try {
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ error: 'not_connected', detail: 'Not authenticated' });
+      }
+
+      const token = await storage.getYahooToken(userId);
+      if (!token) {
+        return res.status(401).json({ error: 'not_connected', detail: 'Yahoo token not found' });
+      }
+
+      const url = 'https://fantasysports.yahooapis.com/fantasy/v2/users;use_login=1/games;game_keys=nfl/leagues?format=json';
+      const yres = await fetch(url, { headers: { Authorization: `Bearer ${token.accessToken}` } });
+
+      const ct = yres.headers.get('content-type') || '';
+      const text = await yres.text();
+
+      if (!yres.ok) {
+        console.error('Yahoo error:', yres.status, text.slice(0, 300));
+        return res.status(yres.status).json({ error: 'yahoo_error', status: yres.status, snippet: text.slice(0, 200) });
+      }
+      if (!ct.includes('application/json')) {
+        console.error('Unexpected content-type:', ct, text.slice(0, 200));
+        return res.status(502).json({ error: 'unexpected_content_type', contentType: ct, snippet: text.slice(0, 200) });
+      }
+
+      const data = JSON.parse(text);
+      const leagues = parseLeaguesFromYahooJson(data);
+      return res.status(200).json({ leagues });
+    } catch (error) {
+      console.error('Internal leagues API error:', error);
+      return res.status(500).json({ error: 'internal_error', detail: String((error as Error)?.message || error) });
+    }
   });
 
   // Link a Yahoo league
@@ -245,17 +275,34 @@ export async function registerRoutes(app: Express): Promise<Server | void> {
     }
   });
 
-  // Yahoo API proxy for client-side requests (now handled by /api/yahoo-proxy)
+  // Yahoo API proxy for client-side requests
   app.get('/api/yahoo/proxy', async (req, res) => {
-    // Redirect to the new proxy endpoint
-    const { path, ...otherParams } = req.query;
-    const searchParams = new URLSearchParams();
-    if (path) searchParams.append('action', path as string);
-    Object.entries(otherParams).forEach(([key, value]) => {
-      if (value) searchParams.append(key, value as string);
-    });
-    const proxyUrl = `/api/yahoo-proxy?${searchParams.toString()}`;
-    res.redirect(proxyUrl);
+    try {
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ error: 'Not authenticated' });
+      }
+
+      const { path } = req.query;
+      if (!path || typeof path !== 'string') {
+        return res.status(400).json({ error: 'Path parameter required' });
+      }
+
+      const token = await storage.getYahooToken(userId);
+      if (!token) {
+        return res.status(401).json({ error: 'Yahoo token not found' });
+      }
+
+      // Make request to Yahoo API using OAuth 2.0 Bearer token
+      const yahooResponse = await makeYahooApiRequest(path, token.accessToken);
+      res.json(yahooResponse);
+    } catch (error) {
+      console.error('Yahoo API proxy error:', error);
+      if (error instanceof Error && error.message?.includes('401')) {
+        return res.status(401).json({ error: 'Yahoo token expired' });
+      }
+      res.status(500).json({ error: 'Failed to fetch from Yahoo API' });
+    }
   });
 
   // Note: /api/league POST endpoint is now handled by serverless function at /api/league.ts

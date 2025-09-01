@@ -1,43 +1,63 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import PageHeader from "@/components/PageHeader";
+import PlayerPicker from "@/components/PlayerPicker";
+import ComparisonPanel from "@/components/ComparisonPanel";
 import ConnectionCallout from "@/components/ConnectionCallout";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { getSession } from "@/services/api";
-import { getOptimalLineup } from "@/services/yahoo";
-import type { RosteredPlayer } from "@shared/types";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { comparePlayers } from "@/services/api";
+import { StartSitInput, PlayerSummary } from "@/services/types";
 
 export default function StartSit() {
-  // Get session data (league and team keys)
-  const { data: session, isLoading: sessionLoading } = useQuery({
-    queryKey: ["session"],
-    queryFn: getSession,
-    retry: 1,
+  const [playerA, setPlayerA] = useState<PlayerSummary | null>({ 
+    id: "nfl.p.1234", 
+    name: "Jaylen Waddle", 
+    pos: "WR", 
+    team: "MIA" 
   });
+  const [playerB, setPlayerB] = useState<PlayerSummary | null>({ 
+    id: "nfl.p.5678", 
+    name: "Courtland Sutton", 
+    pos: "WR", 
+    team: "DEN" 
+  });
+  const [week, setWeek] = useState("8");
+  const [scoring, setScoring] = useState("half_ppr");
+  const [submitted, setSubmitted] = useState(false);
 
-  // Get optimal lineup when we have league and team keys
-  const { data: optimalLineup, isLoading: lineupLoading, error: lineupError } = useQuery({
-    queryKey: ["optimal-lineup", session?.league_key, session?.team_key],
+  const { data: result, isLoading } = useQuery({
+    queryKey: ["/api/start-sit", playerA?.id, playerB?.id, week, scoring],
     queryFn: () => {
-      if (!session?.league_key || !session?.team_key) {
-        throw new Error("League and team keys required");
+      if (!playerA?.id || !playerB?.id) {
+        throw new Error("Player IDs are required");
       }
-      return getOptimalLineup(session.league_key, session.team_key);
+      return comparePlayers({
+        playerAId: playerA.id,
+        playerBId: playerB.id,
+        week: parseInt(week),
+        scoring: scoring as "standard" | "half_ppr" | "ppr"
+      });
     },
-    enabled: !!session?.league_key && !!session?.team_key && session.connected,
-    retry: 1,
+    enabled: submitted && !!playerA?.id && !!playerB?.id,
   });
 
-  const isLoading = sessionLoading || lineupLoading;
+  const handleSubmit = () => {
+    if (playerA?.id && playerB?.id) {
+      setSubmitted(true);
+    }
+  };
+
+  // Reset submitted state when players change
+  useEffect(() => {
+    setSubmitted(false);
+  }, [playerA?.id, playerB?.id]);
 
   return (
     <div>
       <PageHeader 
-        title="Start/Sit Optimizer" 
-        subtitle="Get AI-powered lineup recommendations for your Yahoo Fantasy team" 
+        title="Start/Sit Analyzer" 
+        subtitle="Compare two players and get a data-driven recommendation" 
       />
 
       {/* Connection Status */}
@@ -45,162 +65,113 @@ export default function StartSit() {
         <ConnectionCallout />
       </div>
 
-      {/* Loading State */}
-      {isLoading && (
-        <div className="flex items-center justify-center py-12">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-textDim">Loading your team data...</p>
+      {/* Input Form */}
+      <div className="bg-surface border border-border rounded-2xl p-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+          <div>
+            <label className="block text-sm font-medium text-text mb-2">Player A</label>
+            <PlayerPicker 
+              placeholder="Search player..." 
+              value={playerA?.name || ""}
+              onSelect={setPlayerA}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-text mb-2">Player B</label>
+            <PlayerPicker 
+              placeholder="Search player..." 
+              value={playerB?.name || ""}
+              onSelect={setPlayerB}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-text mb-2">Week</label>
+            <Select value={week} onValueChange={setWeek}>
+              <SelectTrigger data-testid="select-week">
+                <SelectValue placeholder="Select week" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="8">Week 8</SelectItem>
+                <SelectItem value="9">Week 9</SelectItem>
+                <SelectItem value="10">Week 10</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-text mb-2">Scoring</label>
+            <Select value={scoring} onValueChange={setScoring}>
+              <SelectTrigger data-testid="select-scoring">
+                <SelectValue placeholder="Select scoring" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="half_ppr">Half PPR</SelectItem>
+                <SelectItem value="ppr">Full PPR</SelectItem>
+                <SelectItem value="standard">Standard</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
-      )}
+        <Button 
+          onClick={handleSubmit} 
+          className="btn-primary"
+          disabled={isLoading || !playerA || !playerB}
+          data-testid="button-compare-players"
+        >
+          <i className="fas fa-search mr-2"></i>
+          {isLoading ? "Comparing..." : "Compare Players"}
+        </Button>
+      </div>
 
-      {/* Error State */}
-      {lineupError && (
-        <Alert className="mb-6">
-          <AlertDescription>
-            Failed to load lineup data. Please check your Yahoo connection and try again.
-          </AlertDescription>
-        </Alert>
-      )}
-
-      {/* Not Connected State */}
-      {!sessionLoading && !session?.connected && (
-        <Alert className="mb-6">
-          <AlertDescription>
-            Please connect your Yahoo Fantasy account to use the Start/Sit Optimizer.
-          </AlertDescription>
-        </Alert>
-      )}
-
-      {/* No League Selected */}
-      {session?.connected && !session?.league_key && (
-        <Alert className="mb-6">
-          <AlertDescription>
-            Please select a league from your Yahoo Fantasy account to get started.
-          </AlertDescription>
-        </Alert>
-      )}
-
-      {/* Optimal Lineup Results */}
-      {optimalLineup && (
-        <div className="space-y-6">
-          {/* Start Recommendations */}
-          {optimalLineup.recommendations.start.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <span className="text-green-600">🚀 Start These Players</span>
-                  <Badge variant="secondary">{optimalLineup.recommendations.start.length}</Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {optimalLineup.recommendations.start.map((player: RosteredPlayer, index: number) => (
-                    <div key={player.player_key} className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
-                      <div>
-                        <div className="font-medium text-green-800">{player.name}</div>
-                        <div className="text-sm text-green-600">
-                          {player.editorial_team_abbr} • {player.eligible_positions.join(', ')}
-                        </div>
-                      </div>
-                      <Badge variant="outline" className="text-green-700 border-green-300">
-                        {optimalLineup.recommendations.reasons[index]?.split(' at ')[1]?.split(' instead')[0] || 'START'}
-                      </Badge>
-                    </div>
-                  ))}
+      {/* Results Panel */}
+      {result && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Recommendation */}
+          <div className="lg:col-span-1">
+            <div className="bg-surface border border-border rounded-2xl p-6">
+              <h3 className="text-lg font-semibold text-text mb-4">Recommendation</h3>
+              <div className="text-center mb-6">
+                <div className="bg-secondary/10 text-secondary text-lg font-bold py-3 px-4 rounded-lg mb-3">
+                  START {result.recommendation === "A" ? result.facts.playerA.name.toUpperCase() : result.facts.playerB.name.toUpperCase()}
                 </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Sit Recommendations */}
-          {optimalLineup.recommendations.sit.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <span className="text-red-600">⏸️ Sit These Players</span>
-                  <Badge variant="secondary">{optimalLineup.recommendations.sit.length}</Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {optimalLineup.recommendations.sit.map((player: RosteredPlayer, index: number) => (
-                    <div key={player.player_key} className="flex items-center justify-between p-3 bg-red-50 border border-red-200 rounded-lg">
-                      <div>
-                        <div className="font-medium text-red-800">{player.name}</div>
-                        <div className="text-sm text-red-600">
-                          {player.editorial_team_abbr} • {player.eligible_positions.join(', ')}
-                        </div>
-                      </div>
-                      <Badge variant="outline" className="text-red-700 border-red-300">
-                        BENCH
-                      </Badge>
-                    </div>
-                  ))}
+                <div className="text-2xl font-bold text-text mb-1" data-testid="text-confidence">
+                  {Math.round(result.confidence * 100)}%
                 </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Optimal Lineup Display */}
-          <Card>
-            <CardHeader>
-              <CardTitle>🎯 Optimal Lineup</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {Object.entries(optimalLineup.starters).map(([position, players]) => (
-                  <div key={position} className="space-y-2">
-                    <h4 className="font-medium text-text capitalize">{position}</h4>
-                    {(players as RosteredPlayer[]).map((player: RosteredPlayer) => (
-                      <div key={player.player_key} className="flex items-center justify-between p-2 bg-surface border border-border rounded">
-                        <div>
-                          <div className="font-medium">{player.name}</div>
-                          <div className="text-sm text-textDim">
-                            {player.editorial_team_abbr}
-                            {player.status && (
-                              <Badge variant="destructive" className="ml-2 text-xs">
-                                {player.status}
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-                      </div>
+                <div className="text-sm text-textDim">Confidence</div>
+              </div>
+              <div className="space-y-3">
+                <h4 className="font-medium text-text">Key Reasons:</h4>
+                <ul className="text-sm text-textDim space-y-2">
+                  {result.reasons?.map((reason: string, index: number) => (
+                    <li key={index} className="flex items-start">
+                      <i className="fas fa-check text-secondary text-xs mt-1 mr-2"></i>
+                      {reason}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              {result.pivots && (
+                <div className="mt-6 pt-4 border-t border-border">
+                  <h4 className="font-medium text-text mb-2">Pivot Options:</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {result.pivots?.map((pivot: string, index: number) => (
+                      <span key={index} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                        {pivot}
+                      </span>
                     ))}
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Bench Players */}
-          {optimalLineup.bench.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>🪑 Bench Players</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {optimalLineup.bench.map((player: RosteredPlayer) => (
-                    <div key={player.player_key} className="flex items-center justify-between p-2 bg-muted border border-border rounded">
-                      <div>
-                        <div className="font-medium">{player.name}</div>
-                        <div className="text-sm text-textDim">
-                          {player.editorial_team_abbr} • {player.eligible_positions.join(', ')}
-                          {player.status && (
-                            <Badge variant="destructive" className="ml-2 text-xs">
-                              {player.status}
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
                 </div>
-              </CardContent>
-            </Card>
-          )}
+              )}
+            </div>
+          </div>
+
+          {/* Player Comparison */}
+          <div className="lg:col-span-2">
+            <ComparisonPanel 
+              playerA={result.facts.playerA}
+              playerB={result.facts.playerB}
+              recommendation={result.recommendation}
+            />
+          </div>
         </div>
       )}
     </div>

@@ -99,70 +99,45 @@ export async function comparePlayers(input: StartSitInput): Promise<StartSitResu
       ...mockData.default.result,
       facts: mockData.default.facts,
       sos: mockData.default.sos,
-      input: mockData.default.input as StartSitInput
-    } as StartSitResult & {facts: any; sos: any; input: StartSitInput}), 500);
+      input: mockData.default.input
+    }), 500);
   });
 }
 
 export async function getWaivers(week: number, position?: string): Promise<{candidates: WaiverItem[]; drops: PlayerSummary[]; faab: FAABGuidance[]}> {
   const mockData = await import("../mocks/waivers.mock.json");
   return new Promise((resolve) => {
-    setTimeout(() => resolve(mockData.default as {candidates: WaiverItem[]; drops: PlayerSummary[]; faab: FAABGuidance[]}), 300);
+    setTimeout(() => resolve(mockData.default), 300);
   });
 }
 
 export async function analyzeTrade(sideA: PlayerSummary[], sideB: PlayerSummary[]): Promise<TradeResult> {
   const mockData = await import("../mocks/trade.mock.json");
   return new Promise((resolve) => {
-    setTimeout(() => resolve(mockData.default as TradeResult), 800);
+    setTimeout(() => resolve(mockData.default), 800);
   });
 }
 
 export async function optimizeLineup(week: number): Promise<LineupRec> {
   const mockData = await import("../mocks/lineup.mock.json");
   return new Promise((resolve) => {
-    setTimeout(() => resolve(mockData.default as LineupRec), 600);
+    setTimeout(() => resolve(mockData.default), 600);
   });
 }
 
 export async function getSoS(pos?: string): Promise<SoSCell[]> {
   const mockData = await import("../mocks/sos.mock.json");
   return new Promise((resolve) => {
-    setTimeout(() => resolve(mockData.default as SoSCell[]), 400);
+    setTimeout(() => resolve(mockData.default), 400);
   });
 }
 
 export async function getNews(): Promise<NewsItem[]> {
   const mockData = await import("../mocks/news.mock.json");
   return new Promise((resolve) => {
-    setTimeout(() => resolve(mockData.default as NewsItem[]), 200);
+    setTimeout(() => resolve(mockData.default), 200);
   });
 }
-
-// Import Yahoo client wrapper
-import { getYahooLeagues, getLeagueSettings, getTeamRoster, getOptimalLineup } from './yahoo';
-
-// Session management
-export async function getSession(): Promise<{connected: boolean; league_key: string | null; team_key: string | null; error?: string}> {
-  try {
-    const response = await fetch('/api/session', {
-      method: 'GET',
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to get session data');
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error('Error getting session:', error);
-    return { connected: false, league_key: null, team_key: null };
-  }
-}
-
-// Re-export Yahoo functions for backward compatibility
-export { getYahooLeagues, getLeagueSettings, getTeamRoster, getOptimalLineup };
 
 export async function searchPlayers(query: string): Promise<PlayerSummary[]> {
   // Mock implementation - will be replaced with real API call to /api/search/players?q={query}
@@ -201,7 +176,7 @@ export async function searchPlayers(query: string): Promise<PlayerSummary[]> {
       ];
 
       // Filter based on query
-      const filtered = allPlayers.filter((player: PlayerSummary) => 
+      const filtered = allPlayers.filter(player => 
         player.name.toLowerCase().includes(query.toLowerCase()) ||
         player.team.toLowerCase().includes(query.toLowerCase())
       );
