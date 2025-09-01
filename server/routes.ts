@@ -305,48 +305,7 @@ export async function registerRoutes(app: Express): Promise<Server | void> {
     }
   });
 
-  // Set selected league (new endpoint for league selector)
-  app.post('/api/league', async (req, res) => {
-    try {
-      const userId = req.session.userId;
-      if (!userId) {
-        return res.status(401).json({ error: 'Not authenticated' });
-      }
-
-      const { league_key } = req.body;
-      if (!league_key || typeof league_key !== 'string') {
-        return res.status(400).json({ error: 'invalid_league_key' });
-      }
-
-      // Find the league by league_key
-      const userLeagues = await storage.getUserYahooLeagues(userId);
-      const league = userLeagues.find(l => l.leagueKey === league_key);
-      
-      if (!league) {
-        return res.status(404).json({ error: 'League not found' });
-      }
-
-      // Link the league
-      const success = await storage.linkYahooLeague(userId, league.id);
-      if (!success) {
-        return res.status(400).json({ error: 'Failed to link league' });
-      }
-
-      // Set HTTP-only cookie for additional persistence
-      res.cookie('yahoo_league_key', league_key, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        path: '/',
-        maxAge: 60 * 60 * 24 * 365 // 1 year
-      });
-
-      res.json({ ok: true });
-    } catch (error) {
-      console.error('Set league error:', error);
-      res.status(500).json({ error: 'Failed to set league' });
-    }
-  });
+  // Note: /api/league POST endpoint is now handled by serverless function at /api/league.ts
 
   // Only create HTTP server in development
   if (process.env.NODE_ENV !== 'production') {

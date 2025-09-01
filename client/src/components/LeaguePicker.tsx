@@ -59,10 +59,9 @@ export default function LeaguePicker({ onLeagueSelected }: LeaguePickerProps) {
         body: JSON.stringify({ league_key: selected }),
       });
       
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err?.error ?? 'save_failed');
-      }
+      const ct = res.headers.get('content-type') || '';
+      const data = ct.includes('application/json') ? await res.json() : { error: 'non_json' };
+      if (!res.ok) throw new Error(data.error || `save_failed_${res.status}`);
 
       // Find the selected league to update context
       const selectedLeague = leagues?.find(l => l.league_key === selected);
