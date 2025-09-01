@@ -32,19 +32,14 @@ export default function LeaguePicker({ onLeagueSelected }: LeaguePickerProps) {
 
   const loadLeagues = async () => {
     try {
-      const res = await fetch('/api/yahoo/leagues', { 
-        method: 'GET',
-        credentials: 'include',
-        cache: 'no-store' 
-      });
-      
+      const res = await fetch('/api/yahoo/leagues', { cache: 'no-store' });
+      const ct = res.headers.get('content-type') || '';
+      let payload: any = ct.includes('application/json') ? await res.json() : { error: 'non_json', snippet: await res.text() };
+
       if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error ?? 'failed_fetch');
+        throw new Error(payload?.error || `fetch_failed_${res.status}`);
       }
-      
-      const data = await res.json();
-      setLeagues(data || []);
+      setLeagues(payload.leagues ?? []);
     } catch (e: any) {
       setError(e?.message ?? 'failed_fetch');
     } finally {

@@ -45,62 +45,58 @@ export async function yahooFetch<T>(path: string, token: string): Promise<T> {
     cache: 'no-store',
   });
   
+  const ct = res.headers.get('content-type') || '';
+  let payload: any = ct.includes('application/json') ? await res.json() : { error: 'non_json', snippet: await res.text() };
+
   if (!res.ok) {
     if (res.status === 401) {
       throw new Error('Yahoo API error: 401 - Token expired or invalid');
     }
-    throw new Error(`Yahoo API error: ${res.status}`);
+    throw new Error(payload?.error || `Yahoo API error: ${res.status}`);
   }
   
-  return (await res.json()) as T;
+  return payload as T;
 }
 
 /**
  * Robustly unwrap Yahoo JSON -> League[]
- * Handles Yahoo's nested JSON structure safely
+ * Minimal, defensive parser for Yahoo JSON → League[]
  */
 export function parseLeaguesFromYahooJson(json: any): League[] {
   const out: League[] = [];
   const users = json?.fantasy_content?.users;
-  if (!users) return out;
+  const user = users?.[0]?.user || users?.['0']?.user;
+  if (!user) return out;
 
-  // users["0"].user[1].games is commonly where the games live
-  const userObj = users?.[0]?.user ?? users?.['0']?.user ?? null;
-  if (!userObj) return out;
+  const gamesNode = user.find((n: any) => n?.games)?.games || user?.[1]?.games;
+  if (!gamesNode) return out;
 
-  // find games node
-  const gamesNode = userObj.find((n: any) => n?.games) ?? userObj?.[1]?.games;
-  const games = gamesNode?.[0] ?? gamesNode; // tolerate structures
-
-  if (!games) return out;
-
-  // traverse games -> leagues
-  const gameCount = Number(games?.count ?? Object.keys(games).length ?? 0);
+  const gameCount = Number(gamesNode?.count ?? 0);
   for (let gi = 0; gi < gameCount; gi++) {
-    const game = games?.[gi]?.game;
+    const game = gamesNode?.[gi]?.game;
     if (!game) continue;
 
     const leaguesNode = game.find((n: any) => n?.leagues)?.leagues;
     if (!leaguesNode) continue;
 
-    const leagueCount = Number(leaguesNode?.count ?? Object.keys(leaguesNode).length ?? 0);
+    const leagueCount = Number(leaguesNode?.count ?? 0);
     for (let li = 0; li < leagueCount; li++) {
-      const league = leaguesNode?.[li]?.league;
-      if (!league) continue;
+      const leagueArr = leaguesNode?.[li]?.league;
+      if (!leagueArr) continue;
+      const obj = Object.assign({}, ...leagueArr.filter((x: any) => x && typeof x === 'object'));
 
-      // league is an array; its [0] often has key props
-      const meta = Object.assign({}, ...league.filter((x: any) => typeof x === 'object'));
-      const league_key = meta?.league_key ?? meta?.['league_key'];
-      const league_id = meta?.league_id ?? '';
-      const name = meta?.name ?? '';
-      const season = meta?.season ?? meta?.season_value ?? '';
-      const url = meta?.url;
-      const scoring_type = meta?.scoring_type;
-      const num_teams = Number(meta?.num_teams ?? 0);
+      const league_key = obj.league_key;
+      if (!league_key) continue;
 
-      if (league_key && name) {
-        out.push({ league_key, league_id, name, season: String(season), url, scoring_type, num_teams });
-      }
+      out.push({
+        league_key,
+        league_id: obj.league_id ?? '',
+        name: obj.name ?? '',
+        season: String(obj.season ?? ''),
+        url: obj.url,
+        scoring_type: obj.scoring_type,
+        num_teams: Number(obj.num_teams ?? 0),
+      });
     }
   }
   return out;
