@@ -8,20 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { comparePlayers } from "@/services/api";
 import { StartSitInput, PlayerSummary } from "@/services/types";
+import { useLeagueContext } from "@/context/LeagueContext";
 
 export default function StartSit() {
-  const [playerA, setPlayerA] = useState<PlayerSummary | null>({ 
-    id: "nfl.p.1234", 
-    name: "Jaylen Waddle", 
-    pos: "WR", 
-    team: "MIA" 
-  });
-  const [playerB, setPlayerB] = useState<PlayerSummary | null>({ 
-    id: "nfl.p.5678", 
-    name: "Courtland Sutton", 
-    pos: "WR", 
-    team: "DEN" 
-  });
+  const { connected, linkedLeague } = useLeagueContext();
+  const [playerA, setPlayerA] = useState<PlayerSummary | null>(null);
+  const [playerB, setPlayerB] = useState<PlayerSummary | null>(null);
   const [week, setWeek] = useState("8");
   const [scoring, setScoring] = useState("half_ppr");
   const [submitted, setSubmitted] = useState(false);
@@ -39,7 +31,7 @@ export default function StartSit() {
         scoring: scoring as "standard" | "half_ppr" | "ppr"
       });
     },
-    enabled: submitted && !!playerA?.id && !!playerB?.id,
+    enabled: submitted && !!playerA?.id && !!playerB?.id && connected,
   });
 
   const handleSubmit = () => {
@@ -64,6 +56,37 @@ export default function StartSit() {
       <div className="mb-6">
         <ConnectionCallout />
       </div>
+
+      {/* Not Connected Message */}
+      {!connected && (
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 mb-8">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-amber-800">
+                Connect Your Yahoo Account
+              </h3>
+              <div className="mt-2 text-sm text-amber-700">
+                <p>
+                  To use the Start/Sit Analyzer with real data, please connect your Yahoo Fantasy Football account first.
+                </p>
+              </div>
+              <div className="mt-4">
+                <a
+                  href="/connect"
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-amber-800 bg-amber-100 hover:bg-amber-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
+                >
+                  Connect Now
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Input Form */}
       <div className="bg-surface border border-border rounded-2xl p-6 mb-8">
@@ -114,11 +137,11 @@ export default function StartSit() {
         <Button 
           onClick={handleSubmit} 
           className="btn-primary"
-          disabled={isLoading || !playerA || !playerB}
+          disabled={isLoading || !playerA || !playerB || !connected}
           data-testid="button-compare-players"
         >
           <i className="fas fa-search mr-2"></i>
-          {isLoading ? "Comparing..." : "Compare Players"}
+          {isLoading ? "Comparing..." : !connected ? "Connect to Analyze" : "Compare Players"}
         </Button>
       </div>
 
