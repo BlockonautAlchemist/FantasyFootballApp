@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { buildOptimalLineup, generateStartSitRecommendations } from '../shared/scoring';
 import type { LeagueSlots, RosteredPlayer, OptimalLineup } from '../shared/types';
+import { makeYahooRequest } from '../shared/oauth';
 
 function getCookie(req: VercelRequest, name: string) {
   const cookie = req.headers.cookie || '';
@@ -78,34 +79,74 @@ function parseLeagueSettingsFromYahooJson(json: any): LeagueSlots {
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'method_not_allowed' });
   
-  const token = (req.headers.authorization || '').replace(/^Bearer\s+/i, '') || getCookie(req, 'yahoo_access');
   const action = String(req.query.action || '');
   
-  if (!token) return res.status(401).json({ error: 'missing_token' });
   if (!action) return res.status(400).json({ error: 'missing_action' });
 
-  try {
-    let yahooUrl: string;
-    let params: Record<string, string> = {};
+  // Get OAuth tokens from cookies
+  const oauth_token = getCookie(req, 'yahoo_access_token');
+  const oauth_token_secret = getCookie(req, 'yahoo_access_token_secret');
 
-    // Map actions to Yahoo API endpoints
+  if (!oauth_token || !oauth_token_secret) {
+    return res.status(401).json({ 
+      error: 'not_authenticated',
+      message: 'No Yahoo OAuth tokens found. Please connect your Yahoo account first.'
+    });
+  }
+
+  // Get OAuth credentials
+  const consumer_key = process.env.YAHOO_CLIENT_ID;
+  const consumer_secret = process.env.YAHOO_CLIENT_SECRET;
+
+  if (!consumer_key || !consumer_secret) {
+    return res.status(500).json({ 
+      error: 'oauth_not_configured',
+      message: 'Yahoo OAuth credentials not configured'
+    });
+  }
+
+  try {
+    
     switch (action) {
       case 'leagues':
-        yahooUrl = 'https://fantasysports.yahooapis.com/fantasy/v2/users;use_login=1/games;game_keys=nfl/leagues?format=json';
-        break;
+        const leaguesUrl = 'https://fantasysports.yahooapis.com/fantasy/v2/users;use_login=1/games;game_keys=nfl/leagues?format=json';
+        const leaguesData = await makeYahooRequest(
+          leaguesUrl,
+          consumer_key,
+          consumer_secret,
+          oauth_token,
+          oauth_token_secret
+        );
+        return res.json(leaguesData);
         
       case 'league-settings':
         const league_key = String(req.query.league_key || '');
         if (!league_key) return res.status(400).json({ error: 'missing_league_key' });
-        yahooUrl = `https://fantasysports.yahooapis.com/fantasy/v2/league/${league_key}/settings?format=json`;
-        break;
+        
+        const settingsUrl = `https://fantasysports.yahooapis.com/fantasy/v2/league/${league_key}/settings?format=json`;
+        const settingsData = await makeYahooRequest(
+          settingsUrl,
+          consumer_key,
+          consumer_secret,
+          oauth_token,
+          oauth_token_secret
+        );
+        return res.json(settingsData);
         
       case 'team-roster':
         const team_key = String(req.query.team_key || '');
         if (!team_key) return res.status(400).json({ error: 'missing_team_key' });
+        
         const date = req.query.date ? `;date=${req.query.date}` : '';
-        yahooUrl = `https://fantasysports.yahooapis.com/fantasy/v2/team/${team_key}/roster${date}?format=json`;
-        break;
+        const rosterUrl = `https://fantasysports.yahooapis.com/fantasy/v2/team/${team_key}/roster${date}?format=json`;
+        const rosterData = await makeYahooRequest(
+          rosterUrl,
+          consumer_key,
+          consumer_secret,
+          oauth_token,
+          oauth_token_secret
+        );
+        return res.json(rosterData);
         
       case 'optimal-lineup':
         const lineup_league_key = String(req.query.league_key || '');
@@ -116,26 +157,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         
         // Fetch league settings and team roster in parallel
         const [settingsResponse, rosterResponse] = await Promise.all([
-          fetch(`https://fantasysports.yahooapis.com/fantasy/v2/league/${lineup_league_key}/settings?format=json`, {
-            headers: { Authorization: `Bearer ${token}` }
-          }),
-          fetch(`https://fantasysports.yahooapis.com/fantasy/v2/team/${lineup_team_key}/roster?format=json`, {
-            headers: { Authorization: `Bearer ${token}` }
-          })
+          makeYahooRequest(
+            `https://fantasysports.yahooapis.com/fantasy/v2/league/${lineup_league_key}/settings?format=json`,
+            consumer_key,
+            consumer_secret,
+            oauth_token,
+            oauth_token_secret
+          ),
+          makeYahooRequest(
+            `https://fantasysports.yahooapis.com/fantasy/v2/team/${lineup_team_key}/roster?format=json`,
+            consumer_key,
+            consumer_secret,
+            oauth_token,
+            oauth_token_secret
+          )
         ]);
 
-        // Check for errors
-        if (!settingsResponse.ok || !rosterResponse.ok) {
-          const error = !settingsResponse.ok ? 'settings' : 'roster';
-          return res.status(500).json({ error: `yahoo_${error}_error` });
-        }
-
-        // Parse responses
-        const settingsJson = await settingsResponse.json();
-        const rosterJson = await rosterResponse.json();
-
-        const slots = parseLeagueSettingsFromYahooJson(settingsJson);
-        const roster = parseRosterFromYahooJson(rosterJson);
+        const slots = parseLeagueSettingsFromYahooJson(settingsResponse);
+        const roster = parseRosterFromYahooJson(rosterResponse);
 
         if (Object.keys(slots).length === 0 || roster.length === 0) {
           return res.status(500).json({ error: 'parse_error', detail: 'Failed to parse Yahoo data' });
@@ -156,25 +195,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.json(result);
         
       default:
-        return res.status(400).json({ error: 'invalid_action', valid_actions: ['leagues', 'league-settings', 'team-roster', 'optimal-lineup'] });
+        return res.status(400).json({ 
+          error: 'invalid_action', 
+          valid_actions: ['leagues', 'league-settings', 'team-roster', 'optimal-lineup'] 
+        });
     }
-
-    // Make request to Yahoo API
-    const response = await fetch(yahooUrl, { 
-      headers: { Authorization: `Bearer ${token}` } 
-    });
-    
-    const contentType = response.headers.get('content-type') || '';
-    const text = await response.text();
-    
-    if (!response.ok || !contentType.includes('application/json')) {
-      console.error('Yahoo API error:', response.status, text.slice(0, 200));
-      return res.status(response.status).json({ error: 'yahoo_error', snippet: text.slice(0,200) });
-    }
-    
-    res.json(JSON.parse(text));
   } catch (error) {
     console.error('Yahoo proxy error:', error);
-    return res.status(500).json({ error: 'internal_error', detail: String(error) });
+    return res.status(500).json({ 
+      error: 'internal_error', 
+      detail: String(error),
+      message: 'Yahoo API request failed'
+    });
   }
 }

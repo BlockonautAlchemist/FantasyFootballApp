@@ -1,79 +1,92 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { getAccessToken } from '../../../shared/oauth';
+
+function getCookie(req: VercelRequest, name: string) {
+  const cookie = req.headers.cookie || '';
+  const hit = cookie.split(';').map(s => s.trim()).find(s => s.startsWith(name + '='));
+  return hit ? decodeURIComponent(hit.split('=').slice(1).join('=')) : '';
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // Read query parameters
-  const { code, state, error, error_description } = req.query;
-  
-  // Handle OAuth errors
-  if (error) {
-    return res.status(400).json({
-      error: error,
-      error_description: error_description || null
-    });
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'method_not_allowed' });
   }
-
-  // Verify state cookie matches
-  const stateCookie = req.cookies.yahoo_state;
-  if (!stateCookie || stateCookie !== state) {
-    return res.status(400).json({
-      error: 'invalid_state',
-      error_description: 'State parameter does not match stored state'
-    });
-  }
-
-  // Check if nonce cookie exists when openid scopes were used
-  const nonceCookie = req.cookies.yahoo_nonce;
-  // If nonce cookie exists, it means openid scope was used
-  const usedOpenID = !!nonceCookie;
-
-  // Exchange code for token
-  const clientId = process.env.YAHOO_CLIENT_ID!;
-  const clientSecret = process.env.YAHOO_CLIENT_SECRET!;
-  const redirectUri = process.env.YAHOO_REDIRECT_URI!.trim();
 
   try {
-    const credentials = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
-    
-    const response = await fetch('https://api.login.yahoo.com/oauth2/get_token', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': `Basic ${credentials}`
-      },
-      body: new URLSearchParams({
-        grant_type: 'authorization_code',
-        code: code as string,
-        redirect_uri: redirectUri
-      })
-    });
+    // Get OAuth verifier from query parameters
+    const oauth_verifier = req.query.oauth_verifier as string;
+    const oauth_token = req.query.oauth_token as string;
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      return res.status(400).json({
-        error: 'token_exchange_failed',
-        error_description: errorText
+    if (!oauth_verifier || !oauth_token) {
+      return res.status(400).json({ 
+        error: 'missing_parameters',
+        message: 'Missing oauth_verifier or oauth_token in callback'
       });
     }
 
-    const tokenData = await response.json();
-    
-    // Set access token cookie
+    // Get stored tokens from cookies
+    const stored_oauth_token = getCookie(req, 'yahoo_oauth_token');
+    const stored_oauth_token_secret = getCookie(req, 'yahoo_oauth_token_secret');
+
+    if (!stored_oauth_token || !stored_oauth_token_secret) {
+      return res.status(400).json({ 
+        error: 'missing_stored_tokens',
+        message: 'No stored OAuth tokens found. Please restart the OAuth flow.'
+      });
+    }
+
+    // Verify the token matches
+    if (stored_oauth_token !== oauth_token) {
+      return res.status(400).json({ 
+        error: 'token_mismatch',
+        message: 'OAuth token mismatch'
+      });
+    }
+
+    // Check if OAuth credentials are configured
+    const consumer_key = process.env.YAHOO_CLIENT_ID;
+    const consumer_secret = process.env.YAHOO_CLIENT_SECRET;
+
+    if (!consumer_key || !consumer_secret) {
+      return res.status(500).json({ 
+        error: 'oauth_not_configured',
+        message: 'Yahoo OAuth credentials not configured'
+      });
+    }
+
+    // Exchange verifier for access token
+    const accessToken = await getAccessToken(
+      {
+        consumer_key,
+        consumer_secret,
+        callback_url: process.env.YAHOO_REDIRECT_URI || ''
+      },
+      oauth_token,
+      stored_oauth_token_secret,
+      oauth_verifier
+    );
+
+    // Store access tokens in cookies (in production, use a secure session store)
     res.setHeader('Set-Cookie', [
-      `yahoo_access=${tokenData.access_token}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${tokenData.expires_in}`,
-      ...(tokenData.refresh_token ? [`yahoo_refresh=${tokenData.refresh_token}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=2592000`] : []),
-      // Clear state and nonce cookies
-      'yahoo_state=; HttpOnly; Secure; Path=/; SameSite=Lax; Max-Age=0',
-      'yahoo_nonce=; HttpOnly; Secure; Path=/; SameSite=Lax; Max-Age=0'
+      `yahoo_access_token=${accessToken.oauth_token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=86400`,
+      `yahoo_access_token_secret=${accessToken.oauth_token_secret}; Path=/; HttpOnly; SameSite=Lax; Max-Age=86400`
     ]);
 
-    // Redirect to connect page with success indicator
-    return res.redirect(302, '/connect?connected=1');
+    // Clear temporary tokens
+    res.setHeader('Set-Cookie', [
+      'yahoo_oauth_token=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0',
+      'yahoo_oauth_token_secret=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0'
+    ]);
+
+    // Redirect to success page or dashboard
+    res.redirect('/?oauth_success=true');
 
   } catch (error) {
-    console.error('Token exchange error:', error);
-    return res.status(500).json({
-      error: 'internal_error',
-      error_description: 'Failed to exchange authorization code for token'
+    console.error('Yahoo OAuth callback error:', error);
+    return res.status(500).json({ 
+      error: 'oauth_callback_failed',
+      message: 'Failed to complete Yahoo OAuth flow',
+      detail: String(error)
     });
   }
 }
