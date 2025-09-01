@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { startYahooConnect, logout } from "@/services/auth";
+import { logout } from "@/services/auth";
 import { useLeague } from "@/context/LeagueContext";
 
 interface YahooConnectionStatusProps {
@@ -16,8 +16,24 @@ export default function YahooConnectionStatus({ onConnected }: YahooConnectionSt
     setIsConnecting(true);
     
     try {
-      await startYahooConnect();
-      // The user will be redirected to Yahoo OAuth, so this component will unmount
+      // Call authorize endpoint with explicit scopes
+      const response = await fetch('/api/auth/yahoo/authorize?scope=fspt-r%20fspt-w', {
+        method: 'GET',
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to get authorization URL: ${response.status}`);
+      }
+
+      const { authorizeUrl } = await response.json();
+      
+      if (!authorizeUrl) {
+        throw new Error('No authorization URL received');
+      }
+      
+      // Redirect to Yahoo OAuth
+      window.location.href = authorizeUrl;
     } catch (error) {
       console.error('Connection failed:', error);
       alert('Unable to connect to Yahoo at this time. Please try again later or contact support if the issue persists.');
