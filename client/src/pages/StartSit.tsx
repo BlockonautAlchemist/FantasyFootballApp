@@ -8,10 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { comparePlayers } from "@/services/api";
 import { StartSitInput, PlayerSummary } from "@/services/types";
-import { useLeagueContext } from "@/context/LeagueContext";
+import { useLeague } from "@/context/LeagueContext";
 
 export default function StartSit() {
-  const { connected, linkedLeague } = useLeagueContext();
+  const { connected, linkedLeague } = useLeague();
   const [playerA, setPlayerA] = useState<PlayerSummary | null>(null);
   const [playerB, setPlayerB] = useState<PlayerSummary | null>(null);
   const [week, setWeek] = useState("8");
