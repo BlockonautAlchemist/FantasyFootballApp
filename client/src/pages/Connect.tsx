@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import PageHeader from "@/components/PageHeader";
-import ConnectYahooButton from "@/components/ConnectYahooButton";
+import YahooConnectionStatus from "@/components/YahooConnectionStatus";
 import LeaguePicker from "@/components/LeaguePicker";
 import Callout from "@/components/Callout";
 import { Button } from "@/components/ui/button";
@@ -31,12 +31,12 @@ export default function Connect() {
       <div className="min-h-screen">
         <div className="pt-24 px-4">
           <PageHeader 
-            title="Connect Your Yahoo Account" 
-            subtitle="Link your Yahoo Fantasy account to access your leagues and rosters" 
+            title="Yahoo Connection" 
+            subtitle="Manage your Yahoo Fantasy account connection" 
           />
           <div className="text-center py-8">
             <i className="fas fa-spinner fa-spin text-2xl text-textDim mb-2"></i>
-            <p className="text-textDim">Loading...</p>
+            <p className="text-textDim">Checking connection status...</p>
           </div>
         </div>
       </div>
@@ -79,22 +79,13 @@ export default function Connect() {
     <div className="min-h-screen">
       <div className="pt-24 px-4">
         <PageHeader 
-          title="Connect Your Yahoo Account" 
-          subtitle="Link your Yahoo Fantasy account to access your leagues and rosters" 
+          title="Yahoo Connection" 
+          subtitle="Manage your Yahoo Fantasy account connection" 
         />
 
-      {!connected && !showLeaguePicker && (
+      {!showLeaguePicker && (
         <div className="bg-gray-800 border border-gray-700 rounded-2xl p-8 text-center mb-8">
-          <div className="mb-6">
-            <i className="fab fa-yahoo text-6xl text-purple-600 mb-4"></i>
-            <h3 className="text-xl font-semibold text-white mb-2">
-              Connect with Yahoo Fantasy
-            </h3>
-            <p className="text-gray-300">
-              Authorize access to import your fantasy leagues and manage your teams
-            </p>
-          </div>
-          <ConnectYahooButton onConnected={handleConnected} />
+          <YahooConnectionStatus onConnected={handleConnected} />
         </div>
       )}
 

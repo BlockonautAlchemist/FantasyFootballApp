@@ -71,7 +71,7 @@ export default function ConnectYahooButton({ onConnected }: ConnectYahooButtonPr
         {isConnecting ? (
           <>
             <i className="fas fa-spinner fa-spin mr-3"></i>
-            Connecting to Yahoo...
+            Redirecting to Yahoo...
           </>
         ) : (
           <>
