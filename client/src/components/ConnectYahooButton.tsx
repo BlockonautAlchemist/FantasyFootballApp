@@ -47,38 +47,18 @@ export default function ConnectYahooButton({ onConnected }: ConnectYahooButtonPr
     }
   };
 
-  const handleConnect = async () => {
+  const handleConnect = () => {
     setIsConnecting(true);
     
-    try {
-      // Call authorize endpoint with explicit scopes
-      const response = await fetch('/api/auth/yahoo/authorize?scope=fspt-r%20fspt-w', {
-        method: 'GET',
-        credentials: 'include',
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to get authorization URL: ${response.status}`);
-      }
-
-      const { authorizeUrl } = await response.json();
-      
-      if (!authorizeUrl) {
-        throw new Error('No authorization URL received');
-      }
-      
-      // Redirect to Yahoo OAuth
-      window.location.href = authorizeUrl;
-    } catch (error) {
-      console.error('Connection failed:', error);
-      alert('Unable to connect to Yahoo at this time. Please try again later or contact support if the issue persists.');
-      setIsConnecting(false);
-    }
+    // Simple, reliable: let the server set cookies & redirect
+    const YAHOO_SCOPE = 'openid profile email fspt-w';
+    window.location.href = `/api/auth/yahoo/start?scope=${encodeURIComponent(YAHOO_SCOPE)}`;
   };
 
   return (
     <div className="text-center">
       <Button
+        type="button"
         onClick={handleConnect}
         disabled={isConnecting}
         className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-4 text-lg font-semibold rounded-lg"

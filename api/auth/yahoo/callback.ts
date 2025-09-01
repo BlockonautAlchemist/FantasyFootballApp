@@ -23,13 +23,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // Check if nonce cookie exists when openid scopes were used
   const nonceCookie = req.cookies.yahoo_nonce;
-  const scope = process.env.YAHOO_REQUESTED_SCOPES || 'fspt-r';
-  if (scope.includes('openid') && !nonceCookie) {
-    return res.status(400).json({
-      error: 'missing_nonce',
-      error_description: 'Nonce cookie required for OpenID Connect flow'
-    });
-  }
+  // If nonce cookie exists, it means openid scope was used
+  const usedOpenID = !!nonceCookie;
 
   // Exchange code for token
   const clientId = process.env.YAHOO_CLIENT_ID!;

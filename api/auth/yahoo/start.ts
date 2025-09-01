@@ -38,11 +38,12 @@ function buildAuthorizeUrl(req: VercelRequest, res: VercelResponse, scopeOverrid
   return authorizeUrl;
 }
 
-export default function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const authorizeUrl = buildAuthorizeUrl(req, res);
-    return res.status(200).json({ authorizeUrl, echo: { scope: req.query.scope, hasNonce: /\bopenid\b/.test(req.query.scope as string || '') } });
+    // 302 redirect to Yahoo
+    res.status(302).setHeader('Location', authorizeUrl).end();
   } catch (e) {
-    res.status(500).json({ error: 'authorize_failed', message: (e as Error).message });
+    res.status(500).json({ error: 'start_failed', message: (e as Error).message });
   }
 }
