@@ -94,7 +94,7 @@ export async function getFreeAgents(pos?: string): Promise<any[]> {
 
 export async function comparePlayers(input: StartSitInput): Promise<StartSitResult & {facts: any; sos: any; input: StartSitInput}> {
   try {
-    const response = await fetch('/api/start-sit', {
+    const response = await fetch('/api/fantasy?action=start-sit', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -160,7 +160,7 @@ export async function getNews(): Promise<NewsItem[]> {
 
 export async function searchPlayers(query: string): Promise<PlayerSummary[]> {
   try {
-    const response = await fetch(`/api/search/players?q=${encodeURIComponent(query)}`, {
+    const response = await fetch(`/api/fantasy?action=search&q=${encodeURIComponent(query)}`, {
       method: 'GET',
       credentials: 'include',
     });

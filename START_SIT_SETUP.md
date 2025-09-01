@@ -12,20 +12,23 @@ The start/sit assistant now provides real data-driven recommendations by:
 
 ## API Endpoints Created
 
-### 1. `/api/start-sit` (POST)
+### 1. `/api/fantasy` (Consolidated Endpoint)
+This single endpoint handles multiple fantasy sports operations based on the `action` query parameter:
+
+#### Player Search: `GET /api/fantasy?action=search&q=player_name`
+- **Purpose**: Searches for players in the user's Yahoo leagues
+- **Input**: `?action=search&q=player_name`
+- **Output**: Array of matching players with IDs
+
+#### Player Stats: `GET /api/fantasy?action=stats&playerId=id&week=number`
+- **Purpose**: Gets comprehensive player statistics
+- **Input**: `?action=stats&playerId=id&week=number`
+- **Output**: Player stats including projections, historical data, and context
+
+#### Start/Sit Analysis: `POST /api/fantasy?action=start-sit`
 - **Purpose**: Analyzes two players and provides start/sit recommendations
 - **Input**: `{ playerAId, playerBId, week, scoring }`
 - **Output**: Recommendation with confidence, reasons, and player comparison data
-
-### 2. `/api/search/players` (GET)
-- **Purpose**: Searches for players in the user's Yahoo leagues
-- **Input**: `?q=player_name`
-- **Output**: Array of matching players with IDs
-
-### 3. `/api/players/stats` (GET)
-- **Purpose**: Gets comprehensive player statistics
-- **Input**: `?playerId=id&week=number`
-- **Output**: Player stats including projections, historical data, and context
 
 ## OAuth 2.0 Implementation
 

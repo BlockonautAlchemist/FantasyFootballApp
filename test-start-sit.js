@@ -23,7 +23,7 @@ async function testAPI() {
   // Test 2: Test player search endpoint
   console.log('\n🔍 Testing player search...');
   try {
-    const searchResponse = await fetch(`${BASE_URL}/api/search/players?q=waddle`);
+    const searchResponse = await fetch(`${BASE_URL}/api/fantasy?action=search&q=waddle`);
     if (searchResponse.status === 401) {
       console.log('⚠️  Player search requires authentication (expected)');
     } else if (searchResponse.ok) {
@@ -39,7 +39,7 @@ async function testAPI() {
   // Test 3: Test start/sit endpoint
   console.log('\n⚖️  Testing start/sit analysis...');
   try {
-    const startSitResponse = await fetch(`${BASE_URL}/api/start-sit`, {
+    const startSitResponse = await fetch(`${BASE_URL}/api/fantasy?action=start-sit`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -69,7 +69,7 @@ async function testAPI() {
   // Test 4: Test player stats endpoint
   console.log('\n📊 Testing player stats...');
   try {
-    const statsResponse = await fetch(`${BASE_URL}/api/players/stats?playerId=nfl.p.1234&week=8`);
+    const statsResponse = await fetch(`${BASE_URL}/api/fantasy?action=stats&playerId=nfl.p.1234&week=8`);
     if (statsResponse.status === 401) {
       console.log('⚠️  Player stats require authentication (expected)');
     } else if (statsResponse.ok) {
