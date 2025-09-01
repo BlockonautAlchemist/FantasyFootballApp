@@ -99,44 +99,120 @@ export async function comparePlayers(input: StartSitInput): Promise<StartSitResu
       ...mockData.default.result,
       facts: mockData.default.facts,
       sos: mockData.default.sos,
-      input: mockData.default.input
-    }), 500);
+      input: mockData.default.input as StartSitInput
+    } as StartSitResult & {facts: any; sos: any; input: StartSitInput}), 500);
   });
 }
 
 export async function getWaivers(week: number, position?: string): Promise<{candidates: WaiverItem[]; drops: PlayerSummary[]; faab: FAABGuidance[]}> {
   const mockData = await import("../mocks/waivers.mock.json");
   return new Promise((resolve) => {
-    setTimeout(() => resolve(mockData.default), 300);
+    setTimeout(() => resolve(mockData.default as {candidates: WaiverItem[]; drops: PlayerSummary[]; faab: FAABGuidance[]}), 300);
   });
 }
 
 export async function analyzeTrade(sideA: PlayerSummary[], sideB: PlayerSummary[]): Promise<TradeResult> {
   const mockData = await import("../mocks/trade.mock.json");
   return new Promise((resolve) => {
-    setTimeout(() => resolve(mockData.default), 800);
+    setTimeout(() => resolve(mockData.default as TradeResult), 800);
   });
 }
 
 export async function optimizeLineup(week: number): Promise<LineupRec> {
   const mockData = await import("../mocks/lineup.mock.json");
   return new Promise((resolve) => {
-    setTimeout(() => resolve(mockData.default), 600);
+    setTimeout(() => resolve(mockData.default as LineupRec), 600);
   });
 }
 
 export async function getSoS(pos?: string): Promise<SoSCell[]> {
   const mockData = await import("../mocks/sos.mock.json");
   return new Promise((resolve) => {
-    setTimeout(() => resolve(mockData.default), 400);
+    setTimeout(() => resolve(mockData.default as SoSCell[]), 400);
   });
 }
 
 export async function getNews(): Promise<NewsItem[]> {
   const mockData = await import("../mocks/news.mock.json");
   return new Promise((resolve) => {
-    setTimeout(() => resolve(mockData.default), 200);
+    setTimeout(() => resolve(mockData.default as NewsItem[]), 200);
   });
+}
+
+// New Yahoo Fantasy Sports API endpoints
+export async function getSession(): Promise<{connected: boolean; league_key: string | null; team_key: string | null; error?: string}> {
+  try {
+    const response = await fetch('/api/session', {
+      method: 'GET',
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to get session data');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error getting session:', error);
+    return { connected: false, league_key: null, team_key: null };
+  }
+}
+
+export async function getLeagueSettings(leagueKey: string): Promise<any> {
+  try {
+    const response = await fetch(`/api/yahoo/league-settings?league_key=${encodeURIComponent(leagueKey)}`, {
+      method: 'GET',
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to get league settings');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error getting league settings:', error);
+    throw error;
+  }
+}
+
+export async function getTeamRoster(teamKey: string, date?: string): Promise<any> {
+  try {
+    const params = new URLSearchParams({ team_key: teamKey });
+    if (date) params.append('date', date);
+    
+    const response = await fetch(`/api/yahoo/team-roster?${params}`, {
+      method: 'GET',
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to get team roster');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error getting team roster:', error);
+    throw error;
+  }
+}
+
+export async function getOptimalLineup(leagueKey: string, teamKey: string): Promise<any> {
+  try {
+    const response = await fetch(`/api/optimal-lineup?league_key=${encodeURIComponent(leagueKey)}&team_key=${encodeURIComponent(teamKey)}`, {
+      method: 'GET',
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to get optimal lineup');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error getting optimal lineup:', error);
+    throw error;
+  }
 }
 
 export async function searchPlayers(query: string): Promise<PlayerSummary[]> {
@@ -176,7 +252,7 @@ export async function searchPlayers(query: string): Promise<PlayerSummary[]> {
       ];
 
       // Filter based on query
-      const filtered = allPlayers.filter(player => 
+      const filtered = allPlayers.filter((player: PlayerSummary) => 
         player.name.toLowerCase().includes(query.toLowerCase()) ||
         player.team.toLowerCase().includes(query.toLowerCase())
       );
