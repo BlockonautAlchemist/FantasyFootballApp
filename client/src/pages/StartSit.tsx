@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { getSession, getOptimalLineup } from "@/services/api";
+import { getSession } from "@/services/api";
+import { getOptimalLineup } from "@/services/yahoo";
 import type { RosteredPlayer } from "@shared/types";
 
 export default function StartSit() {

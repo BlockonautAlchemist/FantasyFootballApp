@@ -139,7 +139,10 @@ export async function getNews(): Promise<NewsItem[]> {
   });
 }
 
-// New Yahoo Fantasy Sports API endpoints
+// Import Yahoo client wrapper
+import { getYahooLeagues, getLeagueSettings, getTeamRoster, getOptimalLineup } from './yahoo';
+
+// Session management
 export async function getSession(): Promise<{connected: boolean; league_key: string | null; team_key: string | null; error?: string}> {
   try {
     const response = await fetch('/api/session', {
@@ -158,62 +161,8 @@ export async function getSession(): Promise<{connected: boolean; league_key: str
   }
 }
 
-export async function getLeagueSettings(leagueKey: string): Promise<any> {
-  try {
-    const response = await fetch(`/api/yahoo/league-settings?league_key=${encodeURIComponent(leagueKey)}`, {
-      method: 'GET',
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to get league settings');
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error('Error getting league settings:', error);
-    throw error;
-  }
-}
-
-export async function getTeamRoster(teamKey: string, date?: string): Promise<any> {
-  try {
-    const params = new URLSearchParams({ team_key: teamKey });
-    if (date) params.append('date', date);
-    
-    const response = await fetch(`/api/yahoo/team-roster?${params}`, {
-      method: 'GET',
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to get team roster');
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error('Error getting team roster:', error);
-    throw error;
-  }
-}
-
-export async function getOptimalLineup(leagueKey: string, teamKey: string): Promise<any> {
-  try {
-    const response = await fetch(`/api/optimal-lineup?league_key=${encodeURIComponent(leagueKey)}&team_key=${encodeURIComponent(teamKey)}`, {
-      method: 'GET',
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to get optimal lineup');
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error('Error getting optimal lineup:', error);
-    throw error;
-  }
-}
+// Re-export Yahoo functions for backward compatibility
+export { getYahooLeagues, getLeagueSettings, getTeamRoster, getOptimalLineup };
 
 export async function searchPlayers(query: string): Promise<PlayerSummary[]> {
   // Mock implementation - will be replaced with real API call to /api/search/players?q={query}

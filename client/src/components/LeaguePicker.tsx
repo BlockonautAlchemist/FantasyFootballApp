@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
 import { Button } from "@/components/ui/button";
 import { useLeague } from "@/context/LeagueContext";
+import { getYahooLeagues, parseLeaguesFromYahooJson } from "@/services/yahoo";
 
 type League = {
   league_key: string;
@@ -32,14 +33,9 @@ export default function LeaguePicker({ onLeagueSelected }: LeaguePickerProps) {
 
   const loadLeagues = async () => {
     try {
-      const res = await fetch('/api/yahoo/leagues', { cache: 'no-store' });
-      const ct = res.headers.get('content-type') || '';
-      let payload: any = ct.includes('application/json') ? await res.json() : { error: 'non_json', snippet: await res.text() };
-
-      if (!res.ok) {
-        throw new Error(payload?.error || `fetch_failed_${res.status}`);
-      }
-      setLeagues(payload.leagues ?? []);
+      const data = await getYahooLeagues();
+      const leagues = parseLeaguesFromYahooJson(data);
+      setLeagues(leagues);
     } catch (e: any) {
       setError(e?.message ?? 'failed_fetch');
     } finally {
